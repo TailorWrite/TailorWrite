@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TailorWrite - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 transition-colors duration-500">
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-900 shadow-md py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-xl font-semibold text-gray-900 dark:text-gray-100">TailorWrite</h1>
+            <label for="darkModeToggle" class="flex items-center cursor-pointer">
+                <input type="checkbox" id="darkModeToggle" class="hidden">
+                <div class="relative">
+                    <div class="w-10 h-4 bg-gray-400 dark:bg-gray-600 rounded-full shadow-inner"></div>
+                    <div class="dot absolute w-6 h-6 bg-white dark:bg-gray-800 rounded-full shadow left-0 transition-transform duration-300 ease-in-out transform"></div>
+                </div>
+                <div class="ml-3 font-medium">Dark Mode</div>
+            </label>
+        </div>
+    </header>
+
+    <!-- Welcome Section -->
+    <section class="bg-gradient-to-b from-gray-200 via-gray-100 to-white dark:from-gray-800 dark:via-gray-900 dark:to-gray-900 py-16">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-4xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Create Tailored Cover Letters with AI</h2>
+                <p class="text-lg text-gray-800 dark:text-gray-200 mb-8">Craft professional cover letters customized for each job application effortlessly using AI.</p>
+                <a href="#" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-md shadow-md transition-colors duration-300">Get Started</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container mx-auto my-8 px-4 py-8 bg-white dark:bg-gray-900 shadow-lg rounded-lg">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">How it Works</h2>
+        <p class="text-lg text-gray-800 dark:text-gray-200 mb-4">TailorWrite uses advanced AI algorithms to analyze job descriptions and generate personalized cover letters.</p>
+        <p class="text-lg text-gray-800 dark:text-gray-200 mb-4">Simply input your details and the job title, and let TailorWrite create a tailored cover letter for you.</p>
+        <p class="text-lg text-gray-800 dark:text-gray-200 mb-4">Edit and customize your cover letter to match your preferences and specific job requirements.</p>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <p>&copy; 2024 TailorWrite. All rights reserved.</p>
+            <ul class="flex space-x-4">
+                <li><a href="#" class="hover:text-gray-200">Privacy Policy</a></li>
+                <li><a href="#" class="hover:text-gray-200">Terms of Service</a></li>
+                <li><a href="#" class="hover:text-gray-200">Contact Us</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <!-- JavaScript for dark mode toggle -->
+    <script src="script.js"></script>
+</body>
+</html>
