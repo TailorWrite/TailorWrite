@@ -2,7 +2,8 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-    <img src="frontend/public/images/Stucal Blue.png" alt="Logo">
+    <!-- <img src="frontend/public/images/Stucal Blue.png" alt="Logo"> -->
+    <h1 align="center">TailorWrite</h1>
     <!-- <h1 align="center"> StuCal</h1> -->
     <h6 align="center">July 2024 - October 2024</h6>
     
