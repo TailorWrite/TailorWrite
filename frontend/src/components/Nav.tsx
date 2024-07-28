@@ -5,6 +5,7 @@ import { Dialog, DialogPanel } from '@headlessui/react';
 import { Switch } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
+import Logo from './Logo';
 import PathConstants from '../routes/pathConstants';
 
 const navigation = [
@@ -36,11 +37,7 @@ export default function Nav() {
                 <div className="flex lg:flex-1">
                     <Link to={PathConstants.HOME} className="-m-1.5 p-1.5">
                         <span className="sr-only">TailorWrite</span>
-                        <img
-                            alt=""
-                            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                            className="h-8 w-auto"
-                        />
+                        <Logo className="h-8 w-auto" />
                     </Link>
                 </div>
                 <div className="flex lg:hidden">
@@ -65,6 +62,7 @@ export default function Nav() {
                         <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6">
                             
                             {
+                                // Toggling between sun and moon icons within the toggle 
                                 darkMode ? (
                                     <svg viewBox="0 0 24 24" fill="none" className="size-4">
                                         <path fill-rule="evenodd" clip-rule="evenodd" d="M17.715 15.15A6.5 6.5 0 0 1 9 6.035C6.106 6.922 4 9.645 4 12.867c0 3.94 3.153 7.136 7.042 7.136 3.101 0 5.734-2.032 6.673-4.853Z" className="fill-gray-400/20"></path>
@@ -92,13 +90,9 @@ export default function Nav() {
                     <div className="flex items-center justify-between">
                         <Link to={PathConstants.HOME} className="-m-1.5 p-1.5">
                             <span className="sr-only">TailorWrite</span>
-                            <img
-                                alt=""
-                                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                                className="h-8 w-auto"
-                            />
+                            <Logo className="h-8 w-auto" />
                         </Link>
-                        <div className="flex gap-2 grid-cols-2 justify-end">
+                        <div className="flex     gap-2 grid-cols-2 justify-end">
                             <Switch checked={darkMode} onChange={setDarkMode} className="group my-auto inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition data-[checked]:bg-blue-600 ">
                                 <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6">
 
