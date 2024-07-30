@@ -1,5 +1,5 @@
-import Nav from '../components/Nav';
 import Logo from '../components/Logo';
+import { Link } from 'react-router-dom';
 
 export default function LoginPage() {
 
@@ -9,8 +9,6 @@ export default function LoginPage() {
 
     return (
         <>
-            <Nav />
-
             <div className="flex min-h-screen flex-1 flex-col justify-center px-6 py-12 lg:px-8 dark:bg-gray-900">
                 <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                     <Logo className="mx-auto h-10 w-auto" />
@@ -73,9 +71,9 @@ export default function LoginPage() {
 
                     <p className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
                         Not a member?{' '}
-                        <a href="#" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+                        <Link to="/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
                             Create an account now!
-                        </a>
+                        </Link>
                     </p>
                 </div>
             </div>
