@@ -12,7 +12,6 @@ CREATE TABLE users (
     first_name VARCHAR(100),
     last_name VARCHAR(100),
     phone_number VARCHAR(20),
-    address TEXT,
     bio TEXT,
     profile_picture_url TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -25,7 +24,8 @@ CREATE TABLE experience (
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     job_title VARCHAR(100),
     company_name VARCHAR(100),
-    start_date DATE,
+    is_current_job BOOL NOT NULL,
+    start_date DATE NOT NULL,
     end_date DATE,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -69,3 +69,6 @@ CREATE TABLE job_applications (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+GRANT USAGE, SELECT ON SEQUENCE users_id_seq TO anon;
