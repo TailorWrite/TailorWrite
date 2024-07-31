@@ -11,9 +11,7 @@ interface NavigationItem {
     icon: React.ReactNode;
 }
 
-export default function DefaultSidebar({ navigation, userNavigation }: { navigation: NavigationItem[], userNavigation: NavigationItem[]}) {
-
-    // const [openAlert, setOpenAlert] = React.useState(true);
+export default function DefaultSidebar({ title, navigation, userNavigation }: { title: string, navigation: NavigationItem[], userNavigation: NavigationItem[]}) {
     
     return (
         <Card
@@ -24,7 +22,7 @@ export default function DefaultSidebar({ navigation, userNavigation }: { navigat
         >
             <div className="mb-2 p-4">
                 <Typography className="dark:text-white" variant="h5" color="blue-gray" placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>
-                    Dashboard
+                    Dashboard {title}
                 </Typography>
             </div>
             <List placeholder="" onPointerEnterCapture={() => {}} onPointerLeaveCapture={() => {}}>

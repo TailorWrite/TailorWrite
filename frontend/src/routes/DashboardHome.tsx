@@ -2,7 +2,9 @@ import {
     MagnifyingGlassIcon,
     ChevronUpDownIcon,
     LinkIcon,
+    DocumentTextIcon,
 } from "@heroicons/react/24/outline";
+
 import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import {
     Card,
@@ -20,6 +22,8 @@ import {
     IconButton,
     Tooltip,
 } from "@material-tailwind/react";
+import { useEffect, useState } from "react";
+// import { useOutletContext } from "react-router-dom";
 
 const TABS = [
     { label: "All", value: "all", },
@@ -33,7 +37,7 @@ const TABLE_HEAD = ["Company", "Role", "Status", "Date", "Actions"];
 
 const TABLE_ROWS = [
     {
-        img: "https://docs.material-tailwind.com/img/logos/logo-google.svg",
+        img: "https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png",
         name: "Google",
         job: "Graduate Software Engineer",
         org: "",
@@ -42,11 +46,29 @@ const TABLE_ROWS = [
         link: "https://www.google.com",
     },
     {
-        img: "https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png",
-        name: "Google",
-        job: "Graduate Software Engineer",
+        img: "https://storage.googleapis.com/pr-newsroom-wp/1/2023/05/Spotify_Primary_Logo_RGB_Green.png",
+        name: "Spotify",
+        job: "Fullstack Engineer",
         org: "",
         status: "Interview",
+        date: "23/04/18",
+        link: "https://www.google.com",
+    },
+    {
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Facebook_Logo_2023.png/768px-Facebook_Logo_2023.png",
+        name: "Facebook",
+        job: "Graduate QA Engineer",
+        org: "",
+        status: "Rejected",
+        date: "23/04/18",
+        link: "https://www.google.com",
+    },
+    {
+        img: "https://freelogopng.com/images/all_img/1659761207uber-app-logo-png.png",
+        name: "Uber",
+        job: "Principal Software Engineer",
+        org: "",
+        status: "Offer",
         date: "23/04/18",
         link: "https://www.google.com",
     },
@@ -65,6 +87,24 @@ export default function DashboardTable() {
         console.log("Add Job Application");
     };
 
+    let isFetching = false;
+    const getJobApplications = () => {
+        // TODO: Query the API to get the job applications for the user
+        console.log("Get Job Applications");
+    }
+    
+    
+    const [filter, setFilter] = useState('all'); 
+    const [searchTerm, setSearchTerm] = useState('');
+    const handleSearch = (e) => setSearchTerm(e.target.value.toLowerCase());
+    
+    useEffect(() => {
+        if (!isFetching) getJobApplications();
+        isFetching = true;
+    }, [])
+
+    // const { setTitle } = useOutletContext();
+    // setTitle("Application Tracker");
 
     return (
         <Card className="w-full dark:bg-gray-800">
@@ -76,13 +116,10 @@ export default function DashboardTable() {
                             Application Tracker
                         </Typography>
                         <Typography color="gray" className="mt-1 font-normal dark:text-gray-400" >
-                            Track status of your job applications 
+                            Track the status of your job applications 
                         </Typography>
                     </div>
                     <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-                        <Button variant="outlined" size="sm" className="dark:text-white dark:border-gray-400">
-                            view all
-                        </Button>
                         <Button className="flex items-center gap-3 dark:bg-white dark:text-black" size="sm" onClick={addJobApplication}>
                             <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Job Application
                         </Button>
@@ -92,7 +129,7 @@ export default function DashboardTable() {
                     <Tabs value="all" className="w-full md:w-max">
                         <TabsHeader>
                             {TABS.map(({ label, value }) => (
-                                <Tab key={value} value={value}>
+                                <Tab key={value} value={value} onClick={() => setFilter(value)}>
                                     &nbsp;&nbsp;{label}&nbsp;&nbsp;
                                 </Tab>
                             ))}
@@ -101,6 +138,7 @@ export default function DashboardTable() {
                     <div className="w-full md:w-72">
                         <Input
                             label="Search"
+                            onChange={handleSearch}
                             icon={<MagnifyingGlassIcon className="h-5 w-5" />}
                         />
                     </div>
@@ -131,13 +169,17 @@ export default function DashboardTable() {
                         </tr>
                     </thead>
                     <tbody>
-                        {TABLE_ROWS.map(
-                            ({ img, name, job, org, status, date }, index) => {
+                        {TABLE_ROWS.filter(
+                            ({ name, job, status }) =>
+                                (filter === "all" || status.toLowerCase() === filter) &&
+                                (name.toLowerCase().includes(searchTerm) || job.toLowerCase().includes(searchTerm))
+                        ).map(
+                            ({ img, name, job, org, status, date, link }, index) => {
                                 const isLast = index === TABLE_ROWS.length - 1;
                                 const classes = isLast ? "p-4" : "p-4 border-b border-blue-gray-50";
 
                                 return (
-                                    <tr key={name}>
+                                    <tr key={index}>
                                         <td className={classes}>
                                             <div className="flex items-center gap-3">
                                                 <Avatar src={img} alt={name} size="sm" />
@@ -189,12 +231,19 @@ export default function DashboardTable() {
                                                 {date}
                                             </Typography>
                                         </td>
-                                        <td className={`${classes} flex gap-2 justify-end`}>
-                                            <Tooltip content="Application Link">
+                                        <td className={`${classes} flex gap-2 justify-center`}>
+                                            <Tooltip content="Cover Letter">
                                                 <IconButton variant="text">
-                                                    <LinkIcon className="h-4 w-4 dark:text-white" />
+                                                    <DocumentTextIcon className="h-4 w-4 text-blue-400" />
                                                 </IconButton>
                                             </Tooltip>
+                                            <a href={link} target="_blank">
+                                                <Tooltip content="Application Link">
+                                                    <IconButton variant="text">
+                                                        <LinkIcon className="h-4 w-4 dark:text-white" />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </a>
                                             <Tooltip content="Edit Application">
                                                 <IconButton variant="text">
                                                     <PencilIcon className="h-4 w-4 dark:text-white" />

@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import DashboardNav from '../components/DashboardNav';
 import PathConstants from './pathConstants';
+import { useState } from 'react';
 
 export default function NewDashboardRouter() {
 
@@ -18,14 +19,16 @@ export default function NewDashboardRouter() {
         { name: 'Sign out', route: '#', current: false, icon: <PowerIcon className="h-5 w-5" /> },
     ]
 
+    const [title, setTitle] = useState("");
+
     return (
         <div className="antialiased bg-gray-50 dark:bg-gray-900">
             <DashboardNav />
 
-            <Sidebar navigation={navigation} userNavigation={userNavigation} />            
+            <Sidebar title={title} navigation={navigation} userNavigation={userNavigation} />            
 
             <main className="md:ml-80 h-screen pt-20 p-5 bg-white dark:bg-gray-800">
-                <Outlet />
+                <Outlet context={{ setTitle }} />
             </main>
         </div>
     )
