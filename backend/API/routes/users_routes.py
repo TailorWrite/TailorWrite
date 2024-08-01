@@ -7,7 +7,6 @@ users_bp = Blueprint('users', __name__)
 @users_bp.route('', methods=['POST'])
 def create():
     data = request.json
-    print(data)
     try:
         response = create_user(data)
         id = str(response).split("user=User(id='")[1].split("'")[0]
