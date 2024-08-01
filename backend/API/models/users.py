@@ -12,6 +12,7 @@ def create_profile(data):
     return supabase.table('profiles').insert(data).execute()
 
 def get_user(user_id):
+    print(user_id)
     return supabase.table('profiles').select('*').eq('id', user_id).execute()
 
 def update_user(user_id, data):

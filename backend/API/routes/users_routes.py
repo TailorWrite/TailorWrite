@@ -1,12 +1,13 @@
 # routes/users_routes.py
 from flask import Blueprint, request, jsonify
-from models.users import create_user, create_profile, sign_in, get_user, update_user, delete_user
+from models.users import create_user, create_profile, get_user, update_user, delete_user
 
 users_bp = Blueprint('users', __name__)
 
 @users_bp.route('', methods=['POST'])
 def create():
     data = request.json
+    print(data)
     try:
         response = create_user(data)
         id = str(response).split("user=User(id='")[1].split("'")[0]
@@ -17,7 +18,7 @@ def create():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-@users_bp.route('/<int:user_id>', methods=['GET'])
+@users_bp.route('/<string:user_id>', methods=['GET'])
 def read(user_id):
     try:
         response = get_user(user_id)
@@ -29,7 +30,7 @@ def read(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-@users_bp.route('/<int:user_id>', methods=['PUT'])
+@users_bp.route('/<string:user_id>', methods=['PUT'])
 def update(user_id):
     data = request.json
     try:
@@ -38,7 +39,7 @@ def update(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-@users_bp.route('/<int:user_id>', methods=['DELETE'])
+@users_bp.route('/<string:user_id>', methods=['DELETE'])
 def delete(user_id):
     try:
         response = delete_user(user_id)

@@ -1,12 +1,50 @@
 // import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'; 
 
+import axios from 'axios';
 import Logo from '../components/Logo';
 
 export default function SignupPage() {
 
-    const signUp = () => {
-        console.log('Sign up');
-    }
+    const signUp = async () => {
+        // Define the data to be sent in the request body
+        const requestData = {
+            email: "john.doe@example.com",
+            password: "this!@32password",
+            profile: {
+                first_name: "John",
+                last_name: "Doe",
+                bio: "This is my bio",
+                id: "1224-4322"
+            }
+        };
+    
+        try {
+            // Perform the fetch request
+            const response = await fetch('http://localhost:5000/users', {
+                method: 'POST', // Specify the method
+                headers: {
+                    'Content-Type': 'application/json' // Specify the content type
+                },
+                body: JSON.stringify(requestData) // Convert the request data to JSON
+            });
+    
+            // Check if the response is ok (status code 200-299)
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            // Parse the JSON response
+            const data = await response.json();
+    
+            // Log the response data
+            console.log('Response:', data);
+    
+        } catch (error) {
+            // Handle and log any errors
+            console.log("fuck")
+            console.error('Error:', error);
+        }
+    };
 
     return (
         <>
