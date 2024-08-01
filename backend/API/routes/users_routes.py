@@ -1,6 +1,6 @@
 # routes/users_routes.py
 from flask import Blueprint, request, jsonify
-from models.users import create_user, get_user, update_user, delete_user
+from models.users import create_user, create_profile, sign_in, get_user, update_user, delete_user
 
 users_bp = Blueprint('users', __name__)
 
@@ -9,7 +9,11 @@ def create():
     data = request.json
     try:
         response = create_user(data)
-        return jsonify(response.data), 201
+        id = str(response).split("user=User(id='")[1].split("'")[0]
+        profile = data['profile']
+        profile['id'] = id
+        response = create_profile(profile)
+        return str(response), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
