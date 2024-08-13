@@ -22,6 +22,7 @@ import {
     IconButton,
     Tooltip,
 } from "@material-tailwind/react";
+
 import { useEffect, useState } from "react";
 // import { useOutletContext } from "react-router-dom";
 
@@ -74,7 +75,10 @@ const TABLE_ROWS = [
     },
 ];
 
-const STATUS_MAP: { [key: string]: string } = {
+type ChipColor = "blue" | "yellow" | "red" | "green";
+
+// Define the STATUS_MAP using the ChipColor type
+const STATUS_MAP: { [key: string]: ChipColor } = {
     Applied: "blue",
     Interview: "yellow",
     Rejected: "red",
@@ -96,7 +100,7 @@ export default function DashboardTable() {
     
     const [filter, setFilter] = useState('all'); 
     const [searchTerm, setSearchTerm] = useState('');
-    const handleSearch = (e) => setSearchTerm(e.target.value.toLowerCase());
+    const handleSearch = (e: { target: { value: string; }; }) => setSearchTerm(e.target.value.toLowerCase());
     
     useEffect(() => {
         if (!isFetching) getJobApplications();
@@ -107,29 +111,29 @@ export default function DashboardTable() {
     // setTitle("Application Tracker");
 
     return (
-        <Card className="w-full dark:bg-gray-800">
+        <Card className="w-full dark:bg-gray-800" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}>
 
             <CardHeader floated={false} shadow={false} className="rounded-none dark:bg-gray-800">
                 <div className="mb-8 flex items-center justify-between gap-8 ">
                     <div>
-                        <Typography variant="h5" color="blue-gray" className="dark:text-white">
+                        <Typography variant="h5" color="blue-gray" className="dark:text-white" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}>
                             Application Tracker
                         </Typography>
-                        <Typography color="gray" className="mt-1 font-normal dark:text-gray-400" >
+                        <Typography color="gray" className="mt-1 font-normal dark:text-gray-400" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} >
                             Track the status of your job applications 
                         </Typography>
                     </div>
                     <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-                        <Button className="flex items-center gap-3 dark:bg-white dark:text-black" size="sm" onClick={addJobApplication}>
+                        <Button className="flex items-center gap-3 dark:bg-white dark:text-black" size="sm" onClick={addJobApplication} placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}>
                             <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Job Application
                         </Button>
                     </div>
                 </div>
                 <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
                     <Tabs value="all" className="w-full md:w-max">
-                        <TabsHeader>
+                        <TabsHeader placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}>
                             {TABS.map(({ label, value }) => (
-                                <Tab key={value} value={value} onClick={() => setFilter(value)}>
+                                <Tab key={value} value={value} onClick={() => setFilter(value)} placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}>
                                     &nbsp;&nbsp;{label}&nbsp;&nbsp;
                                 </Tab>
                             ))}
@@ -139,13 +143,12 @@ export default function DashboardTable() {
                         <Input
                             label="Search"
                             onChange={handleSearch}
-                            icon={<MagnifyingGlassIcon className="h-5 w-5" />}
-                        />
+                            icon={<MagnifyingGlassIcon className="h-5 w-5" />} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} crossOrigin={undefined}                        />
                     </div>
                 </div>
             </CardHeader>
 
-            <CardBody className="px-0 min-h-full">
+            <CardBody className="px-0 min-h-full" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}>
                 <table className="mt-4 w-full min-w-max table-auto text-left">
                     <thead>
                         <tr>
@@ -157,8 +160,7 @@ export default function DashboardTable() {
                                     <Typography
                                         variant="small"
                                         color="blue-gray"
-                                        className={`flex items-center justify-between gap-2 font-normal leading-none opacity-70 ${(index === TABLE_HEAD.length - 1) ? "justify-end pr-4" : ""} dark:text-white`}
-                                    >
+                                        className={`flex items-center justify-between gap-2 font-normal leading-none opacity-70 ${(index === TABLE_HEAD.length - 1) ? "justify-end pr-4" : ""} dark:text-white`} placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}                                    >
                                         {head}{" "}
                                         {index < TABLE_HEAD.length - 1 && (
                                             <ChevronUpDownIcon strokeWidth={2} className="h-4 w-4" />
@@ -182,12 +184,12 @@ export default function DashboardTable() {
                                     <tr key={index}>
                                         <td className={classes}>
                                             <div className="flex items-center gap-3">
-                                                <Avatar src={img} alt={name} size="sm" />
+                                                <Avatar src={img} alt={name} size="sm" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined} />
                                                 <div className="flex flex-col">
                                                     <Typography
                                                         variant="small"
                                                         color="blue-gray"
-                                                        className="font-normal dark:text-white"
+                                                        className="font-normal dark:text-white" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}
                                                     >
                                                         {name}
                                                     </Typography>
@@ -199,14 +201,13 @@ export default function DashboardTable() {
                                                 <Typography
                                                     variant="small"
                                                     color="blue-gray"
-                                                    className="font-normal dark:text-white"
-                                                >
+                                                    className="font-normal dark:text-white" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}                                                >
                                                     {job}
                                                 </Typography>
                                                 <Typography
                                                     variant="small"
                                                     color="blue-gray"
-                                                    className="font-normal opacity-70 dark:text-white"
+                                                    className="font-normal opacity-70 dark:text-white" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}
                                                 >
                                                     {org}
                                                 </Typography>
@@ -226,26 +227,26 @@ export default function DashboardTable() {
                                             <Typography
                                                 variant="small"
                                                 color="blue-gray"
-                                                className="font-normal dark:text-white"
+                                                className="font-normal dark:text-white" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}
                                             >
                                                 {date}
                                             </Typography>
                                         </td>
                                         <td className={`${classes} flex gap-2 justify-center`}>
                                             <Tooltip content="Cover Letter">
-                                                <IconButton variant="text">
+                                                <IconButton variant="text" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}>
                                                     <DocumentTextIcon className="h-4 w-4 text-blue-400" />
                                                 </IconButton>
                                             </Tooltip>
                                             <a href={link} target="_blank">
                                                 <Tooltip content="Application Link">
-                                                    <IconButton variant="text">
+                                                    <IconButton variant="text" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}>
                                                         <LinkIcon className="h-4 w-4 dark:text-white" />
                                                     </IconButton>
                                                 </Tooltip>
                                             </a>
                                             <Tooltip content="Edit Application">
-                                                <IconButton variant="text">
+                                                <IconButton variant="text" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}>
                                                     <PencilIcon className="h-4 w-4 dark:text-white" />
                                                 </IconButton>
                                             </Tooltip>
@@ -258,15 +259,15 @@ export default function DashboardTable() {
                 </table>
             </CardBody>
 
-            <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-                <Typography variant="small" color="blue-gray" className="font-normal dark:text-white">
+            <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}>
+                <Typography variant="small" color="blue-gray" className="font-normal dark:text-white" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}>
                     Page 1 of 10
                 </Typography>
                 <div className="flex gap-2">
-                    <Button variant="outlined" size="sm" className="dark:text-white dark:border-gray-400">
+                    <Button variant="outlined" size="sm" className="dark:text-white dark:border-gray-400" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}>
                         Previous
                     </Button>
-                    <Button variant="outlined" size="sm" className="dark:text-white dark:border-gray-400">
+                    <Button variant="outlined" size="sm" className="dark:text-white dark:border-gray-400" placeholder={undefined} onPointerEnterCapture={undefined} onPointerLeaveCapture={undefined}>
                         Next
                     </Button>
                 </div>

@@ -1,4 +1,4 @@
-import { BriefcaseIcon, CubeTransparentIcon, FingerPrintIcon } from "@heroicons/react/24/solid";
+import { BriefcaseIcon } from "@heroicons/react/24/solid";
 
 interface LogoProps {
     className?: string;

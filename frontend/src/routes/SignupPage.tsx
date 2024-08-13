@@ -12,7 +12,7 @@ export default function SignupPage() {
     });
 
     // Handle input changes
-    const handleChange = (e) => {
+    const handleChange = (e: { target: { name: any; value: any; }; }) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
             ...prevData,
@@ -21,7 +21,7 @@ export default function SignupPage() {
     };
 
     // Handle form submission
-    const signUp = async (e) => {
+    const signUp = async (e: { preventDefault: () => void; }) => {
         e.preventDefault(); // Prevent default form submission behavior
 
         const requestData = {
