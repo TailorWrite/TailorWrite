@@ -14,7 +14,7 @@ const navigation = [
     { name: 'Product', href: '#' },
     { name: 'Features', href: '#' },
     { name: 'Marketplace', href: '#' },
-    { name: 'Company', href: '#' },
+    { name: 'Company', href: PathConstants.DASHBOARD },
 ]
 
 export default function Nav() {
@@ -54,9 +54,9 @@ export default function Nav() {
                 </div>
                 <div className="hidden lg:flex lg:gap-x-12">
                     {navigation.map((item) => (
-                        <a key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-gray-900 dark:text-white">
+                        <Link key={item.name} to={item.href} className="text-sm font-semibold leading-6 text-gray-900 dark:text-white">
                             {item.name}
-                        </a>
+                        </Link>
                     ))}
                 </div>
                 <div className="hidden lg:flex lg:flex-1 lg:gap-4 lg:justify-end">
