@@ -1,0 +1,58 @@
+@startuml Create Account
+
+title Communication between Frontend, Backend and Database
+
+' === Style Tweaks ===
+
+skinparam {
+	Style strictuml
+	RoundCorner 5
+	BoxPadding 35
+	ParticipantPadding 15
+    Padding 2
+
+	Sequence {
+		' make activations yellow too
+		LifeLineBackgroundColor #FDFDCD
+
+		' make stereotypes more presentable
+		Stereotype {
+			Font {
+				Size 11
+				Style plain
+			}
+		}
+	}
+
+	Database {
+		' make database border consistent with the rest of the diagram
+		BorderColor #A80036
+	}
+
+}
+
+' === Actors / Participants
+actor "User" as user 
+participant "React Frontend" as frontend <<Frontend>>
+participant "Python Flask API" as backend <<Backend>>
+database "Python Flask API" as db <<Database>>
+
+' Messages
+
+user -> frontend : Navigates to Job Dashboard
+
+    group Check if user's authentication and authorisation
+            frontend -> backend : GET request to /uuid/jobs
+                backend -> db : SELECT * FROM jobs
+                backend <-- db : Returns jobs
+            frontend <-- backend : Returns jobs
+        user <-- frontend : Displays jobs within view on Dashboard
+    
+    else Redirect back to login page 
+        frontend -> frontend : Redirect to Login Page
+        user <-- frontend : Present login page 
+        
+    end
+    
+
+@enduml
