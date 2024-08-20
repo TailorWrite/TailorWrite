@@ -1,11 +1,11 @@
-DROP TABLE IF EXISTS job_applications;
-DROP TABLE IF EXISTS education;
-DROP TABLE IF EXISTS skills;
-DROP TABLE IF EXISTS experience;
-DROP TABLE IF EXISTS profiles;
+DROP TABLE IF EXISTS job_applications CASCADE;
+DROP TABLE IF EXISTS education CASCADE;
+DROP TABLE IF EXISTS skills CASCADE;
+DROP TABLE IF EXISTS experience CASCADE;
+DROP TABLE IF EXISTS accounts CASCADE;
 
--- Create profiles table
-CREATE TABLE profiles (
+-- Create accounts table
+CREATE TABLE accounts (
     id uuid PRIMARY KEY,
     first_name VARCHAR(100),
     last_name VARCHAR(100),
@@ -25,7 +25,7 @@ CREATE TABLE profiles (
 -- Create experience table
 CREATE TABLE experience (
     id SERIAL PRIMARY KEY,
-    user_id uuid REFERENCES profiles(id) ON DELETE CASCADE,
+    user_id uuid REFERENCES accounts(id) ON DELETE CASCADE,
     job_title VARCHAR(100),
     company_name VARCHAR(100),
     is_current_job BOOL NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE experience (
 -- Create skills table
 CREATE TABLE skills (
     id SERIAL PRIMARY KEY,
-    user_id uuid REFERENCES profiles(id) ON DELETE CASCADE,
+    user_id uuid REFERENCES accounts(id) ON DELETE CASCADE,
     skill_name VARCHAR(100),
     proficiency_level VARCHAR(50),  -- e.g., Beginner, Intermediate, Expert
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -49,7 +49,7 @@ CREATE TABLE skills (
 -- Create education table
 CREATE TABLE education (
     id SERIAL PRIMARY KEY,
-    user_id uuid REFERENCES profiles(id) ON DELETE CASCADE,
+    user_id uuid REFERENCES accounts(id) ON DELETE CASCADE,
     institution_name VARCHAR(100),
     degree VARCHAR(100),
     field_of_study VARCHAR(100),
@@ -63,7 +63,7 @@ CREATE TABLE education (
 -- Create job_applications table
 CREATE TABLE job_applications (
     id SERIAL PRIMARY KEY,
-    user_id uuid REFERENCES profiles(id) ON DELETE CASCADE,
+    user_id uuid REFERENCES accounts(id) ON DELETE CASCADE,
     application_url VARCHAR(250),
     job_title VARCHAR(100),
     company_name VARCHAR(100),
@@ -72,4 +72,15 @@ CREATE TABLE job_applications (
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+
+
+alter policy "Enable all actions for users based on user_id"
+on "public"."accounts"
+to public
+using (
+    (( SELECT auth.uid() AS uid) = id)
 );
