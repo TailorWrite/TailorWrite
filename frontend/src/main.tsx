@@ -8,6 +8,7 @@ import Root from "./routes/root";
 import PathConstants from './routes/pathConstants';
 
 import LoginPage from "./routes/LoginPage";
+import ProfilePage from './routes/ProfilePage';
 import SignupPage from "./routes/SignupPage";
 import ErrorPage from "./routes/ErrorPage";
 import LandingPage from './routes/LandingPage';
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
       {
         path: PathConstants.ARCHIVE, 
         element: <NotFound />,    // TODO: Add sections here
+      },
+      {
+        path: PathConstants.PROFILE, 
+        element: <ProfilePage />,    // TODO: Add sections here
       }
     ]
   },
