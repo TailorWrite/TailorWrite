@@ -1,11 +1,13 @@
-# app.py
 from flask import Flask, request
 from flask_cors import CORS
+from flask_restx import Api, Resource
 from routes import register_routes
 
 app = Flask(__name__)
 CORS(app)  # This handles CORS preflight requests automatically
-register_routes(app)
+api = Api(app, doc='/swagger')  # Swagger UI available at /swagger
+
+register_routes(api)  # Modify this function to accept 'api' instead of 'app'
 
 @app.before_request
 def handle_options():
