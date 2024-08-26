@@ -1,6 +1,7 @@
-from flask_restx import Namespace, Resource, fields
+from flask_restx import Namespace, Resource, fields, reqparse, api
 from flask import request, jsonify
-from models.users import create_user, create_account, get_user, update_user, delete_user
+from models.users import create_user, create_account, get_user, update_user, delete_user, login_user, validate_token
+from functools import wraps
 
 # Define the namespace
 users_ns = Namespace('users', description='User operations')
@@ -34,6 +35,27 @@ update_account_model = users_ns.model('Account', {
     'phone': fields.String(required=False, description='The user phone number', example="1234567890")
 })
 
+login_model = users_ns.model('Login', {
+    'email': fields.String(required=True, description='The user email', example='user@example.com'),
+    'password': fields.String(required=True, description='The user password', example='securepassword123')
+})
+
+# Authentication decorator
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        if not token:
+            return {'message': 'Authentication token is missing'}, 401
+        try:
+            result = validate_token(token)
+            if not result['valid']:
+                return {'message': 'Invalid authentication token'}, 401
+        except Exception as e:
+            return {'message': str(e)}, 401
+        return f(*args, **kwargs)
+    return decorated
+
 
 @users_ns.route('')
 class UserList(Resource):
@@ -55,6 +77,8 @@ class UserList(Resource):
 
 @users_ns.route('/<string:user_id>')
 class User(Resource):
+    @token_required
+    @users_ns.doc(security='apikey')
     @users_ns.response(200, 'Success', account_model)
     @users_ns.response(404, 'User not found')
     def get(self, user_id):
@@ -69,7 +93,8 @@ class User(Resource):
         except Exception as e:
             return {'error': str(e)}, 400
 
-    @users_ns.expect(account_model)
+    @token_required  # Require token for this route
+    @users_ns.doc(security='apikey')
     @users_ns.response(200, 'User updated successfully', user_model)
     @users_ns.response(400, 'Bad Request')
     def put(self, user_id):
@@ -83,6 +108,8 @@ class User(Resource):
         except Exception as e:
             return {'error': str(e)}, 400
 
+    @token_required
+    @users_ns.doc(security='apikey')
     @users_ns.response(200, 'User deleted successfully')
     @users_ns.response(400, 'Bad Request')
     def delete(self, user_id):
@@ -92,3 +119,24 @@ class User(Resource):
             return {'message': 'User deleted successfully'}, 200
         except Exception as e:
             return {'error': str(e)}, 400
+
+@users_ns.route('/login')
+class UserLogin(Resource):
+    @users_ns.expect(login_model)
+    @users_ns.doc(parser=None)  # Exclude auth parser for login
+    @users_ns.response(200, 'Login successful')
+    @users_ns.response(401, 'Unauthorized')
+    def post(self):
+        """Login a user"""
+        data = request.json
+        email = data.get('email')
+        password = data.get('password')
+
+        try:
+            response = login_user(email, password)
+            session = response.session
+            access_token = response.session.access_token
+            refresh_token = response.session.refresh_token
+            return {'message': 'Login successful', 'access_token': access_token, 'refresh_token': refresh_token}, 200
+        except Exception as e:
+            return {'error': str(e)}, 401

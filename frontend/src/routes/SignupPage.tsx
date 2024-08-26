@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import PathConstants from './pathConstants';
 
 export default function SignupPage() {
     // State to manage form values
@@ -11,7 +12,7 @@ export default function SignupPage() {
     });
 
     // Handle input changes
-    const handleChange = (e) => {
+    const handleChange = (e: { target: { name: any; value: any; }; }) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
             ...prevData,
@@ -26,7 +27,7 @@ export default function SignupPage() {
         const requestData = {
             email: formData.email,
             password: formData.password,
-            profile: {
+            account_info: {
                 first_name: formData.firstName,
                 last_name: formData.lastName,
                 email: formData.email,
@@ -34,7 +35,7 @@ export default function SignupPage() {
         };
 
         try {
-            const response = await axios.post('http://localhost:5000/users', requestData, {
+            const response = await axios.post(PathConstants.API.USERS, requestData, {
                 headers: {
                     'Content-Type': 'application/json'
                 }

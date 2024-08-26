@@ -2,21 +2,51 @@ from flask import Flask, request
 from flask_cors import CORS
 from flask_restx import Api, Resource
 from routes import register_routes
+import logging
+
+# logging.basicConfig(level=logging.DEBUG)
+# logger = logging.getLogger(__name__)
+
+authorizations = {
+    'apikey': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization'  # Header name
+    },
+}
+
+
 
 app = Flask(__name__)
-CORS(app)  # This handles CORS preflight requests automatically
-api = Api(app, doc='/swagger')  # Swagger UI available at /swagger
+# CORS(app)  # This handles CORS preflight requests automatically
+CORS(app, resources={r"/*": {
+    "origins": "*",
+    "allow_headers": ["Content-Type", "Authorization", "Authenticate_token"],
+    "expose_headers": ["Content-Type", "Authorization", "Authenticate_token"],
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+}})
+api = Api(
+    app,
+    version='1.0',
+    title='Your API Title',
+    description='Your API Description',
+    authorizations=authorizations,
+    security='apikey',  # Reference the security definition
+    doc='/swagger'
+)
 
-register_routes(api)  # Modify this function to accept 'api' instead of 'app'
+
+register_routes(api)
 
 @app.before_request
-def handle_options():
+def handle_preflight():
     if request.method == 'OPTIONS':
-        response = app.make_response('')
+        response = app.make_default_options_response()
         response.headers['Access-Control-Allow-Origin'] = '*'
         response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authenticate_token, Authorization'
         return response
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
