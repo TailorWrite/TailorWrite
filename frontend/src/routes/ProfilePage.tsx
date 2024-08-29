@@ -5,6 +5,12 @@ import {
 import React, { useState } from "react";
 import { UserPlusIcon } from "@heroicons/react/24/solid";
 
+import { Datepicker } from "flowbite-react";
+
+export function DatePicker() {
+  return <Datepicker />;
+}
+
 // ExperienceForm Component
 function ExperienceForm({index})  {
   const [isCurrentJob, setIsCurrentJob] = useState(false);
@@ -15,6 +21,7 @@ function ExperienceForm({index})  {
   };
 
   return (
+    <form>
     <div className="border-b border-gray-900/10 pb-12">
       <h3 className="text-base font-semibold leading-7 text-gray-900 mt-5">Experience {index + 1}</h3>
 
@@ -30,6 +37,7 @@ function ExperienceForm({index})  {
               type="text"
               autoComplete="job_title"
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              required
             />
           </div>
         </div>
@@ -45,6 +53,7 @@ function ExperienceForm({index})  {
               type="text"
               autoComplete="company-name"
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              required
             />
           </div>
         </div>
@@ -62,33 +71,32 @@ function ExperienceForm({index})  {
           </label>
         </div>
 
-        <div className="relative max-w-sm col-span-full">
-          <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-            <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
-            </svg>
-          </div>
-          <input
-            datepicker
+        <div className="sm:col-span-2 sm:col-start-1">
+          <label htmlFor={`start_date-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
+            Start Date
+          </label>
+          <DatePicker
             id={`start_date-${index}`}
             type="text"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 text-center"
             placeholder="Start Date"
+            required
           />
         </div>
 
-        <div className="relative max-w-sm col-span-full">
+        <div className="sm:col-span-2 sm:col-start-1">
           <div className="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-            <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
-            </svg>
           </div>
-          <input
+          <label htmlFor={`end_date-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
+            End Date
+          </label>
+          <DatePicker
             id={`end_date-${index}`}
             type="text"
             className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 ${isCurrentJob ? 'bg-gray-200 cursor-not-allowed' : ''}`}
             placeholder="End Date"
             disabled={isCurrentJob} // Disable if checkbox is checked
+            required
           />
         </div>
 
@@ -99,10 +107,55 @@ function ExperienceForm({index})  {
             maxLength={2000}
             rows={4}
             className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+
           />
         </div>
       </div>
     </div>
+    </form>
+  );
+}
+
+export function SkillsForm({index}) {
+  return (
+
+    <div className="border-b border-gray-900/10 pb-12">
+          <h2 className="text-base font-semibold leading-7 text-gray-900">Skill {index + 1}</h2>
+
+    <div className="sm:col-span-3">
+          <label htmlFor={`company_name-${index}`} className="block text-sm font-medium leading-6 text-gray-900 mt-2">
+            Add a Skill
+          </label>
+          <div className="mt-2">
+            <input
+              id={`skill_name-${index}`}
+              name={`skill_name-${index}`}
+              type="text"
+              autoComplete="skill"
+              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              required
+            />
+          </div>
+        </div>
+
+      <div className="sm:col-span-3">
+      <label htmlFor={`company_name-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
+        Proficiency Level
+      </label>
+      <div className="mt-2">
+        <input
+          id={`skill_name-${index}`}
+          name={`skill_name-${index}`}
+          type="text"
+          autoComplete="skill"
+          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          required
+        />
+      </div>
+      </div>
+</div>
+        
+
   );
 }
 
@@ -110,9 +163,22 @@ function ExperienceForm({index})  {
 export default function ProfilePage() {
 
   const [experienceForms, setExperienceForms] = useState([]);
+  const [skillsForms, setSkillsForm] = useState([]);
 
   const addExperienceForm = () => {
-    setExperienceForms([...experienceForms, {}]);
+    if (experienceForms.length < 8) {
+      setExperienceForms([...experienceForms, {}]);
+    } else {
+      alert("You can only add up to 8 experience fields.");
+    }
+  };
+
+  const addSkillsForm = () => {
+    if (experienceForms.length < 8) {
+      setSkillsForm([...skillsForms, {}]);
+    } else {
+      alert("You can only add up to 12 skills fields.");
+    }
   };
 
   return (
@@ -272,6 +338,11 @@ export default function ProfilePage() {
           <ExperienceForm key={index} index={index} />
         ))}
 
+          {skillsForms.map((_, index) => (
+                  <SkillsForm key={index} index={index} />
+                ))}
+
+
       <div className="flex shrink-0 flex-col gap-2 sm:flex-row mt-4">
           <Button
             className="flex items-center gap-3 dark:bg-white dark:text-black"
@@ -281,6 +352,18 @@ export default function ProfilePage() {
             <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Experience
           </Button>
         </div>
+
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row mt-4">
+          <Button
+            className="flex items-center gap-3 dark:bg-white dark:text-black"
+            size="sm"
+            onClick={addSkillsForm}
+          >
+            <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Skill
+          </Button>
+        </div>
+
+
       </div>
 
       <div className="mt-6 flex items-center justify-end gap-x-6 pb-2">
@@ -294,6 +377,7 @@ export default function ProfilePage() {
           Save
         </button>
       </div>
+
     </form>
   );
 }
