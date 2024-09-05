@@ -2,10 +2,9 @@ from flask import Flask, request
 from flask_cors import CORS
 from flask_restx import Api, Resource
 from routes import register_routes
-import logging
+from dotenv import load_dotenv
 
-# logging.basicConfig(level=logging.DEBUG)
-# logger = logging.getLogger(__name__)
+load_dotenv()
 
 authorizations = {
     'apikey': {
@@ -25,6 +24,7 @@ CORS(app, resources={r"/*": {
     "expose_headers": ["Content-Type", "Authorization", "Authenticate_token"],
     "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 }})
+
 api = Api(
     app,
     version='1.0',

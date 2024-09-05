@@ -1,5 +1,8 @@
 # config.py
+import os
+
 class Config:
-    SUPABASE_URL = 'https://zxaxcaejqogycvxvygqy.supabase.co'
-    SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4YXhjYWVqcW9neWN2eHZ5Z3F5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI0NjcyNzQsImV4cCI6MjAzODA0MzI3NH0.okqdLZ8Je4Gc1IWI584dVmTCwUA-QaRXIpxLRq6d9do'
-    SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4YXhjYWVqcW9neWN2eHZ5Z3F5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyMjQ2NzI3NCwiZXhwIjoyMDM4MDQzMjc0fQ.GgxP6IlCirQF9sNudZCPiLKO_3OVob6X3TdaaSGNZZE'
+    SUPABASE_URL = os.getenv("SUPABASE_URL")
+    SUPABASE_KEY = os.getenv("ANON_KEY")
+    SUPABASE_SERVICE_ROLE_KEY = os.getenv("SERVICE_ROLE_KEY")
+    

@@ -69,18 +69,8 @@ CREATE TABLE job_applications (
     company_name VARCHAR(100),
     application_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(50),
+    description TEXT,
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-
-
-
-
-alter policy "Enable all actions for users based on user_id"
-on "public"."accounts"
-to public
-using (
-    (( SELECT auth.uid() AS uid) = id)
 );

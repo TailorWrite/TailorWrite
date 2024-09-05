@@ -1,7 +1,7 @@
 from flask_restx import Namespace, Resource, fields, reqparse, api
 from flask import request, jsonify
-from models.users import create_user, create_account, get_user, update_user, delete_user, login_user, validate_token
-from functools import wraps
+from models.users import create_user, create_account, get_user, update_user, delete_user, login_user
+from models.authentication import token_required
 
 # Define the namespace
 users_ns = Namespace('users', description='User operations')
@@ -40,22 +40,6 @@ login_model = users_ns.model('Login', {
     'password': fields.String(required=True, description='The user password', example='securepassword123')
 })
 
-# Authentication decorator
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = request.headers.get('Authorization')
-        if not token:
-            return {'message': 'Authentication token is missing'}, 401
-        try:
-            result = validate_token(token)
-            if not result['valid']:
-                return {'message': 'Invalid authentication token'}, 401
-        except Exception as e:
-            return {'message': str(e)}, 401
-        return f(*args, **kwargs)
-    return decorated
-
 
 @users_ns.route('')
 class UserList(Resource):
@@ -67,9 +51,11 @@ class UserList(Resource):
         data = request.json
         try:
             response = create_user(data)
-            user_id = str(response).split("user=User(id='")[1].split("'")[0]
+            user_id = response.user.id
+            email = response.user.email
             account = data.get('account_info', {})
             account['id'] = user_id
+            account['email'] = email
             create_account(account)
             return {'message': 'User created successfully', 'id': user_id}, 201
         except Exception as e:
@@ -80,14 +66,16 @@ class User(Resource):
     @token_required
     @users_ns.doc(security='apikey')
     @users_ns.response(200, 'Success', account_model)
+    @users_ns.response(403, 'Forbidden')
     @users_ns.response(404, 'User not found')
-    def get(self, user_id):
+    def get(self, user_id, token_user_id):
         """Fetch a user by ID"""
         try:
-            response = get_user(user_id)
-            user = response.data
+            if user_id != token_user_id:
+                return {'error': 'No you\'re not allowed this with that auth key'}, 403
+            user = get_user(user_id).data
             if user:
-                return jsonify(user[0])
+                return jsonify(user)
             else:
                 return {'message': 'User not found'}, 404
         except Exception as e:
@@ -134,9 +122,8 @@ class UserLogin(Resource):
 
         try:
             response = login_user(email, password)
-            session = response.session
-            access_token = response.session.access_token
-            refresh_token = response.session.refresh_token
-            return {'message': 'Login successful', 'access_token': access_token, 'refresh_token': refresh_token}, 200
+            access_token = response[0]
+            user_id = response[1]
+            return {'message': 'Login successful', 'user_id': user_id, 'basic_auth_token': access_token}, 200
         except Exception as e:
             return {'error': str(e)}, 401
