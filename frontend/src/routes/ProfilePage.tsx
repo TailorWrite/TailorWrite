@@ -5,6 +5,8 @@ import {
 import React, { useState } from "react";
 import { UserPlusIcon } from "@heroicons/react/24/solid";
 
+import { Form} from 'react-router-dom'
+
 import { Datepicker } from "flowbite-react";
 
 export function DatePicker() {
@@ -21,7 +23,7 @@ function ExperienceForm({index})  {
   };
 
   return (
-    <form>
+    <Form method="post">
     <div className="border-b border-gray-900/10 pb-12">
       <h3 className="text-base font-semibold leading-7 text-gray-900 mt-5">Experience {index + 1}</h3>
 
@@ -112,7 +114,7 @@ function ExperienceForm({index})  {
         </div>
       </div>
     </div>
-    </form>
+    </Form>
   );
 }
 
@@ -182,7 +184,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <form>
+    <Form method="post">
       <div className="space-y-12">
         <div className="border-b border-gray-900/10 pb-12">
           <h2 className="text-base font-semibold leading-7 text-gray-900">Profile</h2>
@@ -378,7 +380,7 @@ export default function ProfilePage() {
         </button>
       </div>
 
-    </form>
+    </Form>
   );
 }
 
