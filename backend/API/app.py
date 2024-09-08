@@ -32,7 +32,7 @@ api = Api(
     description='Your API Description',
     authorizations=authorizations,
     security='apikey',  # Reference the security definition
-    doc='/swagger'
+    doc='/'
 )
 
 

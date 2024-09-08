@@ -14,4 +14,4 @@ def delete_application(application_id):
     return supabase.table('job_applications').delete().eq('id', application_id).execute()
 
 def get_applications_by_user(user_id):
-    return supabase.table('job_applications').select('*').eq('user_id', user_id).execute()
+    return supabase.table('job_applications').select('*').eq('user_id', user_id).order(column='updated_at', desc=True).execute()

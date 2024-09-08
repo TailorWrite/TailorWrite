@@ -1,3 +1,5 @@
+import datetime
+import pytz
 from flask_restx import Namespace, Resource, fields
 from flask import request, jsonify
 from models.applications import create_application, get_application, update_application, delete_application, get_applications_by_user
@@ -81,6 +83,9 @@ class JobApplication(Resource):
             user_id = response.data[0]['user_id']
             if user_id != token_user_id:
                 return {'error': 'No you\'re not allowed this with that auth key'}, 403
+            utc_now = datetime.datetime.now(pytz.utc)
+            formatted_time = utc_now.strftime('%Y-%m-%dT%H:%M:%SZ')
+            data['updated_at'] = formatted_time
             response = update_application(application_id, data)
             if response.data:
                 return jsonify(response.data)
