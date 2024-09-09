@@ -11,7 +11,7 @@ import LandingRouter from "./layouts/MarketingLayout";
 import DashboardRouter from "./layouts/DashboardLayout";
 import ApplicationsLayout from './layouts/ApplicationsLayout';
 
-import Profile from './views/Profile';
+import ProfilePage from './routes/ProfilePage';
 import DashboardHome from './views/DashboardHome';
 import ApplicationDetails from './views/ApplicationDetails';
 
@@ -92,7 +92,7 @@ const router = createBrowserRouter([
       },
       {
         path: PathConstants.PROFILE,
-        element: <Profile />,
+        element: <ProfilePage />,
       },
     ],
   },  
