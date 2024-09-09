@@ -1,7 +1,4 @@
-import { ClockIcon } from '@heroicons/react/24/outline';
-import { Timeline, TimelineBody, TimelineConnector, TimelineHeader, TimelineIcon, TimelineItem } from '@material-tailwind/react';
 import React from 'react';
-import { formatDate } from '../utils';
 
 const DashboardHome: React.FC = () => {
 
