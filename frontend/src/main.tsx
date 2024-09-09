@@ -1,30 +1,34 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider, } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { ThemeProvider } from "@material-tailwind/react";
 
-// import App from './App.tsx'
-import Root from "./routes/root";
-import PathConstants from './routes/pathConstants';
+import { LandingPage, LoginPage, SignupPage, ErrorPage } from './pages';
+import NotFound from "./components/common/NotFound";
 
-import LoginPage from "./routes/LoginPage";
+import LandingRouter from "./layouts/MarketingLayout";
+import DashboardRouter from "./layouts/DashboardLayout";
+import ApplicationsLayout from './layouts/ApplicationsLayout';
+
 import ProfilePage from './routes/ProfilePage';
-import SignupPage from "./routes/SignupPage";
-import ErrorPage from "./routes/ErrorPage";
-import LandingPage from './routes/LandingPage';
-import NewDashboardRouter from "./routes/DashboardRouter";
+import DashboardHome from './views/DashboardHome';
+import ApplicationDetails from './views/ApplicationDetails';
 
-import NotFound from "./components/NotFound";
-import DashboardHome from './routes/DashboardHome';
+import PathConstants from './pathConstants';
+import { handleAddApplication, handleUpdateApplication } from './actions';    // TODO: Could be added to actions.ts
+import { allApplicationLoader, applicationLoader } from './loaders';
 
 import './index.css';
+import 'react-toastify/dist/ReactToastify.css';
 
+const queryClient = new QueryClient();
 const router = createBrowserRouter([
   {
     path: PathConstants.HOME,
-    element: <Root />,
+    element: <LandingRouter />,
     errorElement: <ErrorPage />,
-    children : [
+    children: [
       {
         path: PathConstants.HOME,
         element: <LandingPage />,
@@ -41,32 +45,66 @@ const router = createBrowserRouter([
   },
   {
     path: PathConstants.DASHBOARD,
-    element: <NewDashboardRouter />,
+    element: <DashboardRouter />,
     children: [
       {
-        path: PathConstants.DASHBOARD, 
-        element: <DashboardHome />,    // TODO: Add sections here
+        index: true,
+        element: <DashboardHome />,
       },
       {
-        path: PathConstants.GENERATE, 
-        element: <NotFound />,    // TODO: Add sections here
+        path: PathConstants.APPLICATIONS,
+        element: <ApplicationsLayout />,
+        loader: allApplicationLoader,
+        children: [
+          {
+            path: PathConstants.NEW_APPLICATION,
+            element: <ApplicationDetails />,
+            loader: () => Promise.resolve({}),
+            // Adds a new application to the database
+            action: handleAddApplication,
+          },
+          {
+            path: PathConstants.APPLICATION,
+            element: <ApplicationDetails />,
+            // Loads application data of the given uuid
+            loader: applicationLoader,
+            action: handleUpdateApplication,
+          },
+        ]
+      },
+      // { 
+      //   path: PathConstants.NEW_APPLICATION, 
+      //   element: <ApplicationTracker />,
+      // },
+      // { 
+      //   path: PathConstants.APPLICATION, 
+      //   element: <ApplicationTracker />,
+      //   loader: applicationLoader,
+      // },
+
+      {
+        path: PathConstants.GENERATE,
+        element: <NotFound />,
       },
       {
-        path: PathConstants.ARCHIVE, 
-        element: <NotFound />,    // TODO: Add sections here
+        path: PathConstants.ARCHIVE,
+        element: <NotFound />,
       },
       {
-        path: PathConstants.PROFILE, 
-        element: <ProfilePage />,    // TODO: Add sections here
-      }
-    ]
-  },
+        path: PathConstants.PROFILE,
+        element: <ProfilePage />,
+      },
+    ],
+  },  
 ], { basename: PathConstants.BASENAME });
+
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <RouterProvider router={router}/>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </QueryClientProvider>
   </React.StrictMode>,
 )

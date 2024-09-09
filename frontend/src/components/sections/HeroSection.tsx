@@ -1,4 +1,4 @@
-import Nav from '../components/Nav'; 
+import Nav from '../common/Nav'; 
 
 export default function Example() {
     

@@ -5,10 +5,9 @@ import { Dialog, DialogPanel } from '@headlessui/react';
 import { Switch } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
-import Logo from './Logo';
-import PathConstants from '../routes/pathConstants';
-import SunIcon from './SunIcon';
-import MoonIcon from './MoonIcon';
+import { Logo, LightModeIcon, DarkModeIcon } from "../icons";
+
+import PathConstants from '../../pathConstants';
 
 const navigation = [
     { name: 'Product', href: '#' },
@@ -66,8 +65,8 @@ export default function Nav() {
                             {
                                 // Toggling between sun and moon icons within the toggle 
                                 darkMode ? 
-                                    <SunIcon className="size-4" /> : 
-                                    <MoonIcon className="size-4" />
+                                    <LightModeIcon className="size-4" /> : 
+                                    <DarkModeIcon className="size-4" />
                             }
                         
                         </span>
@@ -92,8 +91,8 @@ export default function Nav() {
                                     {
                                         // Toggling between sun and moon icons within the toggle 
                                         darkMode ?
-                                            <SunIcon className="size-4" /> :
-                                            <MoonIcon className="size-4" />
+                                            <LightModeIcon className="size-4" /> :
+                                            <DarkModeIcon className="size-4" />
                                     }
 
                                 </span>
