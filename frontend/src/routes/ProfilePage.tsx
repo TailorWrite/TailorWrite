@@ -26,6 +26,7 @@ function ExperienceForm({index})  {
     <Form method="post">
     <div className="border-b border-gray-900/10 pb-12">
       <h3 className="text-base font-semibold leading-7 text-gray-900 mt-5">Experience {index + 1}</h3>
+      <p className="mt-1 text-sm leading-6 text-gray-600">Please add your previous experience</p>
 
       <div className="mt-2 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
         <div className="sm:col-span-3">
@@ -112,6 +113,16 @@ function ExperienceForm({index})  {
 
           />
         </div>
+
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row mt-4">
+          <Button
+            className="flex items-center gap-3 dark:bg-white dark:text-black"
+            size="sm"
+            onClick={addExperienceForm}
+          >
+            <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Experience
+          </Button>
+        </div>
       </div>
     </div>
     </Form>
@@ -123,6 +134,7 @@ export function SkillsForm({index}) {
 
     <div className="border-b border-gray-900/10 pb-12">
           <h2 className="text-base font-semibold leading-7 text-gray-900">Skill {index + 1}</h2>
+          <p className="mt-1 text-sm leading-6 text-gray-600">Please provide skills you have</p>
 
     <div className="sm:col-span-3">
           <label htmlFor={`company_name-${index}`} className="block text-sm font-medium leading-6 text-gray-900 mt-2">
@@ -161,11 +173,117 @@ export function SkillsForm({index}) {
   );
 }
 
+function EducationForm({ index }) {
+  return (
+    <Form method="post">
+      <div className="border-b border-gray-900/10 pb-12">
+        <h2 className="text-base font-semibold leading-7 text-gray-900">Previous Education {index + 1}</h2>
+        <p className="mt-1 text-sm leading-6 text-gray-600">Please add your previous education</p>
+
+          <div className="mt-2 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+            <div className="sm:col-span-3">
+              <label htmlFor={`institution_name-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
+                Job Title
+              </label>
+              <div className="mt-2">
+                <input
+                  id={`institution_name-${index}`}
+                  name={`institution_name-name${index}`}
+                  type="text"
+                  autoComplete="job_title"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="sm:col-span-3">
+              <label htmlFor="degree" className="block text-sm font-medium leading-6 text-gray-900">
+                Degree
+              </label>
+              <div className="mt-2">
+                <input
+                  id="degree"
+                  name="degree"
+                  type="text"
+                  autoComplete="degree"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div className="sm:col-span-3">
+              <label htmlFor="field_of_study" className="block text-sm font-medium leading-6 text-gray-900">
+                Field of Study
+              </label>
+              <div className="mt-2">
+                <input
+                  id="field_of_study"
+                  name="field_of_study"
+                  type="text"
+                  autoComplete="family-name"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div className="sm:col-span-3">
+              <label htmlFor="start_date" className="block text-sm font-medium leading-6 text-gray-900">
+                Start Date
+              </label>
+              <div className="mt-2">
+              <DatePicker
+                id={`start_date_education-${index}`}
+                type="text"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 text-center"
+                placeholder="Start Date"
+                required
+              />
+              </div>
+            </div>
+
+            <div className="sm:col-span-3">
+              <label htmlFor="end_date" className="block text-sm font-medium leading-6 text-gray-900">
+                End Date
+              </label>
+              <div className="mt-2">
+              <DatePicker
+                id={`end_date_education-${index}`}
+                type="text"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 text-center"
+                placeholder="End Date"
+                required
+              />
+              </div>
+            </div>
+
+            <div className="col-span-full">
+              <label htmlFor="education-description" className="block text-sm font-medium leading-6 text-gray-900">
+                Description
+              </label>
+              <div className="mt-2">
+              <textarea
+                  id={`education-description-${index}`}
+                  maxLength={2000}
+                  rows={4}
+                  className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+
+                />
+              </div>
+            </div>
+          </div>
+      </div>
+    </Form>
+  );
+}
+
+
 // Main ProfilePage Component
 export default function ProfilePage() {
 
   const [experienceForms, setExperienceForms] = useState([]);
-  const [skillsForms, setSkillsForm] = useState([]);
+  const [skillsForms, setSkillsForms] = useState([]);
+  const [educationForms, setEducationForms] = useState([]);
 
   const addExperienceForm = () => {
     if (experienceForms.length < 8) {
@@ -177,9 +295,17 @@ export default function ProfilePage() {
 
   const addSkillsForm = () => {
     if (experienceForms.length < 8) {
-      setSkillsForm([...skillsForms, {}]);
+      setSkillsForms([...skillsForms, {}]);
     } else {
       alert("You can only add up to 12 skills fields.");
+    }
+  };
+
+  const addEducationForm = () => {
+    if (educationForms.length < 3) {
+      setEducationForms([...educationForms, {}]);
+    } else {
+      alert("You can only add up to 3 previous education experiences.");
     }
   };
 
@@ -344,6 +470,10 @@ export default function ProfilePage() {
                   <SkillsForm key={index} index={index} />
                 ))}
 
+          {educationForms.map((_, index) => (
+                  <EducationForm key={index} index={index} />
+                ))}
+
 
       <div className="flex shrink-0 flex-col gap-2 sm:flex-row mt-4">
           <Button
@@ -362,6 +492,16 @@ export default function ProfilePage() {
             onClick={addSkillsForm}
           >
             <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Skill
+          </Button>
+        </div>
+
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row mt-4">
+          <Button
+            className="flex items-center gap-3 dark:bg-white dark:text-black"
+            size="sm"
+            onClick={addEducationForm}
+          >
+            <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Education
           </Button>
         </div>
 
