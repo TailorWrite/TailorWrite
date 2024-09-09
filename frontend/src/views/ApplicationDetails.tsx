@@ -25,7 +25,7 @@ export default function ApplicationDetails({ actionData }: ApplicationDetailsPro
     const loaderData: ApplicationData[] = useLoaderData() as ApplicationData[];
 
     // Extracting the first application from the loader data array
-    const application: ApplicationData = loaderData[0] !== undefined ? loaderData[0] : {} as ApplicationData;
+    const application: ApplicationData = loaderData[0] as ApplicationData ?? {};
     const [applicationData] = useState<ApplicationData>(application);
 
     applicationData.img = getCompanyLogoUrl(applicationData.company_name);
@@ -44,7 +44,7 @@ export default function ApplicationDetails({ actionData }: ApplicationDetailsPro
     }
 
     const [showCalendar, setShowCalendar] = useState(false);
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(applicationData.application_date) ?? new Date());
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date(applicationData.application_date ?? new Date()));
 
     const handleShowDatePicker = () => setShowCalendar(true);
     const handleDateSelect = (date: Date) => {
