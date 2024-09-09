@@ -7,9 +7,9 @@ import { ThemeProvider } from "@material-tailwind/react";
 import { LandingPage, LoginPage, SignupPage, ErrorPage } from './pages';
 import NotFound from "./components/common/NotFound";
 
-import LandingRouter from "./routers/LandingRouter";
-import DashboardRouter from "./routers/DashboardRouter";
-import ApplicationsLayout from './routers/ApplicationsLayout';
+import LandingRouter from "./layouts/MarketingLayout";
+import DashboardRouter from "./layouts/DashboardLayout";
+import ApplicationsLayout from './layouts/ApplicationsLayout';
 
 import Profile from './views/Profile';
 import DashboardHome from './views/DashboardHome';

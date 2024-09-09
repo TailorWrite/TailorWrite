@@ -8,7 +8,7 @@ import PathConstants from '../pathConstants';
 import Sidebar from '../components/dashboard/Sidebar';
 import DashboardNav from '../components/dashboard/DashboardNav';
 
-export default function DashboardRouter() {
+export default function DashboardLayout() {
     const navigation = [
         { name: 'Dashboard', route: PathConstants.DASHBOARD, current: true, icon: <PresentationChartBarIcon className="h-5 w-5" /> },
         { name: 'Applications', route: PathConstants.APPLICATIONS, current: false, icon: <PresentationChartBarIcon className="h-5 w-5" /> },
