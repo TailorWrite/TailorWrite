@@ -67,7 +67,7 @@ export default function LoginPage() {
                     sessionStorage.setItem('email', userData[0].email);
                 }
     
-                window.location.href = '/dashboard';
+                window.location.href = '/dashboard/applications';
             }
         } catch (error) {
             console.error('There was a problem with the fetch operation:', error);
