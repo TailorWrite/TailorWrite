@@ -14,7 +14,7 @@ RUN npm install -g npm@latest
 # Install dependencies, copy the source code and build the application
 RUN npm install
 COPY . .
-RUN npm run build
+RUN npm run build:docker
 
 # Hosting frontend for production
 FROM nginx:alpine
