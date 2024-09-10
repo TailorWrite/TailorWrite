@@ -18,7 +18,7 @@ import { headers } from "./api";
 export async function applicationLoader({ params }: LoaderFunctionArgs) {
     const { uuid } = params;
 
-    if (!uuid) return json({});
+    if (!uuid) return json([]);
 
     try {
         const response = await axios.get(APIConstants.APPLICATION(uuid), { headers });
@@ -33,7 +33,7 @@ export async function applicationLoader({ params }: LoaderFunctionArgs) {
         const errorMessage = (error as AxiosError).response.data.error || "Failed to fetch application.";
 
         console.error(errorMessage);
-        return json({ error: errorMessage });
+        return json([]);
     }
 }
 
@@ -53,6 +53,6 @@ export async function allApplicationLoader() {
         const errorMessage = (error as AxiosError).response.data.error || "Failed to fetch applications.";
 
         console.error(errorMessage);
-        return json({ error: errorMessage });
+        return json([]);
     }
 }
