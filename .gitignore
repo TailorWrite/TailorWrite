@@ -3,3 +3,7 @@
 
 node_modules
 */node_modules
+
+
+# Ignore the folder frontend_old
+frontend_old/

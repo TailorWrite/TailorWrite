@@ -1,40 +1,89 @@
-# React + TypeScript + Vite
+<p align="center"> 
+  <h1 align="center"> Deploying via Docker - Frontend </h1> 
+  <h6 align="center">August 2024 - James Robiony-Rogers & Corban Surtees</h6> 
+  
+  <p align="center"> 
+    This README provides instructions for getting started developing the frontend of the Job Application Tracker
+  </p> 
+</p>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Build Tool:** [Vite](https://vitejs.dev)
+- **Framework:** [React](https://reactjs.org)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com)
+- **Testing:** [Vitest](https://vitejs.dev/guide/features.html#testing)
 
-## Running The Project 
+## Folder Structure
 
-Running the project website requires the following commands:
+The frontend project is structured as follows:
 
+- `public` - Contains the public assets for the project
+- `src` - Contains the source code for the project
+  - `api` - Contains functions for making API requests separated by queries and mutations
+  - `components` - Contains the React components for the project separated into different categories such as `common`, `dashboard`, `icons`, `modals`, etc...
+  - `pages` - Contains simple pages for the project, such as 404, Login, Register, etc...
+  - `layouts` - Contains components that define the layout of the application
+  - `views` - Contains the main views for the application, such as the, application tracker, etc...
+  -
+  - `ts_files` - Various typescript files used throughout the project such as types, util functions, etc...
+  - `main.tsx` - The main application component that renders the application and defines the routes
+
+- `tests` - Contains the tests for the project nested in the same structure as the `src` directory
+---
+
+
+## Running the Frontend for Development
+
+Running the project website in development mode requires the following commands:
+
+1. Change into the frontend directory and install the dependencies:
 ```zsh
-cd frontend 
+cd frontend
 npm install
+```
+
+2. Start the development server:
+```zsh
 npm run dev
 ```
 
-## Expanding the ESLint configuration
+3. Open the browser and navigate to [`http://localhost:5173`](http://localhost:5173) to view the application.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Running the Frontend using Docker
 
-- Configure the top-level `parserOptions` property like this:
+To run the frontend using Docker, you can use the following commands:
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json', './tsconfig.app.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+1. Build the Docker image:
+```zsh
+docker build -t job-tracker-frontend .
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+2. Run the Docker container:
+```zsh
+docker run -d -p 5173:80 job-tracker-frontend
+```
+This will run the container in detached mode and expose the frontend on port 5173.
+
+3. Open the browser and navigate to [`http://localhost:80`](http://localhost:80) to view the application.
+
+--- 
+
+## Testing the Frontend
+
+You have two options when running tests for the frontend: 
+
+1. Running basic tests using Vitest in the terminal:
+
+```zsh
+npm run test
+```
+
+2. Running tests with an interactive web UI:
+
+```zsh
+npm run test:ui
+```
+This should open a browser window where you can interact with the tests. If not navigate to [`http://localhost:51204/__vitest__/#/`](http://localhost:51204/__vitest__/#/) to view the tests.
