@@ -11,7 +11,6 @@ import LandingRouter from "./layouts/MarketingLayout";
 import DashboardRouter from "./layouts/DashboardLayout";
 import ApplicationsLayout from './layouts/ApplicationsLayout';
 
-import ProfilePage from './routes/ProfilePage';
 import DashboardHome from './views/DashboardHome';
 import ApplicationDetails from './views/ApplicationDetails';
 
@@ -21,6 +20,7 @@ import { allApplicationLoader, applicationLoader } from './loaders';
 
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
+import Profile from './views/Profile';
 
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
@@ -92,7 +92,7 @@ const router = createBrowserRouter([
       },
       {
         path: PathConstants.PROFILE,
-        element: <ProfilePage />,
+        element: <Profile />,
       },
     ],
   },  
