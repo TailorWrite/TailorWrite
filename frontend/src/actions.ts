@@ -83,7 +83,6 @@ export async function handleAddApplication({ request }: { request: Request }): P
 
 }
 
-// TODO: Implement the handleUpdateApplication function
 export async function handleUpdateApplication({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
     const toastId = toast.loading('Updating application...');
 
