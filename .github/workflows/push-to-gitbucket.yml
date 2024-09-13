@@ -17,7 +17,7 @@ jobs:
       - name: Push to GitBucket
         env:
           # Set the GitBucket URL, username and password as secrets in your repository settings
-          GITBUCKET_URL: "isgb.otago.ac.nz/info301/git/robja577/TailorWrite-Github-Test.git"
+          GITBUCKET_URL: "isgb.otago.ac.nz/info301/git/TailorWrite/TailorWrite.git"
           GITBUCKET_USERNAME: ${{ secrets.GITBUCKET_USERNAME }}
           GITBUCKET_PASSWORD: ${{ secrets.GITBUCKET_PASSWORD }}
         run: |
