@@ -8,7 +8,7 @@ from models.authentication import token_required
 # Define the namespace
 educations_ns = Namespace('educations', description='User Education operations')
 
-# Define the job education model
+# Define the education model
 education_model = educations_ns.model('Education', {
     'user_id': fields.String(required=True, description='User ID of the applicant', example='5a4245c0-5404-4be3-9061-f728d77fdb42'),
     'institution_name': fields.String(required=True, description='Name of Institution for Study', example='MIT'),
@@ -54,7 +54,7 @@ class EducationList(Resource):
     @educations_ns.response(404, 'User or education records not found')
     @educations_ns.response(403, 'Forbidden')
     def get(self, user_id, token_user_id):
-        """Fetch all job educations for a specific user"""
+        """Fetch all educations for a specific user"""
         if user_id != token_user_id:
             return {'error': 'No you\'re not allowed this with that auth key'}, 403
         try:
@@ -71,10 +71,10 @@ class Education(Resource):
     @token_required
     @educations_ns.doc(security='apikey')
     @educations_ns.response(200, 'Success', education_model)
-    @educations_ns.response(404, 'Job education not found')
+    @educations_ns.response(404, 'Education not found')
     @educations_ns.response(403, 'Forbidden')
     def get(self, education_id, token_user_id):
-        """Fetch a job education by ID"""
+        """Fetch an Education by ID"""
         try:
             response = get_education(education_id)
             user_id = response.data[0]['user_id']
@@ -90,11 +90,11 @@ class Education(Resource):
     @token_required
     @educations_ns.doc(security='apikey')
     @educations_ns.expect(update_education_model)
-    @educations_ns.response(200, 'Job education updated successfully', education_model)
+    @educations_ns.response(200, 'Education updated successfully', education_model)
     @educations_ns.response(400, 'Bad Request')
     @educations_ns.response(403, 'Forbidden')
     def put(self, education_id, token_user_id):
-        """Update a job education by ID"""
+        """Update an Education by ID"""
         data = request.json
         try:
             response = get_education(education_id)
@@ -108,17 +108,17 @@ class Education(Resource):
             if response.data:
                 return jsonify(response.data)
             else:
-                return {'message': 'Failed to update job education'}, response.status_code
+                return {'message': 'Failed to update education'}, response.status_code
         except Exception as e:
             return {'error': str(e)}, 400
 
     @token_required
     @educations_ns.doc(security='apikey')
-    @educations_ns.response(200, 'Job education deleted successfully')
+    @educations_ns.response(200, 'Education deleted successfully')
     @educations_ns.response(400, 'Bad Request')
     @educations_ns.response(403, 'Forbidden')
     def delete(self, education_id, token_user_id):
-        """Delete a job education by ID"""
+        """Delete an Education by ID"""
         try:
             response = get_education(education_id)
             user_id = response.data[0]['user_id']
@@ -126,7 +126,7 @@ class Education(Resource):
                 return {'error': 'No you\'re not allowed this with that auth key'}, 403
             response = delete_education(education_id)
             if response.data:
-                return {'message': 'Job education deleted successfully'}, 200
+                return {'message': 'Education deleted successfully'}, 200
             else:
                 return {'message': 'Failed to delete job education'}, response.status_code
         except Exception as e:

@@ -10,3 +10,6 @@ def register_routes(api: Api):
     
     from routes.educations_routes import educations_ns
     api.add_namespace(educations_ns, path='/educations')
+    
+    from routes.experience_routes import experiences_ns
+    api.add_namespace(experiences_ns, path='/experience')
