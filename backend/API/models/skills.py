@@ -1,4 +1,4 @@
-# models/skillss.py
+# models/skills.py
 from models import supabase
 
 def create_skills(data):
