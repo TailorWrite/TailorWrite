@@ -1,48 +1,34 @@
-import { useEffect, useState } from 'react';
-import { Link, Form, useNavigate, useLoaderData } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, Form, useNavigate, useLoaderData, useSubmit } from 'react-router-dom';
 import { Field, Menu, MenuButton, MenuItem, MenuItems, Textarea } from '@headlessui/react';
 import { PlusIcon, CheckIcon, ChevronDownIcon, ClockIcon, LinkIcon, CalendarDaysIcon, PaperClipIcon } from '@heroicons/react/20/solid';
 import { DocumentTextIcon } from '@heroicons/react/24/outline';
 import { BuildingOffice2Icon, NoSymbolIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Avatar, Breadcrumbs, Drawer, Timeline, TimelineBody, TimelineConnector, TimelineHeader, TimelineIcon, TimelineItem } from '@material-tailwind/react';
-import { Bounce, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import StatusSelector from '../components/common/StatusSelector';
 import DateSelector from '../components/common/DateSelector';
-
-import { ActionDataProps, ApplicationAction, ApplicationData, ApplicationStatus, suppressMissingAttributes } from '../types';
-import PathConstants from '../pathConstants';
-import { appendHttpsToLink, formatDate, getCompanyLogoUrl } from '../utils';
-import { handleDeleteApplication } from '../api/mutations';
 import WarningModal from '../components/modals/WarningModal';
 
-interface ApplicationDetailsProps {
-    actionData?: ActionDataProps,
-}
+import { appendHttpsToLink, formatDate, getCompanyLogoUrl } from '../utils';
 
-export default function ApplicationDetails({ actionData }: ApplicationDetailsProps) {
+import PathConstants from '../pathConstants';
+import { ApplicationAction, ApplicationData, ApplicationStatus, suppressMissingAttributes } from '../types';
+
+
+export default function ApplicationDetails() {
+    const submit = useSubmit();
     const navigate = useNavigate();
     const loaderData: ApplicationData[] = useLoaderData() as ApplicationData[];
 
-    // Extracting the first application from the loader data array
+    // Processing the application details from the loader function
     const application: ApplicationData = loaderData[0] as ApplicationData ?? {};
     const [applicationData] = useState<ApplicationData>(application);
-
     applicationData.img = getCompanyLogoUrl(applicationData.company_name);
 
 
-    const handleUploadDocument = () => {
-        toast.success('Document uploaded successfully ', {
-            position: "bottom-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            theme: "light",
-            transition: Bounce,
-        });
-    }
-
+    // Managing component state 
     const [showCalendar, setShowCalendar] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Date>(new Date(applicationData.application_date ?? new Date()));
 
@@ -63,31 +49,27 @@ export default function ApplicationDetails({ actionData }: ApplicationDetailsPro
         setTimeout(() => navigate(PathConstants.APPLICATIONS), 200);
     }
 
-    const handleDelete = () => {
-        setWarningModelOpen(true);
-    }
-    
     const [warningModelOpen, setWarningModelOpen] = useState(false);
-    const [warningModelConfirmed, setWarningModelConfirmed] = useState(false);
-    
-    useEffect(() => {
-        if (warningModelConfirmed) {
-            toast.success('Application deleted successfully ');
-            setShowDrawer(false);
-            handleDeleteApplication(applicationData.id);
-            setTimeout(() => navigate(PathConstants.APPLICATIONS), 200);
-        }
-    } , [warningModelConfirmed, applicationData.id, navigate]);
+    const handleWarningModalClose = () => setWarningModelOpen(false);
+    const handleWarningModalConfirm = () => {
+        // Close the drawer and modal 
+        setShowDrawer(false);
+        setWarningModelOpen(false);
 
-    const handleComingSoon = () => {
-        toast('🚀 Feature coming soon!');
+        // Submit the delete request and navigate to the applications page after drawer closes
+        submit({ intent: "delete", id: applicationData.id }, { method: "post" })
+        setTimeout(() => navigate(PathConstants.APPLICATIONS), 200);
     }
+
+    // Managing application quick actions
+    const handleDeleteApplication = () => setWarningModelOpen(true);
+    const handleComingSoon = () => toast('🚀 Feature coming soon!');
 
     const ACTIONS: ApplicationAction[] = [
         { name: 'Add event to timeline', color: 'gray', icon: PlusIcon, action: () => handleComingSoon()  },
         { name: 'Mark as Rejected', color: 'red', icon: NoSymbolIcon, action: () => handleStatusSelect('Rejected') },
-        { name: 'Delete this application', color: 'red', icon: TrashIcon, action: () => handleDelete()},
-    ];
+        { name: 'Delete this application', color: 'red', icon: TrashIcon, action: () => handleDeleteApplication() },
+    ]
 
     return (
         <Drawer
@@ -110,9 +92,6 @@ export default function ApplicationDetails({ actionData }: ApplicationDetailsPro
                     <Link to={PathConstants.NEW_APPLICATION} className="opacity-60"> New Application </Link>
                 </Breadcrumbs>
 
-                {actionData?.error && <p style={{ color: "red" }}>{actionData.error}</p>}
-                {actionData?.success && <p style={{ color: "green" }}>{actionData.success}</p>}
-
                 <input type="hidden" name="id" value={applicationData.id} />
 
                 {/* Heading */}
@@ -126,7 +105,6 @@ export default function ApplicationDetails({ actionData }: ApplicationDetailsPro
                                     type="text"
                                     defaultValue={applicationData.job_title}
                                     placeholder="Job Title"
-                                    // onChange={handleChange}
                                     className="-m-2 p-2 w-full flex-grow text-2xl font-bold leading-7 text-gray-900 border-transparent focus:border-transparent md:text-3xl"
                                 />
                             </h2>
@@ -156,7 +134,8 @@ export default function ApplicationDetails({ actionData }: ApplicationDetailsPro
                             <span className="sm:ml-3">
                                 <button
                                     type="submit"
-                                    // onClick={handleSave}
+                                    name="intent"
+                                    value="save"
                                     className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                 >
                                     <CheckIcon aria-hidden="true" className="-ml-0.5 mr-1.5 h-5 w-5" />
@@ -345,7 +324,7 @@ export default function ApplicationDetails({ actionData }: ApplicationDetailsPro
                     <section onClick={handleComingSoon} className="col-span-6 row-span-3 sm:order-3 md:order-none">
                         <div className="mb-2 flex flex-row justify-between">
                             <h3 className="text-lg font-bold text-gray-900">Documents</h3>
-                            <button onClick={handleUploadDocument} type="button" className=" inline-flex gap-2 items-center rounded-md bg-indigo-600 px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                            <button onClick={undefined} type="button" className=" inline-flex gap-2 items-center rounded-md bg-indigo-600 px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                                 <PlusIcon className="h-4 w-4" />
                                 <span className="text-sm text-white">Upload Document</span>
                             </button>
@@ -425,7 +404,8 @@ export default function ApplicationDetails({ actionData }: ApplicationDetailsPro
                 </div>
             </Form>
 
-            <WarningModal open={warningModelOpen} onClose={setWarningModelOpen} onConfirm={setWarningModelConfirmed}/>
+            <WarningModal open={warningModelOpen} onClose={handleWarningModalClose} onConfirm={handleWarningModalConfirm}/>
+            {/* <WarningModal open={warningModelOpen} onClose={setWarningModelOpen} onConfirm={setWarningModelConfirmed}/> */}
         </Drawer>
 
     );
