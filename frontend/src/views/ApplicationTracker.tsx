@@ -46,7 +46,6 @@ export default function ApplicationTracker() {
     const currentApplications = filteredApplications.slice((page - 1) * recordsPerPage, page * recordsPerPage);
 
     const handleAddApplication = () => navigate('/dashboard/applications/new');
-    const handleReloadComponent = () => navigate('.', { replace: true });
 
     return (
         <Card className="flex flex-col h-full shadow-none dark:bg-neutral-950" {...suppressMissingAttributes}>
@@ -61,10 +60,6 @@ export default function ApplicationTracker() {
                         </Typography>
                     </div>
                     <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-                        <Button onClick={handleReloadComponent} className="flex items-center gap-3 dark:bg-white dark:text-black" size="sm" {...suppressMissingAttributes}>
-                            <ArrowPathIcon strokeWidth={2} className="h-4 w-4" /> Reload
-                        </Button>
-
                         <Button onClick={handleAddApplication} className="flex items-center gap-3 dark:bg-white dark:text-black" size="sm" {...suppressMissingAttributes}>
                             <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Job Application
                         </Button>
