@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import { Card, CardHeader, Input, Typography, Button, CardBody, Chip, CardFooter, Tabs, TabsHeader, Tab, Avatar } from "@material-tailwind/react";
-import { MagnifyingGlassIcon, ChevronUpDownIcon, ArrowPathIcon, UserPlusIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, ChevronUpDownIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 import { color as ChipColor } from "@material-tailwind/react/types/components/chip";
 import { ApplicationData, suppressMissingAttributes } from "../types";
 import { formatDate, getCompanyLogoUrl } from "../utils";
