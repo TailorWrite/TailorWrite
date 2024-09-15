@@ -1,6 +1,7 @@
 name: Mirror to GitBucket
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - "*"
@@ -13,6 +14,25 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          fetch-tags: true
+
+      - name: Fetch all branches
+        run: |
+          git fetch --all
+          git fetch --tags
+
+      - name: List branches
+        run: |
+          git branch -a
+
+      # Enables tracking of remote branches ensuring all branches are pushed to GitBucket
+      - name: Track remote branches
+        run: |
+          for branch in $(git branch -r | grep -v '\->'); do
+            local_branch=${branch#origin/}
+            git branch --track "$local_branch" "$branch" || true
+          done
+
 
       - name: Push to GitBucket
         env:
@@ -25,4 +45,5 @@ jobs:
           git config --global user.email "actions@github.com"
 
           git remote add gitbucket https://$GITBUCKET_USERNAME:$GITBUCKET_PASSWORD@$GITBUCKET_URL
-          git push --mirror gitbucket
+          git push --mirror -v gitbucket
+          

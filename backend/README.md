@@ -1,6 +1,6 @@
 <p align="center"> 
   <h1 align="center"> Deploying via Docker - Backend </h1> 
-  <h6 align="center">August 2024 - James Robiony-Rogers & Corban Surtees</h6> 
+  <h6 align="center">July 2024 - October 2024</h6> 
   
   <p align="center"> 
     This README provides instructions for getting started developing the backend for the Job Application Tracker
