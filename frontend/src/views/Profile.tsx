@@ -9,11 +9,14 @@ import { Form} from 'react-router-dom'
 
 import { Datepicker } from "flowbite-react";
 
+// Import the useLoaderData hook from react-router
+import { useLoaderData } from 'react-router-dom';
+import { ProfileData } from '../types';
+
 export function DatePicker() {
   return <Datepicker />;
 
 }
-
 
 // ExperienceForm Component
 function ExperienceForm({index})  {
@@ -129,7 +132,6 @@ function ExperienceForm({index})  {
 }
 
 
-
 export function SkillForm({index}) {
   return (
 
@@ -231,7 +233,7 @@ function EducationForm({ index }) {
             </label>
             <div className="mt-2">
               <DatePicker
-                id={`start_date_education-${index}`}
+                id={`start_date-${index}`}
                 placeholder="Start Date"
                 required
               />
@@ -244,7 +246,7 @@ function EducationForm({ index }) {
             </label>
             <div className="mt-2">
               <DatePicker
-                id={`end_date_education-${index}`}
+                id={`end_date-${index}`}
                 placeholder="End Date"
                 required
               />
@@ -515,5 +517,48 @@ export default function ProfilePage() {
 
     </Form>
   );
+
+  
 }
+
+export default function ProfileDetails() {
+  // Get the data from the loader function
+  const loaderData: ProfileData = useLoaderData() as ProfileData;
+
+  // Load the data into a useState hook to access it in the component
+  const [data, setData] = useState<ProfileData>(loaderData);
+
+  // Use the data in the component
+  return (
+  
+      <Form>
+
+          <input type="text" name="first_name" defaultValue={data.first_name} />
+          <input type="text" name="last_name" defaultValue={data.last_name} />
+          <input type="text" name="profile_picture_url" defaultValue={data.profile_picture_url} />
+          <input type="text" name="phone" defaultValue={data.phone} />
+          <input type="text" name="email" defaultValue={data.email} />
+          <input type="text" name="description" defaultValue={data.description} />
+
+          <input type="text" name="job_title" defaultValue={data.job_title} />
+          <input type="text" name="company_name" defaultValue={data.company_name} />
+          <input type="text" name="is_current_job" defaultValue={data.is_current_job} />
+          <input type="text" name="start_date" defaultValue={data.start_date} />
+          <input type="text" name="end_date" defaultValue={data.end_date} />
+          <input type="text" name="description" defaultValue={data.description} />
+
+          <input type="text" name="skill_name" defaultValue={data.skill_name} />
+          <input type="text" name="proficiency_level" defaultValue={data.proficiency_level} />
+
+          <input type="text" name="institution_name" defaultValue={data.institution_name} />
+          <input type="text" name="degree" defaultValue={data.degree} />
+          <input type="text" name="field_of_study" defaultValue={data.field_of_study} />
+          <input type="text" name="start_date" defaultValue={data.start_date} />
+          <input type="text" name="end_date" defaultValue={data.end_date} />
+          <input type="text" name="description" defaultValue={data.description} />
+
+      </Form>
+  );
+}
+
 

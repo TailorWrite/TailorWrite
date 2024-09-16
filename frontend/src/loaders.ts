@@ -56,3 +56,32 @@ export async function allApplicationLoader() {
         return json([]);
     }
 }
+
+export async function profileLoader({ params }: LoaderFunctionArgs) {
+    // OPTIONAL: Extract the params from the URL 
+    const { uuid } = params;
+
+    // OPTIONAL: Implement parameter validation here 
+    if (!uuid) {
+        return json({ error: 'Invalid parameters' }, { status: 400 });
+    }
+
+    try { 
+        // Query the backend api via the path defined in APIConstants 
+        const response = await axios.get(APIConstants.PROFILE(uuid), { headers });)
+
+        // Handle any errors here ...
+        if (!response.data) {
+            return json({ error: 'No data found' }, { status: 404 });
+        }
+
+        // Return the data to the component
+        return json(response.data);
+    } catch (error) {
+        // Extracting the error message from the database
+        const errorMessage = (error as AxiosError).response.data.error || "Failed to <do_operation>";
+
+        // Handle any errors here ...
+        return json({ error: errorMessage }, { status: 500 });
+    }
+}

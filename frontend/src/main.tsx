@@ -11,19 +11,21 @@ import LandingRouter from "./layouts/MarketingLayout";
 import DashboardRouter from "./layouts/DashboardLayout";
 import ApplicationsLayout from './layouts/ApplicationsLayout';
 
+import ProfilePage from './routes/ProfilePage';
 import DashboardHome from './views/DashboardHome';
 import ApplicationDetails from './views/ApplicationDetails';
+import ProfileDetails from './views/Profile';
 
 import PathConstants from './pathConstants';
 import { handleAddApplication, handleUpdateApplication } from './actions';    // TODO: Could be added to actions.ts
-import { allApplicationLoader, applicationLoader } from './loaders';
+import { allApplicationLoader, applicationLoader, profileLoader } from './loaders';
 
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
-import Profile from './views/Profile';
 
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
+
   {
     path: PathConstants.HOME,
     element: <LandingRouter />,
@@ -72,6 +74,13 @@ const router = createBrowserRouter([
           },
         ]
       },
+
+      {
+        path: PathConstants.PROFILE,
+        element: <ProfileDetails/>,
+        // Define the loader function to be called when the route is accessed
+        loader: profileLoader,
+  },
       // { 
       //   path: PathConstants.NEW_APPLICATION, 
       //   element: <ApplicationTracker />,
@@ -92,10 +101,11 @@ const router = createBrowserRouter([
       },
       {
         path: PathConstants.PROFILE,
-        element: <Profile />,
+        element: <ProfilePage />,
       },
     ],
   },  
+
 ], { basename: PathConstants.BASENAME });
 
 
