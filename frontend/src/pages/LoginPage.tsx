@@ -1,25 +1,79 @@
 import { useState } from 'react';
-
-import Logo from '../components/Logo';
 import { Link } from 'react-router-dom';
+
+import { Logo } from '../components/icons';
 
 export default function LoginPage() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const signIn = (e: { preventDefault: () => void; }) => {
-        
+    const signIn = async (e: { preventDefault: () => void; }) => {
         e.preventDefault(); // Prevent default form submission
-
-        const payload  = {
+    
+        const payload = {
             email: email,
             password: password
         };
-
-        console.log('Payload:', payload);
-
+    
+        try {
+            // Send login request
+            const response = await fetch('http://localhost:5001/users/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+    
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+    
+            const result = await response.json();
+            console.log('Login Response:', result);
+    
+            // Save tokens and user ID in sessionStorage
+            if (result.basic_auth_token) {
+                sessionStorage.setItem('basic_auth_token', result.basic_auth_token);
+            }
+            if (result.user_id) {
+                sessionStorage.setItem('user_id', result.user_id);
+    
+                // Fetch user information
+                const userResponse = await fetch(`http://localhost:5001/users/${result.user_id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Basic ${result.basic_auth_token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+    
+                if (!userResponse.ok) {
+                    throw new Error('Failed to fetch user information');
+                }
+    
+                const userData = await userResponse.json();
+                console.log('User Data:', userData);
+    
+                // Store user information in sessionStorage
+                if (userData[0].first_name) {
+                    sessionStorage.setItem('first_name', userData[0].first_name);
+                }
+                if (userData[0].last_name) {
+                    sessionStorage.setItem('last_name', userData[0].last_name);
+                }
+                if (userData[0].email) {
+                    sessionStorage.setItem('email', userData[0].email);
+                }
+    
+                window.location.href = '/dashboard/applications';
+            }
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
     };
+    
 
     return (
         <>

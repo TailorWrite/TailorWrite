@@ -1,0 +1,25 @@
+# Description: This file is used to define the services that will be used in the application.
+# Building; docker-compose build
+# Running: docker-compose up -d
+# Stopping: docker-compose down
+
+name: tailorwrite
+
+# Include the docker-compose file for a locally hosted supabase database 
+# Reffer to https://github.com/JamesRobionyRogers/Assignment01-VirtualisingSoftware for more information
+# include: 
+#   - path: 
+#     - ./database/docker-compose.yml
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend/api
+    ports:
+      - "5001:5001"
