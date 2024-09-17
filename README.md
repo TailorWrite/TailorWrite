@@ -14,7 +14,7 @@
 </p>
 
 ___
-
+[![Frontend Build and Test](https://github.com/TailorWrite/TailorWrite/actions/workflows/frontend-build-and-test.yml/badge.svg)](https://github.com/TailorWrite/TailorWrite/actions/workflows/frontend-build-and-test.yml)
 
 ## Overview 
 TailorWrite addresses the time-consuming challenge of tailoring CVs and cover letters for each job application, a common problem for students and job seekers. By streamlining this process, TailorWrite aims to improve the chances of securing interviews in the competitive job market, particularly for students in their penultimate year, new graduates, and job seekers.
