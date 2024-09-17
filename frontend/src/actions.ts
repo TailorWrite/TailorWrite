@@ -91,7 +91,10 @@ export async function handleAddApplication({ request }: { request: Request }): P
 
 export async function handleApplicationSubmit({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
     // Clone the request to read the body
-    const requestPassOn = request.clone();
+    const requestPassOn = request.clone(); 
+
+    // TODO: Implement this function with checking for the request method (POST, PUT, DELETE)
+
     // Checking what the intent of the form submission was
     const formData = await request.formData();
     const intent = formData.get("intent") as string;
