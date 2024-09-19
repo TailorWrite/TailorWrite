@@ -521,7 +521,7 @@ export default function ProfilePage() {
   
 }
 
-export default function ProfileDetails() {
+function ProfileDetails() {
   // Get the data from the loader function
   const loaderData: ProfileData = useLoaderData() as ProfileData;
 
