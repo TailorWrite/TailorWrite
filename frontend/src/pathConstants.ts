@@ -13,8 +13,8 @@ const PathConstants = {
     GENERATE: '/dashboard/generate',
     ARCHIVE: '/dashboard/archive',
 
-    PROFILE: '/dashboard/profile',
     SETTINGS: '/dashboard/settings',
+    PROFILE: '/dashboard/settings/profile',
 }
 
 const API_BASE_URL = 'http://localhost:5001';
