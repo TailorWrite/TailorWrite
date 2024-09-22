@@ -14,6 +14,7 @@ import ApplicationsLayout from './layouts/ApplicationsLayout';
 import ProfilePage from './routes/ProfilePage';
 import DashboardHome from './views/DashboardHome';
 import ApplicationDetails from './views/ApplicationDetails';
+import ArchivePage from './pages/ArchivePage'
 
 import PathConstants from './pathConstants';
 import { handleAddApplication, handleApplicationSubmit } from './actions';
@@ -80,7 +81,7 @@ const router = createBrowserRouter([
       },
       {
         path: PathConstants.ARCHIVE,
-        element: <NotFound />,
+        element: <ArchivePage />,
       },
       {
         path: PathConstants.PROFILE,
