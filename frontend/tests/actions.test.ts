@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { handleAddApplication, handleUpdateApplication } from '../src/actions';
+import { handleAddApplication, handleApplicationSubmit, handleDeleteApplication, handleUpdateApplication } from '../src/actions';
 import { APIConstants } from '../src/pathConstants';
 
 // Mock dependencies
@@ -71,7 +71,7 @@ describe('Application Actions', () => {
             vi.mocked(axios.post).mockResolvedValue({ data: { success: true } });
 
             // Running the method with the mock request
-            const result = await handleAddApplication({ request: mockRequest as unknown as Request });
+            const result = await handleAddApplication({ request: mockRequest });
 
             // Verify the result and the axios.post method was called with the correct arguments
             expect(axios.post).toHaveBeenCalledWith(
@@ -84,25 +84,17 @@ describe('Application Actions', () => {
                 expect.any(Object)
             );
             expect(result).toEqual({ success: 'Application added successfully!' });
-            expect(toast.success).toHaveBeenCalled();
+            expect(toast.update).toHaveBeenCalled();
         });
 
         it('should handle missing required fields', async () => {
-            const mockFormData = {
-                get: vi.fn((key) => {
-                    const data = { company: 'Tech Corp' };
-                    return data[key];
-                }),
-            };
+            const mockFormData = new MockFormData({ job: 'Software Engineer' });
+            const mockRequest = createMockRequest(mockFormData);
 
-            const mockRequest = {
-                formData: () => Promise.resolve(mockFormData),
-            };
-
-            const result = await handleAddApplication({ request: mockRequest as any });
+            const result = await handleAddApplication({ request: mockRequest });
 
             expect(result).toEqual({ error: 'All fields are required.' });
-            expect(toast.info).toHaveBeenCalled();
+            expect(toast.update).toHaveBeenCalled();
         });
 
         it('should handle API errors', async () => {
@@ -178,7 +170,7 @@ describe('Application Actions', () => {
 
             // Verify the result and that the toast.info method was called
             expect(result).toEqual({ error: 'All fields are required.' });
-            expect(toast.info).toHaveBeenCalled();
+            expect(toast.update).toHaveBeenCalled();
         });
 
         it('should handle API errors', async () => {
@@ -207,6 +199,47 @@ describe('Application Actions', () => {
             expect(result).toEqual({ error: 'Update API Error' });
             expect(toast.update).toHaveBeenCalled();
             
+        });
+    });
+
+    describe('handleDeleteApplication', () => {
+        it('should delete an application successfully', async () => {
+            // Create a MockFormData object with the application ID
+            const mockFormData = new MockFormData({ id: '123' });
+            const mockRequest = createMockRequest(mockFormData);
+
+            // Mock the axios.delete method to return a successful response
+            vi.mocked(axios.delete).mockResolvedValue({ data: { success: true } });
+        
+            // Running the method with the mock request
+            const result = await handleDeleteApplication({ request: mockRequest });
+
+
+            // Verify the result and that the axios.delete method was called with the correct arguments
+            expect(result).toEqual({ success: 'Application deleted successfully!' });
+            expect(axios.delete).toHaveBeenCalledWith(
+                APIConstants.APPLICATION('123'),    // API URL
+                expect.any(Object)                  // Headers
+            );
+            expect(toast.update).toHaveBeenCalled();
+        });
+
+        it('should handle API errors', async () => {
+            // Create a MockFormData object with the application ID
+            const mockFormData = new MockFormData({ id: '123' });
+            const mockRequest = createMockRequest(mockFormData);
+
+            // Mock the axios.delete method to return an error response
+            vi.mocked(axios.delete).mockRejectedValue({ response: { data: { error: 'Delete API Error' } } });
+            vi.spyOn(toast, 'update');
+
+            // Running the method with the mock application ID
+            const result = await handleDeleteApplication({ request: mockRequest });
+
+            // Verify the result and that the axios.delete method was called with the correct arguments
+            expect(result).toEqual({ error: 'Delete API Error' });
+            expect(axios.delete).toHaveBeenCalled();
+            expect(toast.update).toHaveBeenCalled();
         });
     });
 });

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import { Card, CardHeader, Input, Typography, Button, CardBody, Chip, CardFooter, Tabs, TabsHeader, Tab, Avatar } from "@material-tailwind/react";
-import { MagnifyingGlassIcon, ChevronUpDownIcon, ArrowPathIcon, UserPlusIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, ChevronUpDownIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 import { color as ChipColor } from "@material-tailwind/react/types/components/chip";
 import { ApplicationData, suppressMissingAttributes } from "../types";
 import { formatDate, getCompanyLogoUrl } from "../utils";
@@ -46,7 +46,6 @@ export default function ApplicationTracker() {
     const currentApplications = filteredApplications.slice((page - 1) * recordsPerPage, page * recordsPerPage);
 
     const handleAddApplication = () => navigate('/dashboard/applications/new');
-    const handleReloadComponent = () => navigate('.', { replace: true });
 
     return (
         <Card className="flex flex-col h-full shadow-none dark:bg-neutral-950" {...suppressMissingAttributes}>
@@ -61,10 +60,6 @@ export default function ApplicationTracker() {
                         </Typography>
                     </div>
                     <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-                        <Button onClick={handleReloadComponent} className="flex items-center gap-3 dark:bg-white dark:text-black" size="sm" {...suppressMissingAttributes}>
-                            <ArrowPathIcon strokeWidth={2} className="h-4 w-4" /> Reload
-                        </Button>
-
                         <Button onClick={handleAddApplication} className="flex items-center gap-3 dark:bg-white dark:text-black" size="sm" {...suppressMissingAttributes}>
                             <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Job Application
                         </Button>

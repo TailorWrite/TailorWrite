@@ -16,7 +16,7 @@ import DashboardHome from './views/DashboardHome';
 import ApplicationDetails from './views/ApplicationDetails';
 
 import PathConstants from './pathConstants';
-import { handleAddApplication, handleUpdateApplication } from './actions';    // TODO: Could be added to actions.ts
+import { handleAddApplication, handleApplicationSubmit } from './actions';
 import { allApplicationLoader, applicationLoader } from './loaders';
 
 import './index.css';
@@ -68,19 +68,11 @@ const router = createBrowserRouter([
             element: <ApplicationDetails />,
             // Loads application data of the given uuid
             loader: applicationLoader,
-            action: handleUpdateApplication,
+            // Handles the update and deletion of an application
+            action: handleApplicationSubmit,
           },
         ]
       },
-      // { 
-      //   path: PathConstants.NEW_APPLICATION, 
-      //   element: <ApplicationTracker />,
-      // },
-      // { 
-      //   path: PathConstants.APPLICATION, 
-      //   element: <ApplicationTracker />,
-      //   loader: applicationLoader,
-      // },
 
       {
         path: PathConstants.GENERATE,

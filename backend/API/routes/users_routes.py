@@ -1,3 +1,5 @@
+import datetime
+import pytz
 from flask_restx import Namespace, Resource, fields, reqparse, api
 from flask import request, jsonify
 from models.users import create_user, create_account, get_user, update_user, delete_user, login_user
@@ -83,12 +85,21 @@ class User(Resource):
 
     @token_required  # Require token for this route
     @users_ns.doc(security='apikey')
+    @users_ns.expect(update_account_model)
     @users_ns.response(200, 'User updated successfully', user_model)
     @users_ns.response(400, 'Bad Request')
-    def put(self, user_id):
+    @users_ns.response(403, 'Forbidden')
+    def put(self, user_id, token_user_id):
         """Update a user by ID"""
         data = request.json
         try:
+            response = get_user(user_id).data
+            user_id = response[0]['id']
+            if user_id != token_user_id:
+                return {'error': 'No you\'re not allowed this with that auth key'}, 403
+            utc_now = datetime.datetime.now(pytz.utc)
+            formatted_time = utc_now.strftime('%Y-%m-%dT%H:%M:%SZ')
+            data['updated_at'] = formatted_time
             response = update_user(user_id, data)
             response = jsonify(response.data[0])
             response.status_code = 200
