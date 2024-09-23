@@ -11,10 +11,10 @@ import LandingRouter from "./layouts/MarketingLayout";
 import DashboardRouter from "./layouts/DashboardLayout";
 import ApplicationsLayout from './layouts/ApplicationsLayout';
 
-import ProfilePage from './routes/ProfilePage';
+import ProfilePage from './views/ProfilePage';
 import DashboardHome from './views/DashboardHome';
 import ApplicationDetails from './views/ApplicationDetails';
-import ProfileDetails from './views/Profile';
+import ProfileDetails from './views/ProfilePage';
 
 import PathConstants from './pathConstants';
 import { handleAddApplication, handleUpdateApplication } from './actions';    // TODO: Could be added to actions.ts

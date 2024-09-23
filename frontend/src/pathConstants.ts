@@ -22,7 +22,9 @@ const APIConstants = {
     BASE_URL: API_BASE_URL,
     ALL_APPLICATIONS: (user_id: string) => `${API_BASE_URL}/applications/user/${user_id}`,
     APPLICATION: (uuid: string) => `${API_BASE_URL}/applications/${uuid}`,
-    PROFILE: (uuid: string) => `${API_BASE_URL}/applications/${uuid}`,
+    SKILLS: (uuid: string) => `${API_BASE_URL}/skills/user/${uuid}`,
+    EDUCATION: (uuid: string) => `${API_BASE_URL}/educations/user/${uuid}`,
+    EXPERIENCE: (uuid: string) => `${API_BASE_URL}/experiences/user/${uuid}`,
     USERS: `${API_BASE_URL}/users`,
 }
 
