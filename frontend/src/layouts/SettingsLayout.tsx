@@ -21,13 +21,9 @@ export default SettingsLayout
 const Navigation = [
     { title: "General", icon: Cog6ToothIcon, link: PathConstants.SETTINGS },
     { title: "Profile", icon: Cog6ToothIcon, link: PathConstants.PROFILE },
+    { title: "Data", icon: Cog6ToothIcon, link: PathConstants.SETTINGS_DATA },
     // { title: "Security", icon: Cog6ToothIcon, link: PathConstants.SETTINGS_SECURITY },
     // { title: "Notifications", icon: Cog6ToothIcon, link: PathConstants.SETTINGS_NOTIFICATIONS },
-    // { title: "Billing", icon: Cog6ToothIcon, link: PathConstants.SETTINGS_BILLING },
-    // { title: "Integrations", icon: Cog6ToothIcon, link: PathConstants.SETTINGS_INTEGRATIONS },
-    // { title: "API", icon: Cog6ToothIcon, link: PathConstants.SETTINGS_API },
-    // { title: "Advanced", icon: Cog6ToothIcon, link: PathConstants.SETTINGS_ADVANCED },
-    // { title: "About", icon: Cog6ToothIcon, link: PathConstants.SETTINGS_ABOUT },
     // { title: "Support", icon: Cog6ToothIcon, link: PathConstants.SETTINGS_SUPPORT },
 ]
 
@@ -49,9 +45,9 @@ const SettingsHeader = () => {
 
                                 className={clsx(
                                     "py-4 px-1 inline-flex items-center gap-x-1 text-sm whitespace-nowrap hover:text-blue-600 focus:outline-none", 
-                                    "focus:text-blue-600 disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:hover:text-blue-500",
+                                    "focus:text-blue-600 disabled:opacity-50 disabled:pointer-events-none dark:hover:text-blue-500",
                                     // Highlight the active tab
-                                    currentPath === item.link ? "font-semibold text-blue-600" : "text-gray-500"
+                                    currentPath === item.link ? "font-semibold text-blue-600 dark:text-blue-500" : "text-gray-500 dark:text-primaryDarkText"
 
                                 )}
 

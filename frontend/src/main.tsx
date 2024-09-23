@@ -16,6 +16,7 @@ import ProfilePage from './routes/ProfilePage';
 import DashboardHome from './views/DashboardHome';
 import ApplicationDetails from './views/ApplicationDetails';
 import GeneralSettings from './views/settings/GeneralSettings';
+import DataSettings from './views/settings/DataSettings';
 
 import PathConstants from './pathConstants';
 import { handleAddApplication, handleApplicationSubmit } from './actions';
@@ -95,27 +96,15 @@ const router = createBrowserRouter([
           {
             path: PathConstants.PROFILE,
             element: <ProfilePage />,
+          }, 
+          {
+            path: PathConstants.SETTINGS_DATA,
+            element: <DataSettings />,
           }
         ]
       },
     ],
   },
-  // {
-  //   path: PathConstants.SETTINGS,
-  //   element: <DashboardLayout />,
-  //   children: [
-  //     {
-  //       index: true,
-  //       element: <SettingsLayout />,
-  //       children: [
-  //         {
-  //           path: PathConstants.SETTINGS,
-  //         }
-  //       ]
-  //     },
-
-  //   ]
-  // }  
 ], { basename: PathConstants.BASENAME });
 
 
@@ -123,7 +112,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <RouterProvider router={router} />
+          <RouterProvider router={router}/>
       </ThemeProvider>
     </QueryClientProvider>
   </React.StrictMode>,
