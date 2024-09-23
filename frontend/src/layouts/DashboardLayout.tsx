@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Cog6ToothIcon, CubeTransparentIcon, FolderOpenIcon, PowerIcon, PresentationChartBarIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 import { Bounce, ToastContainer } from 'react-toastify';
@@ -21,23 +20,21 @@ export default function DashboardLayout() {
         { name: 'Sign out', route: '#', current: false, icon: <PowerIcon className="h-5 w-5" /> },
     ];
 
-    const [title, setTitle] = useState("");
-
     return (
-        <div className="antialiased bg-gray-50 dark:bg-gray-950 h-screen">
+        <div className="antialiased bg-gray-50 dark:bg-primaryDark h-screen">
 
-            <Sidebar title={title} navigation={navigation} userNavigation={userNavigation} />
+            <Sidebar navigation={navigation} userNavigation={userNavigation} />
 
-            <main className="md:ml-80 h-full pr-2 py-2 max-h-screen overflow-hidden dark:bg-gray-950">
-                <div className="relative rounded-2xl border border-blue-gray-50 bg-white h-full flex flex-col overflow-hidden">
+            <div className="md:ml-80 h-full pr-2 py-2 max-h-screen overflow-hidden ">
+                <main className="relative rounded-2xl h-full flex flex-col overflow-hidden bg-white border border-lightBorder dark:border-darkBorder dark:bg-secondaryDark ">
                     <DashboardNav />
 
                     <div id="outlet-container" className="relative flex-1 overflow-auto no-scrollbar">
-                        <Outlet context={{ setTitle }} />
+                        <Outlet />
                     </div>
 
-                </div>
-            </main>
+                </main>
+            </div>
 
             <ToastContainer
                 stacked
