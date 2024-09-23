@@ -258,12 +258,14 @@ const ViewUserData: React.FC<ViewUserDataProps> = ({ data }) => {
     }, [data, darkMode]);
 
     return (
-        <div className="max-h-72 overflow-scroll rounded-2xl shadow-sm bg-[#fafafa] dark:bg-[#282c34]">
-            <CopyToClipboard 
-                className="absolute right-10 !bg-transparent border-transparent shadow-transparent"
-                text={JSON.stringify(data)} 
-            />
-            <div dangerouslySetInnerHTML={{ __html: html }} />
+        <div id="view-user-data" className="overflow-hidden rounded-2xl">
+            <div className="max-h-72 rounded-2xl overflow-scroll shadow-sm bg-[#fafafa] dark:bg-[#282c34]">
+                <CopyToClipboard 
+                    className="absolute right-10 !bg-transparent border-transparent shadow-transparent"
+                    text={JSON.stringify(data)} 
+                />
+                <div dangerouslySetInnerHTML={{ __html: html }} />
+            </div>
         </div>
     );
 };
