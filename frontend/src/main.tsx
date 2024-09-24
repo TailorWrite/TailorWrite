@@ -8,12 +8,15 @@ import { LandingPage, LoginPage, SignupPage, ErrorPage } from './pages';
 import NotFound from "./components/common/NotFound";
 
 import LandingRouter from "./layouts/MarketingLayout";
-import DashboardRouter from "./layouts/DashboardLayout";
+import DashboardLayout from "./layouts/DashboardLayout";
 import ApplicationsLayout from './layouts/ApplicationsLayout';
+import SettingsLayout from './layouts/SettingsLayout';
 
 import ProfilePage from './routes/ProfilePage';
 import DashboardHome from './views/DashboardHome';
 import ApplicationDetails from './views/ApplicationDetails';
+import GeneralSettings from './views/settings/GeneralSettings';
+import DataSettings from './views/settings/DataSettings';
 
 import PathConstants from './pathConstants';
 import { handleAddApplication, handleApplicationSubmit } from './actions';
@@ -45,7 +48,7 @@ const router = createBrowserRouter([
   },
   {
     path: PathConstants.DASHBOARD,
-    element: <DashboardRouter />,
+    element: <DashboardLayout />,
     children: [
       {
         index: true,
@@ -83,11 +86,25 @@ const router = createBrowserRouter([
         element: <NotFound />,
       },
       {
-        path: PathConstants.PROFILE,
-        element: <ProfilePage />,
+        path: PathConstants.SETTINGS,
+        element: <SettingsLayout />,
+        children: [
+          {
+            index: true,
+            element: <GeneralSettings />,
+          },
+          {
+            path: PathConstants.PROFILE,
+            element: <ProfilePage />,
+          }, 
+          {
+            path: PathConstants.SETTINGS_DATA,
+            element: <DataSettings />,
+          }
+        ]
       },
     ],
-  },  
+  },
 ], { basename: PathConstants.BASENAME });
 
 
@@ -95,7 +112,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <RouterProvider router={router} />
+          <RouterProvider router={router}/>
       </ThemeProvider>
     </QueryClientProvider>
   </React.StrictMode>,

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { handleAddApplication, handleApplicationSubmit, handleDeleteApplication, handleUpdateApplication } from '../src/actions';
+import { handleAddApplication, handleDeleteApplication, handleUpdateApplication } from '../src/actions';
 import { APIConstants } from '../src/pathConstants';
 
 // Mock dependencies
