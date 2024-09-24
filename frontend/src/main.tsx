@@ -17,7 +17,7 @@ import ApplicationDetails from './views/ApplicationDetails';
 import ProfileDetails from './views/ProfilePage';
 
 import PathConstants from './pathConstants';
-import { handleAddApplication, handleUpdateApplication } from './actions';    // TODO: Could be added to actions.ts
+import { handleAddApplication, handleProfile, handleUpdateApplication } from './actions';    // TODO: Could be added to actions.ts
 import { allApplicationLoader, applicationLoader, profileLoader } from './loaders';
 
 import './index.css';
@@ -80,6 +80,7 @@ const router = createBrowserRouter([
         element: <ProfileDetails/>,
         // Define the loader function to be called when the route is accessed
         loader: profileLoader,
+        action: handleProfile,
   },
       // { 
       //   path: PathConstants.NEW_APPLICATION, 

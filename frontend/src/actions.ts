@@ -176,3 +176,72 @@ export async function handleUpdateApplication({ request }: { request: Request })
         return { error: errorMessage };
     }
 }
+
+export async function handleProfile({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
+
+    console.log("test");
+
+    // OPTIONAL: Extract the userId from the session storage
+    const userId = sessionStorage.getItem('userId') as string;
+    
+    // Get the form data from the request
+    const formData = await request.formData();
+
+    // Extract the fields from the form data
+    const job_title = formData.get('job_title-name-${index}');
+    const company_name = formData.get('company_name');
+    const is_current_job = formData.get('is_current_job ');
+    const start_date = formData.get('start_data');
+    const end_date = formData.get('end_data');
+    const description = formData.get('description');
+
+    // OPTIONAL: Implement parameter validation here
+    if (!job_title || !company_name || !is_current_job || !start_date || !end_date || !description ) {
+        return json({ error: 'Invalid parameters' }, { status: 400 });
+    }
+
+    // Construct the payload to be sent to the backend
+    const payload = {
+        user_id: userId,    // OPTIONAL: Include only if userId is required
+        job_title,
+        company_name,
+        is_current_job,
+        start_date,
+        end_date,
+        description
+    };
+
+
+    try { 
+        // Query the backend api via the path defined in APIConstants 
+        const response = await axios.post(APIConstants.EXPERIENCE(userId), payload, { headers });
+
+        // Handle any errors here ...
+        if (!response.data) {
+            return json({ error: 'Failed to update profile' }, { status: 500 });
+        }
+
+        // Implement a toast notification here ...
+        if (!job_title || !company_name) {
+            toast.info('Job title and company name required ', {
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                theme: "light",
+                transition: Bounce,
+            });
+            return { error: "All fields are required." };
+        }
+
+        // Return the data to the component
+        return json(response.data);
+    } catch (error) {
+        // Extracting the error message from the database
+        const errorMessage = (error as AxiosError).response.data.error || "Failed to create application";
+
+        // Handle any errors here ...
+        return json({ error: errorMessage }, { status: 500 });
+    }
+}
