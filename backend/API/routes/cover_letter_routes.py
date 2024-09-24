@@ -6,6 +6,7 @@ from models.users import get_user
 from models.education import get_educations_by_user
 from models.experience import get_experiences_by_user
 from models.skills import get_skills_by_user
+from models.applications import get_application
 import json
 from config import Config
 
@@ -15,11 +16,11 @@ cover_letter_ns = Namespace('cover_letter', description='Cover letter generation
 # Define the cover letter generation model
 cover_letter_model = cover_letter_ns.model('CoverLetterGeneration', {
     'user_id': fields.String(required=True, description='User ID of the applicant', example='5a4245c0-5404-4be3-9061-f728d77fdb42'),
-    'job_description': fields.String(required=True, description='Description of the job', example='We are seeking a skilled software engineer...'),
+    'application_id': fields.String(required=False, description='ID number of the application', example='10')
 })
 
-GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
-API_KEY = "AIzaSyBzfqaAl5vSltZbuHKEZscjAFZv4YJMt7A"
+GEMINI_API_URL = Config.GEMINI_API_URL
+API_KEY = Config.GEMINI_API_KEY
 
 @cover_letter_ns.route('/generate')
 class GenerateCoverLetter(Resource):
@@ -31,9 +32,10 @@ class GenerateCoverLetter(Resource):
     def post(self, token_user_id):
         """Generate a cover letter based on job description and personal description"""
         
-        
         data = request.json
-        print(data)
+        job_description = data.get('job_description')
+        application_id = data.get('application_id')
+
         user_id = data.get('user_id')
         if user_id != token_user_id:
             return {'error': 'No you\'re not allowed this with that auth key'}, 403
@@ -71,9 +73,26 @@ class GenerateCoverLetter(Resource):
             skills_descriptions.append(description)
         full_skills_description = ", ".join(skills_descriptions)
         
-        job_description = data.get('job_description')
+        full_application_description = ""
+        if application_id:
+            response = get_application(application_id)
+            application_data = json.loads(response.json())['data'][0]
+            description = (
+                f"Applied for {application_data['job_title']} at {application_data['company_name']} "
+                f"on {application_data['application_date']} - Status: {application_data['status']}. "
+            )
+            if application_data['notes']:
+                description += f"Notes: {application_data['notes']}. "
 
-        if not job_description or not user_description or not full_education_description or not full_experience_description or not full_skills_description:
+        if job_description:
+            full_application_description += "Further description: " + job_description
+            
+        if full_application_description == "":
+            full_application_description = "No Job Application"
+
+        
+
+        if not user_description or not full_education_description or not full_experience_description or not full_skills_description or not full_application_description:
             return {'error': 'All user descriptions are required'}, 400
 
         try:
@@ -81,7 +100,7 @@ class GenerateCoverLetter(Resource):
             payload = {
                 "contents": [{
                     "parts": [{
-                        "text": f"Generate a cover letter based on the following job description and personal description. Do not include any fields for the user to fill such as [Your Name] or [platform where you found the job listing]. This cover letter is to be used in a professional manner, and will not be modified after you create it:\n\nPersonal Description: {user_description}\nJob Description: {job_description}\n\Education Description: {full_education_description}\n\Experience Description: {full_experience_description}\n\Skills Description: {full_skills_description}"
+                        "text": f"Generate a cover letter based on the following job description and personal description. Do not include any fields for the user to fill such as [Your Name] or [platform where you found the job listing]. This cover letter is to be used in a professional manner, and will not be modified after you create it:\n\nPersonal Description: {user_description}\nJob Description: {full_application_description}\n\Education Description: {full_education_description}\n\Experience Description: {full_experience_description}\n\Skills Description: {full_skills_description}"
                     }]
                 }]
             }
