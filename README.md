@@ -14,6 +14,7 @@
 </p>
 
 ___
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6347d85f7faf446a8b9c8f9e7c9d8f0c)](https://app.codacy.com/gh/TailorWrite/TailorWrite?utm_source=github.com&utm_medium=referral&utm_content=TailorWrite/TailorWrite&utm_campaign=Badge_Grade)
 [![Frontend Build and Test](https://github.com/TailorWrite/TailorWrite/actions/workflows/frontend-build-and-test.yml/badge.svg)](https://github.com/TailorWrite/TailorWrite/actions/workflows/frontend-build-and-test.yml)
 
 ## Overview 
