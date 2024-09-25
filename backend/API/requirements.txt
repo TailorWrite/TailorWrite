@@ -1,8 +1,9 @@
-flask
-supabase
-flask_cors
 python-dotenv
+requests
+supabase
+flask
+flask_cors
 flask_restx
 routes
-requests
+PyLaTeX
 pytest
