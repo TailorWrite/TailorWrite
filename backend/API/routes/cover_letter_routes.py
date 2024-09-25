@@ -1,6 +1,8 @@
+import os
+import subprocess
 import requests
 from flask_restx import Namespace, Resource, fields
-from flask import request, jsonify
+from flask import request, jsonify, send_file
 from models.authentication import token_required
 from models.users import get_user
 from models.education import get_educations_by_user
@@ -22,6 +24,13 @@ cover_letter_model = cover_letter_ns.model('CoverLetterGeneration', {
 GEMINI_API_URL = Config.GEMINI_API_URL
 API_KEY = Config.GEMINI_API_KEY
 
+TEMPLATES_BASE_PATH = "./api/cover_letter_templates"
+OUTPUT_BASE_PATH = "./api/tmp"
+TEMPLATE_INSERT_TOKEN = "INSERT-COVER-LETTER-HERE"
+LINE_SPACING = "\n\n\\vspace{1em}\n"
+
+EXAMPLE_COVER_LETTER = "Dear Hiring Manager,\n\nI am writing to express my strong interest in the Software Engineer position at Sharesies, as advertised on [platform where you found the job listing]. Having followed Sharesies' growth and mission to democratize financial empowerment, I am deeply impressed by your innovative approach to making investing accessible for everyone.\n\nMy background in software development, coupled with my passion for building user-centric applications, aligns perfectly with Sharesies' values.  I possess a solid understanding of Python, Typescript, and SQL, and I am eager to leverage my expertise to contribute to the B2B team's success. \n\nDuring my time as Senior Developer at Tech Corp, I honed my skills in leading a team and managing complex projects. Prior to that, I gained valuable experience in frontend development using React while working at Startup Inc.  I am confident in my ability to collaborate effectively with team members, prioritize tasks efficiently, and meet deadlines consistently. \n\nI am particularly drawn to Sharesies' commitment to fostering a collaborative and supportive work environment.  The opportunity to learn from a team of experienced professionals while contributing to a company with a clear social impact is incredibly appealing. \n\nI am eager to learn more about Sharesies' innovative B2B solutions and how my skills can contribute to your continued growth. Thank you for your time and consideration.\n\nSincerely,\n\nJohn Doe\njohn.doe@example.com\n123-456-7890 \n"
+
 @cover_letter_ns.route('/generate')
 class GenerateCoverLetter(Resource):
     @token_required
@@ -35,6 +44,7 @@ class GenerateCoverLetter(Resource):
         data = request.json
         job_description = data.get('job_description')
         application_id = data.get('application_id')
+        style = data.get('style', 'professional')
 
         user_id = data.get('user_id')
         if user_id != token_user_id:
@@ -104,16 +114,50 @@ class GenerateCoverLetter(Resource):
                     }]
                 }]
             }
-            print(payload)
 
             # Send POST request to Gemini API
             response = requests.post(f"{Config.GEMINI_API_URL}?key={Config.GEMINI_API_KEY}", json=payload)
-
+            generated_text = ""
             if response.status_code == 200:
                 generated_text = response.json()['candidates'][0]['content']['parts'][0]['text']
-                return {'cover_letter': generated_text}, 200
             else:
                 return {'error': 'Failed to generate cover letter', 'details': response.text}, response.status_code
 
         except requests.RequestException as e:
             return {'error': 'Failed to connect to cover letter generation service', 'details': str(e)}, 500
+        
+        # Replace double newlines with custom spacing
+        generated_text = generated_text.replace("\n\n", LINE_SPACING)
+
+        # Read the LaTeX template
+        template_path = f"{TEMPLATES_BASE_PATH}/{style}.tex"
+        if not os.path.exists(template_path):
+            return {"error": f"Template '{style}' not found"}, 404
+
+        with open(template_path, "r") as template:
+            template_contents = template.read()
+
+        # Create the output LaTeX file
+        output_tex_path = f"{OUTPUT_BASE_PATH}/cover_letter.tex"
+        
+        with open(output_tex_path, "w") as output:
+            content = template_contents.replace(TEMPLATE_INSERT_TOKEN, generated_text)
+            output.write(content)
+
+        # Compile the LaTeX file to PDF
+        output_pdf_path = f"{OUTPUT_BASE_PATH}/cover_letter.pdf"
+        try:
+            subprocess.run(['pdflatex', '-output-directory', OUTPUT_BASE_PATH, output_tex_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            
+            # Clean up auxiliary files
+            for ext in ['.aux', '.log', '.out']:
+                aux_file = f"{OUTPUT_BASE_PATH}/cover_letter{ext}"
+                if os.path.exists(aux_file):
+                    os.remove(aux_file)
+            
+            output_pdf_path = f"{os.getcwd()}{output_pdf_path[1:]}"
+            return send_file(output_pdf_path, as_attachment=True, download_name="cover_letter.pdf")
+        except subprocess.CalledProcessError as e:
+            return {"error": f"LaTeX compilation failed: {str(e)}"}, 500
+        except Exception as e:
+            return {"error": f"An error occurred: {str(e)}"}, 500
