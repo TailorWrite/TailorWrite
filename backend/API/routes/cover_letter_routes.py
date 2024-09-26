@@ -24,8 +24,8 @@ cover_letter_model = cover_letter_ns.model('CoverLetterGeneration', {
 GEMINI_API_URL = Config.GEMINI_API_URL
 API_KEY = Config.GEMINI_API_KEY
 
-TEMPLATES_BASE_PATH = "./api/cover_letter_templates"
-OUTPUT_BASE_PATH = "./api/tmp"
+TEMPLATES_BASE_PATH = f"{os.getcwd()}/cover_letter_templates"
+OUTPUT_BASE_PATH = f"{os.getcwd()}/tmp"
 TEMPLATE_INSERT_TOKEN = "INSERT-COVER-LETTER-HERE"
 LINE_SPACING = "\n\n\\vspace{1em}\n"
 
@@ -110,10 +110,12 @@ class GenerateCoverLetter(Resource):
             payload = {
                 "contents": [{
                     "parts": [{
-                        "text": f"Generate a cover letter based on the following job description and personal description. Do not include any fields for the user to fill such as [Your Name] or [platform where you found the job listing]. This cover letter is to be used in a professional manner, and will not be modified after you create it:\n\nPersonal Description: {user_description}\nJob Description: {full_application_description}\n\Education Description: {full_education_description}\n\Experience Description: {full_experience_description}\n\Skills Description: {full_skills_description}"
+                        "text": f"Generate a cover letter based on the following job description and personal description. Do not include any fields for the user to fill such as [Your Name] or [platform where you found the job listing]. This cover letter is to be used in a professional manner, and will not be modified after you create it:\n\nPersonal Description: {user_description}\nJob Description: {full_application_description}\nEducation Description: {full_education_description}\nExperience Description: {full_experience_description}\nSkills Description: {full_skills_description}"
                     }]
                 }]
             }
+
+            # generated_text = EXAMPLE_COVER_LETTER
 
             # Send POST request to Gemini API
             response = requests.post(f"{Config.GEMINI_API_URL}?key={Config.GEMINI_API_KEY}", json=payload)
@@ -132,7 +134,7 @@ class GenerateCoverLetter(Resource):
         # Read the LaTeX template
         template_path = f"{TEMPLATES_BASE_PATH}/{style}.tex"
         if not os.path.exists(template_path):
-            return {"error": f"Template '{style}' not found"}, 404
+            return {"error": f"Template '{style}' not found.", "path": template_path}, 404
 
         with open(template_path, "r") as template:
             template_contents = template.read()
@@ -145,9 +147,10 @@ class GenerateCoverLetter(Resource):
             output.write(content)
 
         # Compile the LaTeX file to PDF
-        output_pdf_path = f"{OUTPUT_BASE_PATH}/cover_letter.pdf"
+        output_pdf_path = f"{OUTPUT_BASE_PATH}/cover_letter.pdf"[4:]
+        print(f"output_pdf_path: {output_pdf_path}")
         try:
-            subprocess.run(['pdflatex', '-output-directory', OUTPUT_BASE_PATH, output_tex_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run(['pdflatex', '-interaction=nonstopmode', '-output-directory', OUTPUT_BASE_PATH, output_tex_path]) # , check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             
             # Clean up auxiliary files
             for ext in ['.aux', '.log', '.out']:
@@ -155,7 +158,7 @@ class GenerateCoverLetter(Resource):
                 if os.path.exists(aux_file):
                     os.remove(aux_file)
             
-            output_pdf_path = f"{os.getcwd()}{output_pdf_path[1:]}"
+            output_pdf_path = f"{os.getcwd()}{output_pdf_path}"
             return send_file(output_pdf_path, as_attachment=True, download_name="cover_letter.pdf")
         except subprocess.CalledProcessError as e:
             return {"error": f"LaTeX compilation failed: {str(e)}"}, 500
