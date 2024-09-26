@@ -35,8 +35,6 @@ export default function DefaultSidebar({ navigation, userNavigation }: SidebarPr
 
     const [profile] = useState<UserProfile>(getUserProfile());
 
-    console.log(profile);
-
     return (
         <Card
             className="fixed top-0 left-0 h-screen w-full max-w-[20rem] p-4 rounded-none bg-gray-50 shadow-none dark:bg-transparent"
