@@ -18,8 +18,13 @@ services:
       - "80:80"
     depends_on:
       - backend
+    # volumes:
+      # - ./frontend:/app  # Mounting the frontend code for real-time updates
 
   backend:
     build: ./backend/api
     ports:
       - "5001:5001"
+    volumes:
+      - ./backend/api:/app  # Mounting the backend code for real-time updates
+      - /app/__pycache__  # Optional: for cache persistence
