@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react()],
   base: PathConstants.BASENAME,
   build: {
-    outDir: '../docs',  // Outputs the build to the docs folder (necessary for gitbucket pages)
+    // outDir: './build',  // Outputs the build to the docs folder (necessary for gitbucket pages)
     emptyOutDir: true,  // also necessary
   }, 
   test: {
