@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, CheckIcon } from '@heroicons/react/24/outline';
-import { Listbox, Transition } from '@headlessui/react';
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions, Transition } from '@headlessui/react';
 
 const months = [
     { id: 0, name: 'January' },
@@ -139,23 +139,20 @@ const DateSelector = ({ onDateSelect, dateSelected }: DateSelectorProps) => {
                     <div className="relative">
                         <Listbox value={currentMonth} onChange={setCurrentMonth}>
                             <div className="relative">
-                                <Listbox.Button className="hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative flex text-nowrap w-full cursor-pointer text-start font-medium text-gray-800 hover:text-blue-600 focus:outline-none focus:text-blue-600">
+                                <ListboxButton className="hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative flex text-nowrap w-full cursor-pointer text-start font-medium text-gray-800 hover:text-blue-600 focus:outline-none focus:text-blue-600">
                                     {months[currentMonth].name}
-                                </Listbox.Button>
+                                </ListboxButton>
                                 <Transition
                                     as={React.Fragment}
                                     leave="transition ease-in duration-100"
                                     leaveFrom="opacity-100"
                                     leaveTo="opacity-0"
                                 >
-                                    <Listbox.Options className="absolute mt-2 z-50 w-32 max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg shadow-lg overflow-auto">
+                                    <ListboxOptions className="absolute mt-2 z-50 w-32 max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg shadow-lg overflow-auto">
                                         {months.map((month) => (
-                                            <Listbox.Option
+                                            <ListboxOption
                                                 key={month.id}
-                                                className={({ active }) =>
-                                                    `cursor-pointer select-none relative p-2 rounded-lg ${active ? 'bg-gray-100 text-gray-800' : 'text-gray-800'
-                                                    }`
-                                                }
+                                                className="cursor-pointer select-none relative p-2 rounded-lg text-gray-800 data-[selected]:bg-gray-100"
                                                 value={month.id}
                                             >
                                                 {({ selected }) => (
@@ -166,9 +163,9 @@ const DateSelector = ({ onDateSelect, dateSelected }: DateSelectorProps) => {
                                                         )}
                                                     </div>
                                                 )}
-                                            </Listbox.Option>
+                                            </ListboxOption>
                                         ))}
-                                    </Listbox.Options>
+                                    </ListboxOptions>
                                 </Transition>
                             </div>
                         </Listbox>
@@ -181,23 +178,20 @@ const DateSelector = ({ onDateSelect, dateSelected }: DateSelectorProps) => {
                     <div className="relative">
                         <Listbox value={currentYear} onChange={setCurrentYear}>
                             <div className="relative">
-                                <Listbox.Button className="hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative flex text-nowrap w-full cursor-pointer text-start font-medium text-gray-800 hover:text-blue-600 focus:outline-none focus:text-blue-600">
+                                <ListboxButton className="hs-select-disabled:pointer-events-none hs-select-disabled:opacity-50 relative flex text-nowrap w-full cursor-pointer text-start font-medium text-gray-800 hover:text-blue-600 focus:outline-none focus:text-blue-600">
                                     {currentYear}
-                                </Listbox.Button>
+                                </ListboxButton>
                                 <Transition
                                     as={React.Fragment}
                                     leave="transition ease-in duration-100"
                                     leaveFrom="opacity-100"
                                     leaveTo="opacity-0"
                                 >
-                                    <Listbox.Options className="absolute mt-2 z-50 w-20 max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg shadow-lg overflow-auto">
+                                    <ListboxOptions className="absolute mt-2 z-50 w-20 max-h-72 p-1 space-y-0.5 bg-white border border-gray-200 rounded-lg shadow-lg overflow-auto">
                                         {years.map((year) => (
-                                            <Listbox.Option
+                                            <ListboxOption
                                                 key={year}
-                                                className={({ active }) =>
-                                                    `cursor-pointer select-none relative p-2 rounded-lg ${active ? 'bg-gray-100 text-gray-800' : 'text-gray-800'
-                                                    }`
-                                                }
+                                                className="cursor-pointer select-none relative p-2 rounded-lg text-gray-800 data-[selected]:bg-gray-100"
                                                 value={year}
                                             >
                                                 {({ selected }) => (
@@ -208,9 +202,9 @@ const DateSelector = ({ onDateSelect, dateSelected }: DateSelectorProps) => {
                                                         )}
                                                     </div>
                                                 )}
-                                            </Listbox.Option>
+                                            </ListboxOption>
                                         ))}
-                                    </Listbox.Options>
+                                    </ListboxOptions>
                                 </Transition>
                             </div>
                         </Listbox>
