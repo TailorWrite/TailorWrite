@@ -3,6 +3,9 @@
 
 */node_modules
 
+# Backend folder
+backend/API/tmp/*.tex
+
 
 # Ignore the folder frontend_old
 frontend_old/
