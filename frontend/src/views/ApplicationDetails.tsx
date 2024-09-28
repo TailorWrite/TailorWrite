@@ -474,7 +474,20 @@ const CoverLetterSection = ({ document }: CoverLetterProps) => {
                     transition: Bounce,
                 });
             })
-            .catch(error => console.error('Error fetching PDF:', error));
+            .catch(error => {
+                console.error('Error fetching PDF:', error)
+                toast.update(toastId, {
+                    render: `Error generating cover letter: ${error}`,
+                    type: 'error',
+                    isLoading: false,
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    theme: "light",
+                    transition: Bounce,
+                });
+            });
     }; 
 
     const handleDownloadCoverLetter = () => {
