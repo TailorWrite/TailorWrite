@@ -51,6 +51,7 @@ export default withMT({
       secondaryDarkText: tailwindColors.neutral[400],
 
       primaryDarkAccent: tailwindColors.blue[500],
+      primaryLightAccent: tailwindColors.indigo[600],
     },
   },
   plugins: [
