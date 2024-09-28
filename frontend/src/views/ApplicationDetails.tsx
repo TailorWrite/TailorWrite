@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, Form, useNavigate, useLoaderData, useSubmit } from 'react-router-dom';
-import { Field, Menu, MenuButton, MenuItem, MenuItems, Textarea } from '@headlessui/react';
-import { PlusIcon, CheckIcon, ChevronDownIcon, ClockIcon, LinkIcon, CalendarDaysIcon, PaperClipIcon } from '@heroicons/react/20/solid';
-import { DocumentTextIcon } from '@heroicons/react/24/outline';
-import { BuildingOffice2Icon, NoSymbolIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { Dialog, DialogBackdrop, DialogPanel, Field, Menu, MenuButton, MenuItem, MenuItems, Textarea } from '@headlessui/react';
+import { PlusIcon, CheckIcon, ChevronDownIcon, ClockIcon, LinkIcon, CalendarDaysIcon, PaperClipIcon, ArrowDownTrayIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import { BuildingOffice2Icon, NoSymbolIcon, TrashIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import { Avatar, Breadcrumbs, Drawer, Timeline, TimelineBody, TimelineConnector, TimelineHeader, TimelineIcon, TimelineItem } from '@material-tailwind/react';
-import { toast } from 'react-toastify';
+import { Document, Page } from 'react-pdf'
+import { Bounce, toast } from 'react-toastify';
+import clsx from 'clsx';
+import axios from 'axios';
 
 import StatusSelector from '../components/common/StatusSelector';
 import DateSelector from '../components/common/DateSelector';
@@ -13,7 +15,7 @@ import WarningModal from '../components/modals/WarningModal';
 
 import { appendHttpsToLink, formatDate, getCompanyLogoUrl } from '../utils';
 
-import PathConstants from '../pathConstants';
+import PathConstants, { APIConstants } from '../pathConstants';
 import { ApplicationAction, ApplicationData, ApplicationDocuments, ApplicationStatus, suppressMissingAttributes } from '../types';
 
 
@@ -136,7 +138,7 @@ export default function ApplicationDetails() {
                                     type="submit"
                                     name="intent"
                                     value="save"
-                                    className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                    className="inline-flex items-center rounded-md bg-primaryLightAccent px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaryLightAccent"
                                 >
                                     <CheckIcon aria-hidden="true" className="-ml-0.5 mr-1.5 h-5 w-5" />
                                     Save
@@ -247,7 +249,7 @@ export default function ApplicationDetails() {
                 <hr className="my-2 border-lightBorder dark:border-darkBorder" />
 
                 {/* Body */}
-                <div className="py-4 px-2 grid grid-cols-[auto_38%] gap-y-10  md:gap-x-5 ">
+                <div className="py-4 px-2 grid grid-cols-[auto_38%] gap-y-10 gap-x-5 ">
                     <div className="flex flex-col gap-y-10">
                         {/* Job description & Timeline */}
                         <section className="col-span-6 row-span-2 sm:order-1 md:order-none">
@@ -258,7 +260,7 @@ export default function ApplicationDetails() {
                                     name="description"
                                     defaultValue={applicationData.description}
                                     placeholder="No job description provided"
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-primaryDark dark:ring-darkBorder dark:text-primaryDarkText dark:placeholder-secondaryDarkText/60"
+                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primaryLightAccent sm:text-sm sm:leading-6 dark:bg-primaryDark dark:ring-darkBorder dark:text-primaryDarkText dark:placeholder-secondaryDarkText/60"
                                     rows={3}
                                 />
                             </Field>
@@ -294,7 +296,7 @@ export default function ApplicationDetails() {
                                     name="notes"
                                     defaultValue={applicationData.notes}
                                     placeholder="Oops... No notes here. &#13;&#10;&#13;&#10;Keep track of things such as the hiring manager's name, the interview date, or any other important details here."
-                                    className="block w-full flex-grow rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-primaryDark dark:text-primaryDarkText dark:ring-darkBorder dark:placeholder-secondaryDarkText/60"
+                                    className="block w-full flex-grow rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primaryLightAccent sm:text-sm sm:leading-6 dark:bg-primaryDark dark:text-primaryDarkText dark:ring-darkBorder dark:placeholder-secondaryDarkText/60"
                                     rows={5}
                                 />
                             </Field>
@@ -306,25 +308,7 @@ export default function ApplicationDetails() {
 
                     <div className="flex flex-col gap-y-10">
                         {/* Cover Letter */}
-                        <section onClick={handleComingSoon} className="relative row-span-6 flex flex-col sm:order-4 sm:row-span-4 md:order-none">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-primaryDarkText">Cover Letter</h3>
-                            <div className="flex-grow mt-2 flex justify-center items-center rounded-lg border border-dashed border-gray-900/25 px-6 dark:border-secondaryDarkText/60">
-                                <div className="text-center py-32 pb-[8.25rem] text-gray-600 dark:text-secondaryDarkText">
-                                    <DocumentTextIcon aria-hidden="true" className="mx-auto h-12 w-12 text-gray-300 dark:text-secondaryDarkText" />
-                                    <div className="mt-4 flex text-sm leading-6">
-                                        <label
-                                            htmlFor="file-upload"
-                                            className="relative cursor-pointer rounded-md font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500 dark:text-primaryDarkAccent"
-                                        >
-                                            <span>Generate</span>
-                                            <input id="file-upload" name="file-upload" type="file" className="sr-only" />
-                                        </label>
-                                        <p className="pl-1">a cover letter here</p>
-                                    </div>
-                                    <p className="text-xs leading-5">TXT or PDF. Up to 3 options</p>
-                                </div>
-                            </div>
-                        </section>
+                        <CoverLetterSection />
 
                         {/* Actions section */}
                         <section className="row-span-2 sm:order-last md:order-none">
@@ -376,7 +360,7 @@ const DocumentUploadSection = ({ documents }: DocumentUploadProps) => {
                 <h3 className="text-lg font-bold text-gray-900 dark:text-primaryDarkText">Documents</h3>
                 <button
                     type="button"
-                    className=" inline-flex gap-2 items-center rounded-md bg-indigo-600 px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    className=" inline-flex gap-2 items-center rounded-md bg-primaryLightAccent px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaryLightAccent"
                     onClick={handleDocumentUpload}
                 >
                     <PlusIcon className="h-4 w-4" />
@@ -401,7 +385,7 @@ const DocumentUploadSection = ({ documents }: DocumentUploadProps) => {
                                         </div>
                                     </div>
                                     <div className="ml-4 flex-shrink-0">
-                                        <a href={document.link} className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-primaryDarkAccent">
+                                        <a href={document.link} className="font-medium text-primaryLightAccent hover:text-indigo-500 dark:text-primaryDarkAccent">
                                             Download
                                         </a>
                                     </div>
@@ -416,7 +400,7 @@ const DocumentUploadSection = ({ documents }: DocumentUploadProps) => {
                             <div className="mt-4 flex text-sm leading-6 text-gray-600 dark:text-secondaryDarkText">
                                 <label
                                     htmlFor="file-upload"
-                                    className="relative cursor-pointer rounded-md font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500 dark:text-primaryDarkAccent"
+                                    className="relative cursor-pointer rounded-md font-semibold text-primaryLightAccent focus-within:outline-none focus-within:ring-2 focus-within:ring-primaryLightAccent focus-within:ring-offset-2 hover:text-indigo-500 dark:text-primaryDarkAccent"
                                 >
                                     <span>Upload</span>
                                     <input id="file-upload" name="file-upload" type="file" className="sr-only" />
@@ -429,5 +413,207 @@ const DocumentUploadSection = ({ documents }: DocumentUploadProps) => {
             }
 
         </section>
+    )
+}
+
+
+interface CoverLetterProps {
+    document?: string;
+}
+const CoverLetterSection = ({ document }: CoverLetterProps) => {
+
+    const downloadLinkRef = useRef<HTMLAnchorElement>(null);
+    const coverLetterContainerRef = useRef<HTMLDivElement>(null);
+    const [file, setFile] = useState<string | undefined>(document);
+    const [coverLetterPageHeight, setCoverLetterPageHeight] = useState<number>(0);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false); 
+
+    // When the page loads and window resizes, set the width of the page
+    useEffect(() => {
+        // Check if the cover letter container exists and set the width of the page 
+        if (coverLetterContainerRef.current) {
+            setCoverLetterPageHeight(coverLetterContainerRef.current.offsetHeight);
+        }
+
+        // Add event listener to resize the window and set the width of the page
+        window.addEventListener('resize', () => {
+            if (coverLetterContainerRef.current) {
+                setCoverLetterPageHeight(coverLetterContainerRef.current.offsetHeight);
+            }
+        });
+    }, [file]);
+
+    const handleGenerateCoverLetter = () => {
+        const toastId = toast('Generating cover letter...', { autoClose: false });
+        // Get the cover letter from the server
+        const payload = {
+            user_id: "70ed3786-c99c-4fd4-85c7-4117361b8306",
+            application_id: "11"
+        }
+
+        const headers = {
+            'Authorization': `Basic ZHNAZXhhbXBsZS5jb206cGFzc3dvcmQ=`,
+            'Content-Type': 'application/json'
+        };
+
+        axios.post(APIConstants.COVER_LETTER_GENERATE, payload, { headers, responseType: 'blob' })
+            .then(response => response.data)
+            .then(blob => {
+                const file = new Blob([blob], { type: 'application/pdf' });
+                const fileURL = URL.createObjectURL(file);
+                setFile(fileURL);
+                toast.update(toastId, {
+                    render: 'Cover letter generated successfully',
+                    type: 'success',
+                    isLoading: false,
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    theme: "light",
+                    transition: Bounce,
+                });
+            })
+            .catch(error => console.error('Error fetching PDF:', error));
+    }; 
+
+    const handleDownloadCoverLetter = () => {
+        if (file) {
+            downloadLinkRef.current?.click();
+        }
+    }
+
+    return (
+
+        <section className="relative row-span-6 flex flex-col sm:order-4 sm:row-span-4 md:order-none">
+            <div className="flex flex-row justify-between">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-primaryDarkText">Cover Letter</h3>
+                { file && <button
+                    type="button"
+                    className="inline-flex gap-2 items-center rounded-md bg-primaryLightAccent px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaryLightAccent"
+                    onClick={() => downloadLinkRef.current?.click()}
+                >
+                    Download
+                    <ArrowDownTrayIcon className="size-4" />
+                </button> } 
+                <a ref={downloadLinkRef} href={file} className="hidden" download="cover-letter.pdf">Download</a>
+            </div>
+            <div ref={coverLetterContainerRef} className={clsx(
+                "flex-grow mt-2 flex justify-center items-center rounded-lg overflow-hidden border border-dashed border-gray-900/25 dark:border-secondaryDarkText/60",
+                file ? "aspect-[3/4]" : "px-6"
+            )}>
+                { file ? (
+                    // <object data={file} type="application/pdf" className="w-full h-full"></object>
+                    <Document onClick={() => setIsModalOpen(true)} className="aspect=[3/4] hover:cursor-pointer" file={file}>
+                        <Page pageNumber={1} height={coverLetterPageHeight + 20}/>
+                    </Document>
+                ) : (
+                    <div className="text-center py-32 pb-[8.25rem] text-gray-600 dark:text-secondaryDarkText">
+                        <DocumentTextIcon aria-hidden="true" className="mx-auto h-12 w-12 text-gray-300 dark:text-secondaryDarkText" />
+                        <div className="mt-4 flex text-sm leading-6">
+                            <label
+                                htmlFor="file-upload"
+                                className="relative cursor-pointer rounded-md font-semibold text-primaryLightAccent focus-within:outline-none focus-within:ring-2 focus-within:ring-primaryLightAccent focus-within:ring-offset-2 hover:text-indigo-500 dark:text-primaryDarkAccent"
+                            >
+                                <span onClick={handleGenerateCoverLetter}>Generate</span>
+                                {/* <input id="file-upload" name="file-upload" type="file" className="sr-only" /> */}
+                            </label>
+                            <p className="pl-1">a cover letter here</p>
+                        </div>
+                        <p className="text-xs leading-5">TXT or PDF. Up to 3 options</p>
+                    </div>
+                )}
+            </div>
+
+
+            { file && <CoverLetterModal file={file} open={isModalOpen} onClose={setIsModalOpen} onDownload={handleDownloadCoverLetter} /> }
+
+        </section>
+    )
+}
+
+interface CoverLetterModalProps {
+    file: string;
+    open: boolean;
+    onClose: (value: boolean) => void;
+    onDownload: () => void;
+}
+const CoverLetterModal = ({ file, open, onClose, onDownload }: CoverLetterModalProps ) => {
+
+    const coverLetterModalContainerRef = useRef<HTMLDivElement>(null);
+    const [coverLetterPageWidth, setCoverLetterPageWidth] = useState<number>(0)
+    const [isModalMounted, setIsModalMounted] = useState<boolean>(false);
+    
+    const updatePageWidth = useCallback(() => {
+        if (coverLetterModalContainerRef.current) {
+            const width = coverLetterModalContainerRef.current.offsetWidth;
+            console.log("Width: ", width);
+            setCoverLetterPageWidth(width);
+        }
+    }, []);
+
+    useLayoutEffect(() => {
+        if (open) {
+            setIsModalMounted(true);
+        }
+    }, [open]);
+
+    useLayoutEffect(() => {
+        console.log('Calculating width');
+        console.log('Open:', open, 'Mounted:', isModalMounted);
+
+        if (open && isModalMounted) {
+            // Add a small delay to ensure the DOM has rendered
+            const timer = setTimeout(() => {
+                updatePageWidth();
+            }, 0);
+
+            window.addEventListener('resize', updatePageWidth);
+
+            return () => {
+                clearTimeout(timer);
+                window.removeEventListener('resize', updatePageWidth);
+            };
+        }
+    }, [open, isModalMounted, updatePageWidth]);
+
+    return (
+        <Dialog open={open} onClose={onClose} className="relative z-50">
+            <DialogBackdrop
+                transition
+                className="fixed inset-0 bg-gray-500/75 dark:bg-primaryDark/75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+            />
+
+            <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0 ">
+                    <DialogPanel
+                        transition
+                        className="relative p-4 transform overflow-hidden rounded-lg bg-white dark:transparent text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-lg data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95 md:max-w-4xl"
+                    >
+                        <div className="flex flex-col">
+                            <div className="flex justify-end">
+                                <button onClick={() => onClose(false)} className="text-gray-400 dark:text-secondaryDarkText">
+                                    <span className="sr-only">Close</span>
+                                    <XMarkIcon className="size-6" />
+                                </button>
+                            </div>
+
+                            <div ref={coverLetterModalContainerRef} className="flex justify-around rounded-lg overflow-hidden">
+                                <Document file={file}>
+                                    <Page pageNumber={1} width={coverLetterPageWidth} />
+                                </Document>
+                            </div>
+
+                            <div className="flex justify-end">
+                                <button onClick={() => onDownload()} className="inline-flex gap-2 rounded-md bg-primaryLightAccent px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaryLightAccent">
+                                    <span>Download</span>
+                                    <ArrowDownTrayIcon className="size-4" />
+                                </button>
+                            </div>
+                        </div>
+                    </DialogPanel>
+                </div>
+            </div>
+        </Dialog>
     )
 }
