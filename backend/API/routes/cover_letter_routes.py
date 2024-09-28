@@ -118,6 +118,7 @@ class GenerateCoverLetter(Resource):
             # generated_text = EXAMPLE_COVER_LETTER
 
             # Send POST request to Gemini API
+            print("[INFO] Sending request to Gemini API...")
             response = requests.post(f"{Config.GEMINI_API_URL}?key={Config.GEMINI_API_KEY}", json=payload)
             generated_text = ""
             if response.status_code == 200:
@@ -150,16 +151,19 @@ class GenerateCoverLetter(Resource):
         output_pdf_path = f"{OUTPUT_BASE_PATH}/cover_letter.pdf"[4:]
         print(f"output_pdf_path: {output_pdf_path}")
         try:
-            subprocess.run(['pdflatex', '-interaction=nonstopmode', '-output-directory', OUTPUT_BASE_PATH, output_tex_path]) # , check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            print("[INFO] Compiling LaTeX file to PDF...")
+            subprocess.run(['pdflatex', '-interaction=nonstopmode', '-output-directory', OUTPUT_BASE_PATH, output_tex_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             
             # Clean up auxiliary files
+            print("[INFO] Cleaning up auxiliary files...")
             for ext in ['.aux', '.log', '.out']:
                 aux_file = f"{OUTPUT_BASE_PATH}/cover_letter{ext}"
                 if os.path.exists(aux_file):
                     os.remove(aux_file)
             
             output_pdf_path = f"{os.getcwd()}{output_pdf_path}"
-            return send_file(output_pdf_path, as_attachment=True, download_name="cover_letter.pdf")
+            print(f"[INFO] PDF file generated successfully: {output_pdf_path}")
+            return send_file(output_pdf_path, as_attachment=True, download_name="cover_letter.pdf", mimetype='application/pdf')
         except subprocess.CalledProcessError as e:
             return {"error": f"LaTeX compilation failed: {str(e)}"}, 500
         except Exception as e:
