@@ -26,7 +26,7 @@ export default function ApplicationDetails({ actionData }: ApplicationDetailsPro
 
     // Extracting the first application from the loader data array
     const application: ApplicationData = loaderData[0] as ApplicationData ?? {};
-    const [applicationData] = useState<ApplicationData>(application);
+    const [applicationData, setApplicationData] = useState<ApplicationData>(application);
 
     applicationData.img = getCompanyLogoUrl(applicationData.company_name);
 
@@ -42,6 +42,35 @@ export default function ApplicationDetails({ actionData }: ApplicationDetailsPro
             transition: Bounce,
         });
     }
+
+// Function to handle input change and update applicationData.description
+const handleInputChangeApplicationURL = (e) => {
+    const url = e.target.value; // Get the input value
+    console.log('Typed URL:', url); // Perform action, e.g., logging the input value
+
+    // Make an API call to the localhost endpoint with URL as a query parameter
+    fetch(`http://localhost:5001/applications/extractDescription?url=${encodeURIComponent(url)}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('API Response:', data); // Log the returned job title and description
+            
+            // Update applicationData with the description from the API response
+            setApplicationData((prevData) => ({
+                ...prevData,
+                description: data.job_description // Update the description in the state
+            }));
+        })
+        .catch(error => {
+            console.error('There was an error with the API request:', error);
+        });
+};
+
+
 
     const [showCalendar, setShowCalendar] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Date>(new Date(applicationData.application_date ?? new Date()));
@@ -253,6 +282,7 @@ export default function ApplicationDetails({ actionData }: ApplicationDetailsPro
                                         name="url"
                                         placeholder="www.application-link.com"
                                         defaultValue={applicationData.application_url}
+                                        onChange={handleInputChangeApplicationURL}
                                         className="py-1 px-4 ps-14 block w-full border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
                                     />
                                     <div className="absolute inset-y-0 start-0 flex items-center pointer-events-none z-20 ps-4">
@@ -277,6 +307,7 @@ export default function ApplicationDetails({ actionData }: ApplicationDetailsPro
                             <Textarea
                                 name="description"
                                 defaultValue={applicationData.description}
+                                // value={applicationData.description}
                                 placeholder="No job description provided"
                                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                 rows={3}

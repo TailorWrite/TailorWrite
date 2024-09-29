@@ -4,6 +4,10 @@ from flask_restx import Namespace, Resource, fields
 from flask import request, jsonify
 from models.applications import create_application, get_application, update_application, delete_application, get_applications_by_user
 from models.authentication import token_required
+import requests
+from bs4 import BeautifulSoup
+from flask import jsonify
+
 
 # Define the namespace
 applications_ns = Namespace('applications', description='Job application operations')
@@ -133,4 +137,45 @@ class JobApplicationsByUser(Resource):
                 return {'message': 'No job applications found for this user'}, 404
         except Exception as e:
             return {'error': str(e)}, 400
+
+@applications_ns.route('/extractDescription')
+class JobApplicationJobDescription(Resource):
+    # @applications_ns.expect(application_model)
+    @applications_ns.response(201, 'Job application created successfully')
+    @applications_ns.response(400, 'Bad Request')
+    @applications_ns.response(403, 'Forbidden')
+    
+    def get(self):
+        url = 'https://www.seek.co.nz/job/79026786?ref=search-standalone&type=standout&origin=jobTitle#sol=63fecb2e91ddb6228b46626a6176806314f42c79'
+        output_file = 'job_description.txt'
+        
+        # Send a GET request to the URL
+        response = requests.get(url)
+        
+        # Check if the request was successful
+        if response.status_code == 200:
+            # Parse the page content with BeautifulSoup
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            # Extract the job title
+            job_title_advert = soup.find('h1')
+            job_title = job_title_advert.get_text(strip=True) if job_title_advert else "No job title found"
+
+            # Extract the job description
+            job_description_section = soup.find('section')
+            job_description = job_description_section.get_text(strip=True) if job_description_section else "No job description found"
+            
+            # Return the data as a JSON object
+            return jsonify({
+                "job_title": job_title,
+                "job_description": job_description
+            })
+        
+        else:
+            # Handle the error when the page couldn't be retrieved
+            return jsonify({
+                "error": f"Failed to retrieve the page. Status code: {response.status_code}"
+            }), response.status_code
+
+
 

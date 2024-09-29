@@ -29,7 +29,7 @@ def scrape_job_description(url, output_file):
         print(f"Failed to retrieve the page. Status code: {response.status_code}")
 
 # URL and output file
-url = 'https://www.seek.co.nz/job/78985106?ref=search-standalone&type=standout&origin=jobTitle#sol=7b8c825fd025bb5c27d94ef0d6134f51643b8b0c'
+url = 'https://www.seek.co.nz/job/79026786?ref=search-standalone&type=standout&origin=jobTitle#sol=63fecb2e91ddb6228b46626a6176806314f42c79'
 output_file = 'job_description.txt'
 
 # Call the function
