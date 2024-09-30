@@ -13,15 +13,17 @@ const PathConstants = {
     GENERATE: '/dashboard/generate',
     ARCHIVE: '/dashboard/archive',
 
-    PROFILE: '/dashboard/profile',
     SETTINGS: '/dashboard/settings',
+    PROFILE: '/dashboard/settings/profile',
+    SETTINGS_DATA: '/dashboard/settings/data',
 }
 
 const API_BASE_URL = 'http://localhost:5001';
 const APIConstants = {
     BASE_URL: API_BASE_URL,
-    ALL_APPLICATIONS: (user_id: string) => `${API_BASE_URL}/applications/user/${user_id}`,
+    APPLICATIONS: `${API_BASE_URL}/applications`,
     APPLICATION: (uuid: string) => `${API_BASE_URL}/applications/${uuid}`,
+    ALL_APPLICATIONS: (user_id: string) => `${API_BASE_URL}/applications/user/${user_id}`,
     SKILLS: (uuid: string) => `${API_BASE_URL}/skills/user/${uuid}`,
     EDUCATION: (uuid: string) => `${API_BASE_URL}/educations/user/${uuid}`,
     EXPERIENCE: (uuid: string) => `${API_BASE_URL}/experiences/user/${uuid}`,

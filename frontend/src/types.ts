@@ -1,3 +1,4 @@
+import { Color } from "./components/common/BasicChip";
 
 export const suppressMissingAttributes = {
     placeholder: undefined,
@@ -5,19 +6,21 @@ export const suppressMissingAttributes = {
     onPointerLeaveCapture: undefined,
 };
 
-// Importing Types
-import { color } from "@material-tailwind/react/types/components/chip";
-
 // Exporting Types
-export type ChipColor = color; 
 export type ApplicationStatus = "Applied" | "Interview" | "Offer" | "Rejected";
 
 // Exporting Interfaces
+export interface UserProfile {
+    name: string,
+    email: string,
+    img: string | null,
+}
+
 export interface StatusMap {
-    Applied: ChipColor,
-    Interview: ChipColor,
-    Offer: ChipColor,
-    Rejected: ChipColor,
+    Applied: Color,
+    Interview: Color,
+    Offer: Color,
+    Rejected: Color,
 }
 
 export interface ApplicationDocuments {
@@ -32,7 +35,7 @@ export interface ApplicationData {
     company_name: string,
     job_title: string,
     description?: string,
-    status: string, // ApplicationStatus,
+    status: ApplicationStatus,
     application_date: string,
     application_url: string,
     notes?: string,

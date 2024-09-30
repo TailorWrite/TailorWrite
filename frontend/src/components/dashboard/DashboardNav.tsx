@@ -30,7 +30,7 @@ export default function DashboardNav() {
 
     return (
         <>
-            <Disclosure as="nav" className="relative flex flex-row justify-between p-3  w-full z-40 dark:bg-gray-800">
+            <Disclosure as="nav" className="relative flex flex-row justify-between p-3 w-full z-40">
 
                 <div className="flex flex-col px-3 justify-start">
                     {/* <Typography variant="h6" color="blue-gray" className="pb-1 leading-none text-left dark:text-white">
@@ -72,7 +72,8 @@ export default function DashboardNav() {
                     </div>
                 </DisclosurePanel>
             </Disclosure>
-            <hr className=" my-2 pb-2 border-blue-gray-50" />
+
+            <hr className=" my-2 pb-2 border-blue-gray-50 dark:border-darkBorder" />
         </>
     )
 }

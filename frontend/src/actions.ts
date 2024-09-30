@@ -14,6 +14,7 @@ import { headers } from "./api";
 import { APIConstants } from "./pathConstants";
 
 export async function handleAddApplication({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
+    const toastId = toast.loading('Uploading application...');
     const userId = sessionStorage.getItem("user_id");
     
     const formData = await request.formData();
@@ -29,8 +30,10 @@ export async function handleAddApplication({ request }: { request: Request }): P
 
     // Perform validation or API request
     if (!job || !company) {
-        toast.info('Job title and company name required ', {
-            position: "bottom-right",
+        toast.update(toastId, {
+            render: 'Job title and company name required ',
+            type: 'info',
+            isLoading: false,
             autoClose: 5000,
             hideProgressBar: false,
             closeOnClick: true,
@@ -38,6 +41,7 @@ export async function handleAddApplication({ request }: { request: Request }): P
             theme: "light",
             transition: Bounce,
         });
+
         return { error: "All fields are required." };
     }
 
@@ -53,7 +57,7 @@ export async function handleAddApplication({ request }: { request: Request }): P
     };
 
     try {
-        const response = await axios.post("http://localhost:5001/applications", payload, { headers });
+        const response = await axios.post(APIConstants.APPLICATIONS, payload, { headers });
 
         if (!response.data) {
             const errorMessage = response.data.error || "Failed to add application.";
@@ -62,8 +66,10 @@ export async function handleAddApplication({ request }: { request: Request }): P
             // return { error: `Failed to add application. ${response.statusText}` };
         }
 
-        toast.success('Application uploaded successfully ', {
-            position: "bottom-right",
+        toast.update(toastId, {
+            render: 'Application uploaded successfully',
+            type: 'success',
+            isLoading: false,
             autoClose: 5000,
             hideProgressBar: false,
             closeOnClick: true,
@@ -83,7 +89,24 @@ export async function handleAddApplication({ request }: { request: Request }): P
 
 }
 
-// TODO: Implement the handleUpdateApplication function
+export async function handleApplicationSubmit({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
+    // Clone the request to read the body
+    const requestPassOn = request.clone(); 
+
+    // TODO: Implement this function with checking for the request method (POST, PUT, DELETE)
+
+    // Checking what the intent of the form submission was
+    const formData = await request.formData();
+    const intent = formData.get("intent") as string;
+
+    // Call the appropriate function based on the intent
+    if ( intent == "delete") {
+        return handleDeleteApplication({ request: requestPassOn });
+    }
+
+    return handleUpdateApplication({ request: requestPassOn });
+}
+
 export async function handleUpdateApplication({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
     const toastId = toast.loading('Updating application...');
 
@@ -102,8 +125,10 @@ export async function handleUpdateApplication({ request }: { request: Request })
 
     // Perform validation or API request
     if (!job || !company) {
-        toast.info('Job title and company name required ', {
-            position: "bottom-right",
+        toast.update(toastId, {
+            render: 'Job title and company name required ',
+            type: 'info',
+            isLoading: false,
             autoClose: 5000,
             hideProgressBar: false,
             closeOnClick: true,
@@ -111,6 +136,7 @@ export async function handleUpdateApplication({ request }: { request: Request })
             theme: "light",
             transition: Bounce,
         });
+
         return { error: "All fields are required." };
     }
 
@@ -144,16 +170,6 @@ export async function handleUpdateApplication({ request }: { request: Request })
             theme: "light",
             transition: Bounce,
         });
-
-        // toast.success('Application updated successfully ', {
-        //     position: "bottom-right",
-        //     autoClose: 5000,
-        //     hideProgressBar: false,
-        //     closeOnClick: true,
-        //     pauseOnHover: true,
-        //     theme: "light",
-        //     transition: Bounce,
-        // });
 
         return { success: "Application updated successfully!" };
     }
@@ -245,3 +261,56 @@ export async function handleProfile({ request }: { request: Request }): Promise<
         return json({ error: errorMessage }, { status: 500 });
     }
 }
+
+
+export async function handleDeleteApplication({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
+    const toastId = toast.loading('Deleting application...');
+
+    // Extract all the form fields from the request
+    const formData = await request.formData();
+
+    // Extract form fields from formData
+    const applicationId = formData.get("id") as string;
+
+    try {
+        const response = await axios.delete(APIConstants.APPLICATION(applicationId), { headers });
+
+        if (!response.data) {
+            const errorMessage = response.data.error || "Failed to delete application.";
+            console.log("Error:", errorMessage);
+            return { error: errorMessage };
+        }
+
+        toast.update(toastId, {
+            render: 'Application deleted successfully',
+            type: 'success',
+            isLoading: false,
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            theme: "light",
+            transition: Bounce,
+        });
+
+        return { success: "Application deleted successfully!" };
+    }
+    catch (error) {
+        const errorMessage = (error as AxiosError).response.data.error || "Failed to delete application.";
+
+        toast.update(toastId, {
+            render: errorMessage,
+            type: 'error',
+            isLoading: false,
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            theme: "light",
+            transition: Bounce,
+        });
+
+        console.error(errorMessage);
+        return { error: errorMessage };
+    }
+} 

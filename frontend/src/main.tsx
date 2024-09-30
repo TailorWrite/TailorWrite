@@ -8,17 +8,20 @@ import { LandingPage, LoginPage, SignupPage, ErrorPage } from './pages';
 import NotFound from "./components/common/NotFound";
 
 import LandingRouter from "./layouts/MarketingLayout";
-import DashboardRouter from "./layouts/DashboardLayout";
+import DashboardLayout from "./layouts/DashboardLayout";
 import ApplicationsLayout from './layouts/ApplicationsLayout';
+import SettingsLayout from './layouts/SettingsLayout';
 
 import ProfilePage from './views/ProfilePage';
 import DashboardHome from './views/DashboardHome';
 import ApplicationDetails from './views/ApplicationDetails';
 import ProfileDetails from './views/ProfilePage';
+import GeneralSettings from './views/settings/GeneralSettings';
+import DataSettings from './views/settings/DataSettings';
 
 import PathConstants from './pathConstants';
-import { handleAddApplication, handleProfile, handleUpdateApplication } from './actions';    // TODO: Could be added to actions.ts
-import { allApplicationLoader, applicationLoader, profileLoader } from './loaders';
+import { handleAddApplication,, handleApplicationSubmit, handleProfile, handleUpdateApplication } from './actions';    // TODO: Could be added to actions.ts
+import { allApplicationLoader, applicationLoader } from './loaders';
 
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
@@ -47,7 +50,7 @@ const router = createBrowserRouter([
   },
   {
     path: PathConstants.DASHBOARD,
-    element: <DashboardRouter />,
+    element: <DashboardLayout />,
     children: [
       {
         index: true,
@@ -70,7 +73,8 @@ const router = createBrowserRouter([
             element: <ApplicationDetails />,
             // Loads application data of the given uuid
             loader: applicationLoader,
-            action: handleUpdateApplication,
+            // Handles the update and deletion of an application
+            action: handleApplicationSubmit,
           },
         ]
       },
@@ -101,8 +105,22 @@ const router = createBrowserRouter([
         element: <NotFound />,
       },
       {
-        path: PathConstants.PROFILE,
-        element: <ProfilePage />,
+        path: PathConstants.SETTINGS,
+        element: <SettingsLayout />,
+        children: [
+          {
+            index: true,
+            element: <GeneralSettings />,
+          },
+          {
+            path: PathConstants.PROFILE,
+            element: <ProfilePage />,
+          }, 
+          {
+            path: PathConstants.SETTINGS_DATA,
+            element: <DataSettings />,
+          }
+        ]
       },
     ],
   },  
@@ -114,7 +132,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <RouterProvider router={router} />
+          <RouterProvider router={router}/>
       </ThemeProvider>
     </QueryClientProvider>
   </React.StrictMode>,
