@@ -6,6 +6,8 @@ import { toast } from 'react-toastify'
 import clsx from 'clsx'
 
 import DataDisplay, { DataDisplayRow } from '../../components/common/DataDisplay'
+import lightModeImage from '../../assets/lightMode.png'
+import darkModeImage from '../../assets/darkMode.png'
 
 
 export interface GeneralSettingsProps {
@@ -53,12 +55,12 @@ const ThemeOptions: ThemeOption[] = [
     {
         title: 'Light Mode',
         description: 'Default branding',
-        image: 'https://s3-alpha.figma.com/hub/file/4175018723/d9fd69a3-ffbc-4f9f-9f8f-294ae6155eaf-cover.png',
+        image: lightModeImage,
     },
     {
         title: 'Dark Mode',
         description: 'Dark mode for night owls',
-        image: 'https://s3-alpha.figma.com/hub/file/4175018723/d9fd69a3-ffbc-4f9f-9f8f-294ae6155eaf-cover.png',
+        image: darkModeImage, 
     }
 ];
 
@@ -82,28 +84,51 @@ const Appearance = () => {
                     className="flex flex-col focus:outline-none hover:cursor-pointer"
                     onClick={() => handleThemeSelection(option)}
                 >
-                    <div className="relative flex flex-col bg-gray-300/20 pt-[50%] sm:pt-[70%] rounded-xl">
+                    <div className={clsx(
+                        "relative flex flex-col rounded-xl bg-gray-300/20 aspect-[1.54/1]",
+                        // option.title.includes('Light') ? 'bg-gray-300/20' : 'bg-primaryDark'
+                        selected.title === option.title ? 'border-4 border-primaryDarkAccent' : 'border-4 border-gray-300 dark:border-darkBorder',
+                    )}>
 
                         <span 
                             // Implemented this way to preserve the transition effect
                             className={clsx(
-                                "absolute p-1 z-10 -top-1 -right-1 bg-primaryDarkAccent rounded-full transition-all duration-300 ease-in-out",
+                                "absolute p-1 z-10 -top-2 -right-2 bg-primaryDarkAccent rounded-full transition-all duration-300 ease-in-out",
                                 // Highlight the selected theme
                                 selected.title === option.title ? 'opacity-100' : 'opacity-0',
                             )} >
                             <CheckIcon className="size-3 text-white"/>
                         </span>
 
-                        <img
-                            className={clsx(
-                                'size-full absolute top-0 start-0 object-cover group-hover:scale-105 group-focus:scale-105 transition-all duration-300 ease-in-out rounded-xl',
-                                // Highlight the selected theme
-                                selected.title === option.title ? 'border-4 border-primaryDarkAccent' : 'border-4 border-gray-300 dark:border-darkBorder',
-                            )}
-                            src={option.image}
-                            alt={option.title}
-                        />
+                        <div className="relative size-full overflow-hidden">
+                            <div className="absolute top-7 start-7">
+                                <figure className="ms-auto me-20 relative z-[1] max-w-full w-[50rem] h-auto shadow-[0_2.75rem_3.5rem_-2rem_rgb(45_55_75_/_20%),_0_0_5rem_-2rem_rgb(45_55_75_/_15%)] dark:shadow-[0_2.75rem_3.5rem_-2rem_rgb(0_0_0_/_20%),_0_0_5rem_-2rem_rgb(0_0_0_/_15%)] rounded-b-lg">
+                                    <div className={clsx(
+                                        "relative flex items-center h-6 max-w-[50rem] rounded-t-lg px-32 ",
+                                        option.image.includes('light') ? 'bg-neutral-200' : 'bg-secondaryDark/95'
+                                    )}>
+                                        <div className="flex gap-x-1 absolute top-2/4 start-4 -translate-y-1">
+                                            <span className="size-2 bg-[#FF605C] rounded-full"></span>
+                                            <span className="size-2 bg-[#FFBD44] rounded-full"></span>
+                                            <span className="size-2 bg-[#00CA4E] rounded-full"></span>
+                                        </div>
+                                        <div className={clsx(
+                                            "flex justify-center items-center w-full h-3 my-4 text-[.25rem] text-gray-400 rounded-sm sm:text-[.5rem] dark:text-neutral-400",
+                                            option.image.includes('light') ? 'bg-neutral-300' : 'bg-primaryDark'
+                                        )}>
+                                            <span>www.tailorwrite.com</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-gray-800 rounded-b-lg">
+                                        <img className="max-w-full h-auto rounded-b-lg pr-[40%]" src={option.image} alt="Browser Placeholder" />
+                                    </div>
+                                </figure>
+                            </div>
+
+                        </div>
                     </div>
+
                     <div className="mt-3">
                         <p className="font-bold text-gray-800 dark:text-primaryDarkText">
                             {option.title}
