@@ -17,6 +17,7 @@ import { appendHttpsToLink, formatDate, getCompanyLogoUrl } from '../utils';
 
 import PathConstants, { APIConstants } from '../pathConstants';
 import { ApplicationAction, ApplicationData, ApplicationDocuments, ApplicationStatus, suppressMissingAttributes } from '../types';
+import { headers } from '../api';
 
 
 export default function ApplicationDetails() {
@@ -308,7 +309,7 @@ export default function ApplicationDetails() {
 
                     <div className="flex flex-col gap-y-10">
                         {/* Cover Letter */}
-                        <CoverLetterSection />
+                        <CoverLetterSection application={applicationData} />
 
                         {/* Actions section */}
                         <section className="row-span-2 sm:order-last md:order-none">
@@ -419,8 +420,9 @@ const DocumentUploadSection = ({ documents }: DocumentUploadProps) => {
 
 interface CoverLetterProps {
     document?: string;
+    application: ApplicationData;
 }
-const CoverLetterSection = ({ document }: CoverLetterProps) => {
+const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
 
     const downloadLinkRef = useRef<HTMLAnchorElement>(null);
     const coverLetterContainerRef = useRef<HTMLDivElement>(null);
@@ -446,15 +448,11 @@ const CoverLetterSection = ({ document }: CoverLetterProps) => {
     const handleGenerateCoverLetter = () => {
         const toastId = toast('Generating cover letter...', { autoClose: false });
         // Get the cover letter from the server
+        console.log(application.id)
         const payload = {
-            user_id: "70ed3786-c99c-4fd4-85c7-4117361b8306",
-            application_id: "11"
+            user_id: sessionStorage.getItem('user_id'),
+            application_id: application.id
         }
-
-        const headers = {
-            'Authorization': `Basic ZHNAZXhhbXBsZS5jb206cGFzc3dvcmQ=`,
-            'Content-Type': 'application/json'
-        };
 
         axios.post(APIConstants.COVER_LETTER_GENERATE, payload, { headers, responseType: 'blob' })
             .then(response => response.data)

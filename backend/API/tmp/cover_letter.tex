@@ -1,71 +1,70 @@
-%Author by Rajib Das Bhagat (rajibdasbhagat@gmail.com)
-%
-\documentclass[11pt,a4paper,roman]{moderncv}      
-\usepackage[english]{babel}
+\documentclass[11pt, letterpaper]{article}
 
-\moderncvstyle{classic}                            
-\moderncvcolor{black}                            
+% Packages:
+\usepackage[
+    top=2cm,
+    bottom=2cm,
+    left=2.2cm,
+    right=2.2cm,
+    footskip=0.5cm
+]{geometry} % for adjusting page geometry
 
-% character encoding
-\usepackage[utf8]{inputenc}                     
+% Define variables for name, location, email and phone number
+\newcommand{\name}{John Doe}
+\newcommand{\location}{}
+\newcommand{\email}{user@example.com}
+\newcommand{\phone}{1234567890}
 
-% adjust the page margins
-\usepackage[scale=0.80]{geometry}
+\newcommand{\jobTitle}{little helper}
 
-% personal data
-\name{Full Name}{}
-\email{xxxxx@gmail.com}
-\phone[mobile]{+91 1234567890}               
-\address{Village, City - State, Country}
-
+% Some settings:
+\pagestyle{empty} % no header or footer
+\setcounter{secnumdepth}{0} % no section numbering
+\setlength{\parindent}{0pt} % no indentation
+\setlength{\parskip}{6pt} % space between paragraphs
 
 \begin{document}
 
-\recipient{To}{The Teacher-In-Charge, \\
-               Department of Computer Application,\\ 
-               Full Address (State)}
-\date{\today}
-\opening{\textbf{Sub: Application for the post of Guest Lecturer (Computer Application) with reference advertisement: XXXX/XX, dated 04-03-2022.}}
-\closing{Your Sincerly, \vspace{-1em}}
+\noindent
+\hfill
+\begin{tabular}{@{}l@{}}
+    \name \\[0.1cm]
+    \phone \\
+    \email \\
+    \location
+\end{tabular}
 
+\vspace{0.5cm}
 
-\enclosure[Enclosed (Marksheets/Certificates)]{
-              \\ 1. SSLC (Admit/MarkSheet/Certificate)
-                 \hspace{0.0em} 5. GATE (2016) \hspace{2em} 9. Identity-Proof (Voter-Id)\\
-                 2. Diploma (MarkSheet/Certificate)
-                 \hspace{1.8em} 6. SLET (2021) \hspace{1.9em} 10. Resume\\        
-                 3. B.Tech (MarkSheet/Certificate)
-                 \hspace{2.3em} 7. UGC-NET (2022) \hspace{-0.1em} \\
-                 4. M.Tech (MarkSheet/Certificate)
-                 \hspace{2.1em} 8. Caste Certificate \\
-                 }
-\makelettertitle
+\noindent\textit{\today}
 
+\vspace{0.2cm}
 
-Dear Hiring Manager,
+\noindent\textbf{Re: \jobTitle}
+
+\vspace{0.5cm}
+
+Dear Hiring Manager, 
 
 \vspace{1em}
-I am writing to express my strong interest in the opportunity at your company. With my extensive background in Artificial Intelligence and Machine Learning, I am confident that I possess the skills and experience necessary to make significant contributions to your team.
+I am writing to express my keen interest in the Little Helper position at the University of Otago. As a highly motivated individual with a strong academic background in both Artificial Intelligence Engineering and Business Development, I am confident in my ability to contribute positively to your team.
 
 \vspace{1em}
-My academic foundation in AI Engineering from MIT, coupled with my practical experience as a Software Engineer at Microsoft, has equipped me with a deep understanding of the latest advancements in the field. My proficiency in Machine Learning, developed through both theoretical study and hands-on projects, allows me to effectively design, implement, and optimize AI solutions.
+My recent experience as a Software Engineer at OpenAI has provided me with a solid foundation in backend development and honed my software development skills to an expert level. I am proficient in Java and possess a strong understanding of software development principles. This, coupled with my academic background in AI, allows me to approach tasks with a unique blend of technical expertise and innovative thinking. 
 
 \vspace{1em}
-During my time at Microsoft, I focused on developing and deploying AI/ML models for various applications, gaining valuable insights into the challenges and opportunities within the industry. I am eager to leverage my technical expertise and problem-solving skills to contribute to your company's success.
+I am eager to learn new skills and contribute to a dynamic environment.  I am available for immediate employment and excited to discuss how my qualifications and enthusiasm can benefit the University of Otago.
 
 \vspace{1em}
-I am a highly motivated and results-oriented individual with a strong work ethic and a passion for pushing the boundaries of AI technology. I am confident that I can quickly adapt to your company's culture and make a positive impact from day one.
-
-\vspace{1em}
-Thank you for your time and consideration. I am available for an interview at your earliest convenience.
+Thank you for your time and consideration. 
 
 \vspace{1em}
 Sincerely,
 
 \vspace{1em}
-Daniel Stevens 
-ds@example.com 
-
+John Doe
+user@example.com
+1234567890 
 
 
 \end{document}

@@ -24,13 +24,6 @@ cover_letter_model = cover_letter_ns.model('CoverLetterGeneration', {
 GEMINI_API_URL = Config.GEMINI_API_URL
 API_KEY = Config.GEMINI_API_KEY
 
-TEMPLATES_BASE_PATH = f"{os.getcwd()}/cover_letter_templates"
-OUTPUT_BASE_PATH = f"{os.getcwd()}/tmp"
-TEMPLATE_INSERT_TOKEN = "INSERT-COVER-LETTER-HERE"
-LINE_SPACING = "\n\n\\vspace{1em}\n"
-
-EXAMPLE_COVER_LETTER = "Dear Hiring Manager,\n\nI am writing to express my strong interest in the Software Engineer position at Sharesies, as advertised on [platform where you found the job listing]. Having followed Sharesies' growth and mission to democratize financial empowerment, I am deeply impressed by your innovative approach to making investing accessible for everyone.\n\nMy background in software development, coupled with my passion for building user-centric applications, aligns perfectly with Sharesies' values.  I possess a solid understanding of Python, Typescript, and SQL, and I am eager to leverage my expertise to contribute to the B2B team's success. \n\nDuring my time as Senior Developer at Tech Corp, I honed my skills in leading a team and managing complex projects. Prior to that, I gained valuable experience in frontend development using React while working at Startup Inc.  I am confident in my ability to collaborate effectively with team members, prioritize tasks efficiently, and meet deadlines consistently. \n\nI am particularly drawn to Sharesies' commitment to fostering a collaborative and supportive work environment.  The opportunity to learn from a team of experienced professionals while contributing to a company with a clear social impact is incredibly appealing. \n\nI am eager to learn more about Sharesies' innovative B2B solutions and how my skills can contribute to your continued growth. Thank you for your time and consideration.\n\nSincerely,\n\nJohn Doe\njohn.doe@example.com\n123-456-7890 \n"
-
 @cover_letter_ns.route('/generate')
 class GenerateCoverLetter(Resource):
     @token_required
@@ -87,12 +80,12 @@ class GenerateCoverLetter(Resource):
         if application_id:
             response = get_application(application_id)
             application_data = json.loads(response.json())['data'][0]
-            description = (
+            full_application_description = (
                 f"Applied for {application_data['job_title']} at {application_data['company_name']} "
                 f"on {application_data['application_date']} - Status: {application_data['status']}. "
             )
             if application_data['notes']:
-                description += f"Notes: {application_data['notes']}. "
+                full_application_description += f"Notes: {application_data['notes']}. "
 
         if job_description:
             full_application_description += "Further description: " + job_description
@@ -129,42 +122,58 @@ class GenerateCoverLetter(Resource):
         except requests.RequestException as e:
             return {'error': 'Failed to connect to cover letter generation service', 'details': str(e)}, 500
         
-        # Replace double newlines with custom spacing
-        generated_text = generated_text.replace("\n\n", LINE_SPACING)
-
-        # Read the LaTeX template
-        template_path = f"{TEMPLATES_BASE_PATH}/{style}.tex"
-        if not os.path.exists(template_path):
-            return {"error": f"Template '{style}' not found.", "path": template_path}, 404
-
-        with open(template_path, "r") as template:
-            template_contents = template.read()
-
-        # Create the output LaTeX file
-        output_tex_path = f"{OUTPUT_BASE_PATH}/cover_letter.tex"
+        return GeneratePDF(generated_text, user_data, application_data, style)
         
-        with open(output_tex_path, "w") as output:
-            content = template_contents.replace(TEMPLATE_INSERT_TOKEN, generated_text)
-            output.write(content)
+        
+def GeneratePDF(generated_text, user_data, application_data, style):
+    TEMPLATES_BASE_PATH = f"{os.getcwd()}/cover_letter_templates"
+    OUTPUT_BASE_PATH = f"{os.getcwd()}/tmp"
+    TEMPLATE_INSERT_TOKEN = "INSERT-COVER-LETTER-HERE"
+    LINE_SPACING = "\n\n\\vspace{1em}\n"
+    
+    # Replace double newlines with custom spacing
+    generated_text = generated_text.replace("\n\n", LINE_SPACING)
 
-        # Compile the LaTeX file to PDF
-        output_pdf_path = f"{OUTPUT_BASE_PATH}/cover_letter.pdf"[4:]
-        print(f"output_pdf_path: {output_pdf_path}")
-        try:
-            print("[INFO] Compiling LaTeX file to PDF...")
-            subprocess.run(['pdflatex', '-interaction=nonstopmode', '-output-directory', OUTPUT_BASE_PATH, output_tex_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            
-            # Clean up auxiliary files
-            print("[INFO] Cleaning up auxiliary files...")
-            for ext in ['.aux', '.log', '.out']:
-                aux_file = f"{OUTPUT_BASE_PATH}/cover_letter{ext}"
-                if os.path.exists(aux_file):
-                    os.remove(aux_file)
-            
-            output_pdf_path = f"{os.getcwd()}{output_pdf_path}"
-            print(f"[INFO] PDF file generated successfully: {output_pdf_path}")
-            return send_file(output_pdf_path, as_attachment=True, download_name="cover_letter.pdf", mimetype='application/pdf')
-        except subprocess.CalledProcessError as e:
-            return {"error": f"LaTeX compilation failed: {str(e)}"}, 500
-        except Exception as e:
-            return {"error": f"An error occurred: {str(e)}"}, 500
+    # Read the LaTeX template
+    template_path = f"{TEMPLATES_BASE_PATH}/{style}.tex"
+    if not os.path.exists(template_path):
+        return {"error": f"Template '{style}' not found.", "path": template_path}, 404
+
+    with open(template_path, "r") as template:
+        template_contents = template.read()
+
+    # Create the output LaTeX file
+    output_tex_path = f"{OUTPUT_BASE_PATH}/cover_letter.tex"
+    
+    with open(output_tex_path, "w") as output:
+        content = template_contents.replace(TEMPLATE_INSERT_TOKEN, generated_text)
+        
+        content = content.replace("INSERT-NAME-HERE", f"{user_data['first_name']} {user_data['last_name']}")
+        content = content.replace("INSERT-PHONE-HERE", f"{user_data['phone']}")
+        content = content.replace("INSERT-EMAIL-HERE", f"{user_data['email']}")
+        content = content.replace("INSERT-LOCATION-HERE", f"")
+        
+        content = content.replace("INSERT-JOB-TITLE-HERE", application_data['job_title'])
+        output.write(content)
+
+    # Compile the LaTeX file to PDF
+    output_pdf_path = f"{OUTPUT_BASE_PATH}/cover_letter.pdf"[4:]
+    print(f"output_pdf_path: {output_pdf_path}")
+    try:
+        print("[INFO] Compiling LaTeX file to PDF...")
+        subprocess.run(['pdflatex', '-interaction=nonstopmode', '-output-directory', OUTPUT_BASE_PATH, output_tex_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        
+        # Clean up auxiliary files
+        print("[INFO] Cleaning up auxiliary files...")
+        for ext in ['.aux', '.log', '.out']:
+            aux_file = f"{OUTPUT_BASE_PATH}/cover_letter{ext}"
+            if os.path.exists(aux_file):
+                os.remove(aux_file)
+        
+        output_pdf_path = f"{os.getcwd()}{output_pdf_path}"
+        print(f"[INFO] PDF file generated successfully: {output_pdf_path}")
+        return send_file(output_pdf_path, as_attachment=True, download_name="cover_letter.pdf", mimetype='application/pdf')
+    except subprocess.CalledProcessError as e:
+        return {"error": f"LaTeX compilation failed: {str(e)}"}, 500
+    except Exception as e:
+        return {"error": f"An error occurred: {str(e)}"}, 500
