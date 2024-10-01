@@ -97,7 +97,14 @@ export async function profileLoader() {
         }
         data.set("experience", response3.data);
 
-        
+        // Query the backend api via the path defined in APIConstants 
+        const response4 = await axios.get(APIConstants.USER(uuid), { headers });
+
+        // Handle any errors here ...
+        if (!response4.data) {
+            return json({ error: 'No data found' }, { status: 404 });
+        }
+        data.set("user", response4.data[0]);        
 
         // Return the data to the component
         return data;

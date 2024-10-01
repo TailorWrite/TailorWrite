@@ -28,6 +28,7 @@ const APIConstants = {
     EDUCATION: (uuid: string) => `${API_BASE_URL}/educations/user/${uuid}`,
     EXPERIENCE: (uuid: string) => `${API_BASE_URL}/experiences/user/${uuid}`,
     USERS: `${API_BASE_URL}/users`,
+    USER: (uuid: string) => `${API_BASE_URL}/users/${uuid}`,
 }
 
 export default PathConstants;

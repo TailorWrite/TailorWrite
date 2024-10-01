@@ -31,7 +31,7 @@ export default function ApplicationDetails() {
 
     // Managing component state 
 // Function to handle input change and update applicationData.description
-const handleInputChangeApplicationURL = (e) => {
+const handleInputChangeApplicationURL = (e: { target: { value: any; }; }) => {
     const url = e.target.value; // Get the input value
     console.log('Typed URL:', url); // Perform action, e.g., logging the input value
 

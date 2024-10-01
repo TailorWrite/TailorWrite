@@ -20,8 +20,8 @@ import GeneralSettings from './views/settings/GeneralSettings';
 import DataSettings from './views/settings/DataSettings';
 
 import PathConstants from './pathConstants';
-import { handleAddApplication,, handleApplicationSubmit, handleProfile, handleUpdateApplication } from './actions';    // TODO: Could be added to actions.ts
-import { allApplicationLoader, applicationLoader } from './loaders';
+import { handleAddApplication, handleApplicationSubmit, handleProfile, handleUpdateApplication } from './actions';    // TODO: Could be added to actions.ts
+import { allApplicationLoader, applicationLoader, profileLoader } from './loaders';
 
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
