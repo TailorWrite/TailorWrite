@@ -1,7 +1,11 @@
 import datetime
 import pytz
+import uuid
 from flask_restx import Namespace, Resource, fields
 from flask import request, jsonify
+from werkzeug.utils import secure_filename
+
+from config import Config
 from models.applications import create_application, get_application, update_application, delete_application, get_applications_by_user
 from models.authentication import token_required
 
@@ -134,3 +138,63 @@ class JobApplicationsByUser(Resource):
         except Exception as e:
             return {'error': str(e)}, 400
 
+@applications_ns.route('/<int:application_id>/documents')
+class JobApplicationDocuments(Resource): 
+    @token_required
+    @applications_ns.doc(security='apikey')
+    @applications_ns.response(200, 'Success', application_model)
+    @applications_ns.response(404, 'Job application not found')
+    @applications_ns.response(403, 'Forbidden')
+    def post(self, application_id, token_user_id):
+        """Upload a document to S3"""
+        if 'document' not in request.files:
+            return {'error': 'No file provided in the request'}, 400
+        
+        document = request.files['document']
+
+        if document.filename == '':
+            return {'error': 'No file selected for uploading'}, 400
+        
+
+        if document and self.allowed_file(document.filename):
+            
+            filename = secure_filename(document.filename)
+            new_filename = self.get_unique_filename(filename)
+
+            try:
+                Config.s3.upload_fileobj(
+                    document, 
+                    Config.BUCKET_NAME, 
+                    new_filename,
+                    ExtraArgs={
+                        "ContentType": document.content_type
+                    }
+                )
+            except Exception as e:
+                return {'error': str(e)}, 400
+            
+            try: 
+                # Upload the new filename to the database
+                data = {
+                    "user_id": token_user_id,
+                    "application_id": application_id,
+                    'link': f"https://{Config.BUCKET_NAME}.s3.amazonaws.com/{new_filename}"
+                    
+                }
+
+            except Exception as e:
+                return {'error': str(e)}, 400
+
+
+        print("Document uploaded successfully")
+        return {'message': 'Document uploaded successfully'}, 200
+
+        
+    def allowed_file(self, filename):
+        ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+    def get_unique_filename(self, filename):
+        ext = filename.rsplit(".", 1)[1].lower()
+        unique_filename = uuid.uuid4().hex
+        return f"{unique_filename}.{ext}"
