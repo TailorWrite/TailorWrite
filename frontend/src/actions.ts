@@ -13,6 +13,23 @@ import { AxiosError } from "./types";
 import { headers } from "./api";
 import { APIConstants } from "./pathConstants";
 
+const toastSettings = {
+    isLoading: false,
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "light",
+    transition: Bounce,
+};
+
+interface ActionProps {
+    request: Request;
+}
+
+type ActionReturn = Promise<{ error?: string; success?: string }>;
+
 export async function handleAddApplication({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
     const toastId = toast.loading('Uploading application...');
     const userId = sessionStorage.getItem("user_id");
@@ -98,13 +115,27 @@ export async function handleApplicationSubmit({ request }: { request: Request })
     // Checking what the intent of the form submission was
     const formData = await request.formData();
     const intent = formData.get("intent") as string;
-
+    
     // Call the appropriate function based on the intent
-    if ( intent == "delete") {
-        return handleDeleteApplication({ request: requestPassOn });
+    switch (intent) {
+        case "add":
+            return handleAddApplication({ request: requestPassOn });
+        case "update":
+            return handleUpdateApplication({ request: requestPassOn });
+        case "delete":
+            return handleDeleteApplication({ request: requestPassOn });
+        case "upload-document": 
+            console.log("Uploading document...");
+            return handleUploadApplicationDocument({ request: requestPassOn });
+        default:
+            return handleUpdateApplication({ request: requestPassOn });
     }
 
-    return handleUpdateApplication({ request: requestPassOn });
+    // if ( intent == "delete") {
+    //     return handleDeleteApplication({ request: requestPassOn });
+    // }
+
+    // return handleUpdateApplication({ request: requestPassOn });
 }
 
 export async function handleUpdateApplication({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
@@ -244,3 +275,69 @@ export async function handleDeleteApplication({ request }: { request: Request })
         return { error: errorMessage };
     }
 } 
+
+export async function handleUploadApplicationDocument({ request }: ActionProps): ActionReturn {
+    const toastId = toast.loading('Uploading document...');
+    // const userId = sessionStorage.getItem("user_id");
+
+    const formData = await request.formData();
+
+    // Extract form fields from formData
+    const document = formData.get("document");
+    const applicationId = formData.get("application_id") as string;
+
+    // Perform validation or API request
+    if (!document) {
+        toast.update(toastId, {
+            render: 'Document required ',
+            type: 'info',
+            ...toastSettings,
+        });
+
+        return { error: "All fields are required." };
+    }
+
+    const payload = {
+        document: document,
+    };
+
+    console.log("Payload:", payload);
+
+    try {
+        const response = await axios.post(
+            APIConstants.DOCUMENTS(applicationId), 
+            payload, 
+            { 
+                headers: {
+                    'Authorization': `Basic ${sessionStorage.getItem('basic_auth_token')}`,
+                    'Content-Type': 'multipart/form-data',
+                }
+            }
+        );
+
+        if (!response.data) {
+            const errorMessage = response.data.error || "Failed to upload document.";
+            console.log("Error:", errorMessage);
+            return { error: errorMessage };
+        }
+
+        toast.update(toastId, {
+            render: 'Document uploaded successfully',
+            type: 'success',
+            ...toastSettings,
+        });
+
+        return { success: "Document uploaded successfully!" };
+    }
+    catch (error) {
+        // const errorMessage = (error as AxiosError).response.data.error ?? "Failed to upload document.";
+
+        toast.update(toastId, {
+            render: 'Failed to upload document',
+            type: 'error',
+            ...toastSettings,
+        });
+        return { error: "Failed to upload document" };
+    }
+
+}

@@ -1,15 +1,18 @@
-import { useState } from 'react';
-import { Link, Form, useNavigate, useLoaderData, useSubmit } from 'react-router-dom';
+import { Suspense, useState } from 'react';
+import { Link, Form, useNavigate, useLoaderData, useSubmit, Await, useLocation, useAsyncValue, useActionData } from 'react-router-dom';
 import { Field, Menu, MenuButton, MenuItem, MenuItems, Textarea } from '@headlessui/react';
 import { PlusIcon, CheckIcon, ChevronDownIcon, ClockIcon, LinkIcon, CalendarDaysIcon, PaperClipIcon } from '@heroicons/react/20/solid';
 import { DocumentTextIcon } from '@heroicons/react/24/outline';
 import { BuildingOffice2Icon, NoSymbolIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { Avatar, Breadcrumbs, Drawer, Timeline, TimelineBody, TimelineConnector, TimelineHeader, TimelineIcon, TimelineItem } from '@material-tailwind/react';
+import { Breadcrumbs, Drawer, Timeline, TimelineBody, TimelineConnector, TimelineHeader, TimelineIcon, TimelineItem } from '@material-tailwind/react';
 import { toast } from 'react-toastify';
 
 import StatusSelector from '../components/common/StatusSelector';
 import DateSelector from '../components/common/DateSelector';
 import WarningModal from '../components/modals/WarningModal';
+import NotFound from '../components/common/NotFound';
+
+import ApplicationDetailsSkeleton from '../components/skeletons/ApplicationDetailsSkeleton';
 
 import { appendHttpsToLink, formatDate, getCompanyLogoUrl } from '../utils';
 
@@ -18,15 +21,64 @@ import { ApplicationAction, ApplicationData, ApplicationDocuments, ApplicationSt
 
 
 export default function ApplicationDetails() {
+    const navigate = useNavigate();
+    const data = useLoaderData() as { application: ApplicationData };
+
+    
+
+    const [showDrawer, setShowDrawer] = useState(true);
+    const handleCloseDrawer = () => {
+        setShowDrawer(false);
+        // Timer to allow the drawer to close before navigating
+        setTimeout(() => navigate(PathConstants.APPLICATIONS), 200);
+    }
+
+    const isNewApplication = useLocation().pathname === PathConstants.NEW_APPLICATION;
+
+    return (
+        <Drawer
+            placement="right"
+            open={showDrawer}
+            onClose={handleCloseDrawer}
+            overlay={false}
+            size={1200}
+            className="p-4 z-40 border border-lightBorder dark:border-darkBorder dark:bg-secondaryDark rounded-xl overflow-scroll"
+            {...suppressMissingAttributes}
+        >
+
+            { !isNewApplication ? ( 
+                <Suspense fallback={<ApplicationDetailsSkeleton />}>
+                    <Await
+                        resolve={data.application}
+                        errorElement={<NotFound />}
+                    >
+                        <ApplicationView setShowDrawer={setShowDrawer}/>
+                    </Await>
+                </Suspense>
+                ) : (
+                    <ApplicationView setShowDrawer={setShowDrawer}/>
+                )
+            }
+
+        </Drawer>
+
+    );
+}
+
+
+interface ApplicationViewProps {
+    setShowDrawer: (show: boolean) => void;
+}
+const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
     const submit = useSubmit();
     const navigate = useNavigate();
-    const loaderData: ApplicationData[] = useLoaderData() as ApplicationData[];
+    const application = useAsyncValue() as ApplicationData;
 
-    // Processing the application details from the loader function
-    const application: ApplicationData = loaderData[0] as ApplicationData ?? {};
-    const [applicationData] = useState<ApplicationData>(application);
+    const [applicationData] = useState<ApplicationData>(application ?? {} as ApplicationData);
     applicationData.img = getCompanyLogoUrl(applicationData.company_name);
 
+    const [selectedStatus, setSelectedStatus] = useState<ApplicationStatus>(applicationData.status as ApplicationStatus ?? "Applied");
+    const handleStatusSelect = (status: ApplicationStatus) => setSelectedStatus(status)
 
     // Managing component state 
     const [showCalendar, setShowCalendar] = useState(false);
@@ -37,17 +89,6 @@ export default function ApplicationDetails() {
         setSelectedDate(date);
         setShowCalendar(false);
     };
-    
-    const [selectedStatus, setSelectedStatus] = useState<ApplicationStatus>(application.status as ApplicationStatus ?? "Applied");
-    const handleStatusSelect = (status: ApplicationStatus) => setSelectedStatus(status)
-    
-
-    const [showDrawer, setShowDrawer] = useState(true);
-    const handleCloseDrawer = () => {
-        setShowDrawer(false);
-        // Timer to allow the drawer to close before navigating
-        setTimeout(() => navigate(PathConstants.APPLICATIONS), 200);
-    }
 
     const [warningModelOpen, setWarningModelOpen] = useState(false);
     const handleWarningModalClose = () => setWarningModelOpen(false);
@@ -66,22 +107,13 @@ export default function ApplicationDetails() {
     const handleComingSoon = () => toast('🚀 Feature coming soon!');
 
     const ACTIONS: ApplicationAction[] = [
-        { name: 'Add event to timeline', color: 'text-gray-500 dark:text-secondaryDarkText', icon: PlusIcon, action: () => handleComingSoon()  },
+        { name: 'Add event to timeline', color: 'text-gray-500 dark:text-secondaryDarkText', icon: PlusIcon, action: () => handleComingSoon() },
         { name: 'Mark as Rejected', color: 'text-red-500', icon: NoSymbolIcon, action: () => handleStatusSelect('Rejected') },
         { name: 'Delete this application', color: 'text-red-500', icon: TrashIcon, action: () => handleDeleteApplication() },
     ]
 
     return (
-        <Drawer
-            placement="right"
-            open={showDrawer}
-            onClose={handleCloseDrawer}
-            overlay={false}
-            size={1200}
-            className="p-4 z-40 border border-lightBorder dark:border-darkBorder dark:bg-secondaryDark rounded-xl overflow-scroll"
-            {...suppressMissingAttributes}
-        >
-
+        <>
             <Form method="post" className="relative h-full ">
                 <Breadcrumbs
                     className="mx-5 px-0 bg-transparent "
@@ -98,7 +130,7 @@ export default function ApplicationDetails() {
                 <div className="m-5 mt-0">
                     <div className="lg:flex lg:items-center lg:justify-between">
                         <div className="flex flex-row gap-5 min-w-0 flex-1">
-                            { applicationData.img && ( <Avatar src={applicationData.img} alt={applicationData.company_name} size="sm" className="flex-shrink-0 my-auto border-transparent" {...suppressMissingAttributes} /> ) }
+                            {applicationData.img && (<img className="inline-block size-9 rounded-full" src={applicationData.img} alt={applicationData.company_name} />)}
                             <h2 className="w-full text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
                                 <input
                                     name="job"
@@ -169,7 +201,7 @@ export default function ApplicationDetails() {
 
                         {/* Application Status */}
                         <div className="mt-auto mb-[0.125rem]">
-                            <StatusSelector onStatusSelect={handleStatusSelect} statusSelected={selectedStatus} setStatusSelected={setSelectedStatus}/>
+                            <StatusSelector onStatusSelect={handleStatusSelect} statusSelected={selectedStatus} setStatusSelected={setSelectedStatus} />
                             <input type="hidden" name="status" value={selectedStatus} />
                         </div>
 
@@ -181,13 +213,13 @@ export default function ApplicationDetails() {
                                         <BuildingOffice2Icon className="h-5 w-5 text-gray-400" />
                                     </div>
 
-                                    <input 
-                                        id="hs-leading-icon" 
-                                        type="text" 
-                                        name="company" 
-                                        placeholder="Company name" 
+                                    <input
+                                        id="hs-leading-icon"
+                                        type="text"
+                                        name="company"
+                                        placeholder="Company name"
                                         defaultValue={applicationData.company_name}
-                                        className="py-1 px-4 ps-11 block w-full border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-primaryDark dark:border-darkBorder dark:text-primaryDarkText dark:placeholder-secondaryDarkText/50 dark:focus:ring-blue-600" 
+                                        className="py-1 px-4 ps-11 block w-full border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-primaryDark dark:border-darkBorder dark:text-primaryDarkText dark:placeholder-secondaryDarkText/50 dark:focus:ring-blue-600"
                                     />
                                 </div>
                             </div>
@@ -202,14 +234,14 @@ export default function ApplicationDetails() {
                                     </div>
 
                                     {/* Needs to be refactored to bring the input into the date picker DateSelector component */}
-                                    <input 
-                                        type="text" 
-                                        name="date" 
-                                        placeholder="Select a date" 
+                                    <input
+                                        type="text"
+                                        name="date"
+                                        placeholder="Select a date"
                                         value={selectedDate ? formatDate(selectedDate) : ''}
                                         onClick={handleShowDatePicker}
                                         readOnly
-                                        className="py-1 px-4 ps-11 block w-56 border-gray-200 shadow-sm rounded-lg text-sm hover:cursor-pointer focus:z-10 focus:border-blue-500 focus:ring-blue-500 dark:bg-primaryDark dark:border-darkBorder dark:text-primaryDarkText dark:placeholder-secondaryDarkText/50 dark:focus:ring-blue-600" 
+                                        className="py-1 px-4 ps-11 block w-56 border-gray-200 shadow-sm rounded-lg text-sm hover:cursor-pointer focus:z-10 focus:border-blue-500 focus:ring-blue-500 dark:bg-primaryDark dark:border-darkBorder dark:text-primaryDarkText dark:placeholder-secondaryDarkText/50 dark:focus:ring-blue-600"
                                     />
                                 </div>
                             </div>
@@ -247,7 +279,7 @@ export default function ApplicationDetails() {
                 <hr className="my-2 border-lightBorder dark:border-darkBorder" />
 
                 {/* Body */}
-                <div className="py-4 px-2 grid grid-cols-[auto_38%] gap-y-10  md:gap-x-5 ">
+                <div className="py-4 px-2 grid grid-cols-[auto_38%] gap-y-10 gap-x-3  md:gap-x-5 ">
                     <div className="flex flex-col gap-y-10">
                         {/* Job description & Timeline */}
                         <section className="col-span-6 row-span-2 sm:order-1 md:order-none">
@@ -266,7 +298,7 @@ export default function ApplicationDetails() {
                             <div onClick={handleComingSoon} className="ml-3">
                                 <span className="w-[28px] grid justify-center"><span className="h-4 border-l-2 border-neutral-300 dark:border-darkBorder"></span></span>
                                 <Timeline id="material-tailwind-TimelineConnector" className="text-gray-500 text-sm md:text-[16px] dark:text-secondaryDarkText">
-                                    
+
                                     <TimelineItem>
                                         <TimelineConnector id="material-tailwind-TimelineConnector" />
                                         <TimelineHeader>
@@ -301,7 +333,10 @@ export default function ApplicationDetails() {
                         </section>
 
 
-                        <DocumentUploadSection documents={applicationData.documents ?? []} />
+                        <DocumentUploadSection 
+                            applicationData={applicationData}
+                            documents={applicationData.documents ?? []} 
+                        />
                     </div>
 
                     <div className="flex flex-col gap-y-10">
@@ -348,50 +383,86 @@ export default function ApplicationDetails() {
 
                 </div>
             </Form>
-
+            
             <WarningModal open={warningModelOpen} onClose={handleWarningModalClose} onConfirm={handleWarningModalConfirm}/>
-        </Drawer>
-
-    );
+        </>
+    )
 }
 
 interface DocumentUploadProps {
+    applicationData: ApplicationData;
     documents: ApplicationDocuments[];
 }
 
-const DocumentUploadSection = ({ documents }: DocumentUploadProps) => {
+const DocumentUploadSection = ({ applicationData, documents }: DocumentUploadProps) => {
+    const submit = useSubmit();
+    const actionData = useActionData(); 
+    console.log('actionData:', actionData);
 
-    // TODO: Implement handle upload of document 
-    const handleDocumentUpload = () => toast('🚀 Feature coming soon!');
+    const [allDocuments, setAllDocuments] = useState<ApplicationDocuments[]>(documents)
 
-    documents = [
-        { name: 'Resume.pdf', size: '1.2MB', link: 'https://www.google.com' },
-        { name: 'CoverLetter.pdf', size: '1.2MB', link: 'https://www.google' },
-    ]
+    const handleDocumentUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
 
+        if (!files || files.length === 0) return;
+
+        // Create a FormData object to hold the files
+        const formData = new FormData();
+
+        // Append the intent to the form data
+        formData.append('intent', 'upload-document');
+        formData.append('application_id', applicationData.id);
+        formData.append('document', files[0]);
+
+        // Adding it to the list of documents
+        setAllDocuments([
+            ...allDocuments, 
+            { 
+                name: files[0].name, 
+                size: `${(files[0].size / 1024).toFixed(2)}KB`, 
+                link: '',
+                uploaded: false
+            }
+        ]);
+
+        // Submit the form data
+        submit(formData, { method: 'post', encType: 'multipart/form-data' });
+    };
+
+    // documents = [
+    //     { name: 'Resume.pdf', size: '1.2MB', link: 'https://www.google.com' },
+    //     { name: 'CoverLetter.pdf', size: '1.2MB', link: 'https://www.google' },
+    // ];
 
     return (
         <section className="col-span-6 row-span-3 sm:order-3 md:order-none">
             <div className="mb-2 flex flex-row justify-between">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-primaryDarkText">Documents</h3>
-                <button
-                    type="button"
-                    className=" inline-flex gap-2 items-center rounded-md bg-indigo-600 px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                    onClick={handleDocumentUpload}
+                <label
+                    htmlFor="file-upload"
+                    className="inline-flex gap-2 items-center rounded-md bg-indigo-600 px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer"
                 >
                     <PlusIcon className="h-4 w-4" />
                     <span className="text-sm text-white">Upload Document</span>
-                </button>
+                    <input
+                        id="file-upload"
+                        name="file-upload"
+                        type="file"
+                        className="sr-only"
+                        onChange={handleDocumentUpload}
+                        multiple
+                    />
+                </label>
             </div>
 
             {
                 // Check if documents exist
-                (documents.length > 0) ?
+                (allDocuments.length > 0) ?
 
                     (<ul role="list" className="divide-y divide-gray-100 rounded-md border border-gray-200 dark:border-darkBorder dark:divide-darkBorder">
 
                         {
-                            documents.map((document, index) => (
+                            allDocuments.map((document, index) => (
                                 <li key={index} className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
                                     <div className="flex w-0 flex-1 items-center dark:text-secondaryDarkText">
                                         <PaperClipIcon aria-hidden="true" className="h-5 w-5 flex-shrink-0 text-gray-400" />
@@ -400,7 +471,17 @@ const DocumentUploadSection = ({ documents }: DocumentUploadProps) => {
                                             <span className="flex-shrink-0 text-gray-400 dark:text-secondaryDarkText/60">{document.size}</span>
                                         </div>
                                     </div>
-                                    <div className="ml-4 flex-shrink-0">
+                                    <div className="flex flex-row gap-x-3 items-center ml-4 flex-shrink-0">
+                                        { document.uploaded ? (
+                                            <CheckIcon aria-hidden="true" className="h-5 w-5 text-green-400 dark:text-green-400" />
+                                        ): (
+                                            // <div className="relative">
+                                            //     <span className="absolute top-0 size-2 bg-orange-400 rounded-full"></span>
+                                            //     <span className="absolute top-0 animate-ping size-2 bg-orange-400 rounded-full"></span>
+                                            // </div>
+                                            <ClockIcon aria-hidden="true" className="h-5 w-5 text-gray-400 dark:text-secondaryDarkText" />
+                                        )}
+
                                         <a href={document.link} className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-primaryDarkAccent">
                                             Download
                                         </a>
@@ -419,10 +500,9 @@ const DocumentUploadSection = ({ documents }: DocumentUploadProps) => {
                                     className="relative cursor-pointer rounded-md font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500 dark:text-primaryDarkAccent"
                                 >
                                     <span>Upload</span>
-                                    <input id="file-upload" name="file-upload" type="file" className="sr-only" />
+                                    <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleDocumentUpload} multiple />
                                 </label>
                                 <p className="pl-1">documents here</p>
-                                {/* <p className="text-xs leading-5 text-gray-600">TXT or PDF. Up to 3 options</p> */}
                             </div>
                         </div>
                     </div>)

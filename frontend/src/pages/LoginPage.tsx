@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Logo } from '../components/icons';
+import { APIConstants } from '../pathConstants';
 
 export default function LoginPage() {
 
@@ -18,7 +19,7 @@ export default function LoginPage() {
     
         try {
             // Send login request
-            const response = await fetch('http://localhost:5001/users/login', {
+            const response = await fetch(APIConstants.LOGIN, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -31,7 +32,6 @@ export default function LoginPage() {
             }
     
             const result = await response.json();
-            console.log('Login Response:', result);
     
             // Save tokens and user ID in sessionStorage
             if (result.basic_auth_token) {
@@ -41,7 +41,7 @@ export default function LoginPage() {
                 sessionStorage.setItem('user_id', result.user_id);
     
                 // Fetch user information
-                const userResponse = await fetch(`http://localhost:5001/users/${result.user_id}`, {
+                const userResponse = await fetch(APIConstants.USER(result.user_id), {
                     method: 'GET',
                     headers: {
                         'Authorization': `Basic ${result.basic_auth_token}`,
@@ -54,7 +54,6 @@ export default function LoginPage() {
                 }
     
                 const userData = await userResponse.json();
-                console.log('User Data:', userData);
     
                 // Store user information in sessionStorage
                 if (userData[0].first_name) {

@@ -3,7 +3,7 @@ import { useMutation } from "react-query";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-import PathConstants from "../pathConstants";
+import PathConstants, { APIConstants } from "../pathConstants";
 import { Logo } from "../components/icons";
 
 interface RegisterFormData {
@@ -20,7 +20,7 @@ interface RegisterFormData {
 }
 
 const registerUser = async (data: RegisterFormData) => {
-	const response = await axios.post("http://localhost:5001/users", data);
+	const response = await axios.post(APIConstants.REGISTER, data);
 	return response.data;
 };
 

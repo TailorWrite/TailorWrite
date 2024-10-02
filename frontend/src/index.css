@@ -40,3 +40,7 @@ html.dark .shiki span {
     font-weight: var(--shiki-dark-font-weight) !important;
     text-decoration: var(--shiki-dark-text-decoration) !important;
 }
+
+.skeleton {
+    @apply animate-pulse bg-gray-200 dark:bg-neutral-700; ;
+}

@@ -1,5 +1,4 @@
 
-
 const PathConstants = {
     BASENAME: '/',
     HOME: '/',
@@ -18,13 +17,22 @@ const PathConstants = {
     SETTINGS_DATA: '/dashboard/settings/data',
 }
 
-const API_BASE_URL = 'http://localhost:5001';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_PATH;
+console.log('API_BASE_URL:', API_BASE_URL);
 const APIConstants = {
     BASE_URL: API_BASE_URL,
+
+    // Auth routes
+    LOGIN: `${API_BASE_URL}/users/login`,
+    REGISTER: `${API_BASE_URL}/users`,
+
+    // User routes
+    USER: (uuid: string) => `${API_BASE_URL}/users/${uuid}`,
+
     APPLICATIONS: `${API_BASE_URL}/applications`,
-    APPLICATION: (uuid: string) => `${API_BASE_URL}/applications/${uuid}`,
+    APPLICATION: (application_id: string) => `${API_BASE_URL}/applications/${application_id}`,
     ALL_APPLICATIONS: (user_id: string) => `${API_BASE_URL}/applications/user/${user_id}`,
-    USERS: `${API_BASE_URL}/users`,
+    DOCUMENTS: (application_id: string) => `${API_BASE_URL}/applications/${application_id}/documents`,
 }
 
 export default PathConstants;
