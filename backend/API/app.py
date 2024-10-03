@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from config import Config,TestConfig
 authorizations = {
     'apikey': {
         'type': 'apiKey',
@@ -17,6 +18,8 @@ authorizations = {
 
 
 app = Flask(__name__)
+
+
 # CORS(app)  # This handles CORS preflight requests automatically
 CORS(app, resources={r"/*": {
     "origins": "*",
@@ -35,8 +38,16 @@ api = Api(
     doc='/'
 )
 
+app.testing = True
+    
+# Determine if running in test mode
+if app.testing == True:
+    app.config.from_object(TestConfig)
+else:
+    app.config.from_object(Config)
 
-register_routes(api)
+with app.app_context():
+    register_routes(api)
 
 @app.before_request
 def handle_preflight():
@@ -46,7 +57,6 @@ def handle_preflight():
         response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authenticate_token, Authorization'
         return response
-    
 
 if __name__ == '__main__':
     app.run(debug=True)
