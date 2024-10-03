@@ -2,16 +2,23 @@
 # via S3 adn CloudFront or in an ECS container via the Dockerfile running nginx.
 
 # Running a build of the frontend when the Terraform script is executed
-resource "null_resource" "build_frontend" {
-    provisioner "local-exec" {
-        command = "cd ../frontend && npm i && npm run build"
-    }
+# resource "null_resource" "build_frontend" {
+#     provisioner "local-exec" {
+#         command = <<-EOT
+#         cd ../frontend && npm i && npm run build
+        
+#         # Add a check to ensure build completion
+#         if [ ! -d "../frontend/dist" ]; then
+#             echo "Build failed: dist directory not found"
+#             exit 1
+#         fi
+#         EOT
+#     }
 
-    # Trigger rebuild on changes
-    triggers = {
-        always_run = "${timestamp()}"
-    }
-}
+#     triggers = {
+#         always_run = "${timestamp()}"
+#     }
+# }
 
 # Updating the .env.production file with the backend Elastic IP address
 resource "local_file" "frontend_config" {
@@ -87,7 +94,8 @@ resource "aws_s3_object" "upload_object" {
     # Ensure the upload occurs after the build
     depends_on = [
         local_file.frontend_config,
-        null_resource.build_frontend
+        # null_resource.build_frontend,
+        # module.template_files
     ]
 }
 
