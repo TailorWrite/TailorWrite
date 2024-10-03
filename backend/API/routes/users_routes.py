@@ -4,6 +4,7 @@ from flask_restx import Namespace, Resource, fields, reqparse, api
 from flask import request, jsonify
 from models.users import create_user, create_account, get_user, update_user, delete_user, login_user
 from models.authentication import token_required
+import bcrypt
 
 # Define the namespace
 users_ns = Namespace('users', description='User operations')
@@ -53,11 +54,15 @@ class UserList(Resource):
         data = request.json
         try:
             response = create_user(data)
+            print(response)
             user_id = response.user.id
             email = response.user.email
             account = data.get('account_info', {})
             account['id'] = user_id
             account['email'] = email
+            hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            account['password'] = hashed_password
+            print(account)
             create_account(account)
             return {'message': 'User created successfully', 'id': user_id}, 201
         except Exception as e:
@@ -75,8 +80,11 @@ class User(Resource):
         try:
             if user_id != token_user_id:
                 return {'error': 'No you\'re not allowed this with that auth key'}, 403
-            user = get_user(user_id).data
+            user = get_user(user_id).data[0]
             if user:
+                print(user)
+                if 'password' in user:
+                    del user['password']
                 return jsonify(user)
             else:
                 return {'message': 'User not found'}, 404
@@ -133,6 +141,8 @@ class UserLogin(Resource):
 
         try:
             response = login_user(email, password)
+            if response == None:
+                return {'error': 'Invalid credentials'}, 401
             access_token = response[0]
             user_id = response[1]
             return {'message': 'Login successful', 'user_id': user_id, 'basic_auth_token': access_token}, 200

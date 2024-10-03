@@ -1,6 +1,7 @@
 # models/users.py
 import base64
 from models import supabase
+import bcrypt
 
 def create_user(data):
     email = data["email"]
@@ -10,6 +11,7 @@ def create_user(data):
     )
     
 def create_account(data):
+    print(data)
     return supabase.table('accounts').insert(data).execute()
 
 def get_user(user_id: str):
@@ -23,11 +25,10 @@ def delete_user(user_id):
 
 def login_user(email, password):
     # the sign in will error if email or password incorrect, if they are correct then we return basic auth token
-    response = supabase.auth.sign_in_with_password(
-        {"email": email, "password": password}
-    )
-    supabase.auth.sign_out()
-    id = response.user.id
+    response = supabase.table('accounts').select('*').eq('email', email).execute()
+    if not bcrypt.checkpw(password.encode('utf-8'), response.data[0]['password'].encode('utf-8')):
+        return None
+    id = response.data[0]['id']
     credentials = f"{email}:{password}"
     basic_auth_token = base64.b64encode(credentials.encode()).decode()
     return [basic_auth_token, id]

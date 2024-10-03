@@ -1,12 +1,13 @@
 -- Create accounts table
 CREATE TABLE IF NOT EXISTS accounts (
     id uuid PRIMARY KEY,
+    email VARCHAR(128) UNIQUE,
+    password TEXT,
     first_name VARCHAR(100),
     last_name VARCHAR(100),
     bio TEXT,
     profile_picture_url TEXT,
     phone VARCHAR(20),
-    email VARCHAR(128),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     -- Foreign key constraint

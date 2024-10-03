@@ -134,7 +134,7 @@ class JobApplicationsByUser(Resource):
             if response.data:
                 return jsonify(response.data)
             else:
-                return {'message': 'No job applications found for this user'}, 404
+                return {}, 200
         except Exception as e:
             return {'error': str(e)}, 400
 
