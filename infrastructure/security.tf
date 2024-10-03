@@ -70,77 +70,16 @@ resource "aws_security_group" "allow_flask" {
     }
 }
 
+resource "aws_security_group" "allow_supabase_dashboard" {
+    name        = "allow_supabase_dashboard"
+    description = "Allow inbound traffic to the Supabase dashboard"
+    vpc_id      = aws_vpc.main.id
 
-# # Configuring the IAM role for the ECS task execution
-# resource "aws_iam_role" "ecs_task_execution_role" {
-#     name = "${var.project_name}-ecs-task-execution-role"
-
-#     assume_role_policy = jsonencode({
-#         Version = "2012-10-17"
-#         Statement = [
-#         {
-#             Action = "sts:AssumeRole"
-#             Effect = "Allow"
-#             Principal = {
-#             Service = "ecs-tasks.amazonaws.com"
-#             }
-#         }
-#         ]
-#     })
-# }
-
-# # Attaching the AmazonECSTaskExecutionRolePolicy to the ECS task execution role
-# resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
-#     role       = aws_iam_role.ecs_task_execution_role.name
-#     policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-# }
-
-
-# # ALB security Group: Edit to restrict access to the application
-# resource "aws_security_group" "lb" {
-#     name        = "cb-load-balancer-security-group"
-#     description = "controls access to the ALB"
-#     vpc_id      = aws_vpc.main.id
-
-#     # Restricting traffic coming in to only the backend port
-#     ingress {
-#         protocol    = "tcp"
-#         from_port   = var.backend_port
-#         to_port     = var.backend_port
-#         cidr_blocks = ["0.0.0.0/0"]
-#     }
-
-#     # Allowing service access to all IP addresses
-#     egress {
-#         from_port   = 0
-#         to_port     = 0
-#         protocol    = "-1"                  # All protocols
-#         cidr_blocks = ["0.0.0.0/0"]         # All IP addresses
-#     }
-# }
-
-# # Traffic to the ECS cluster should only come from the ALB
-# resource "aws_security_group" "ecs_tasks" {
-#     name        = "cb-ecs-tasks-security-group"
-#     description = "allow inbound access from the ALB only"
-#     vpc_id      = aws_vpc.main.id
-
-#     # Restricting traffic coming in to only the backend port
-#     ingress {
-#         protocol        = "tcp"
-#         from_port       = var.backend_port
-#         to_port         = var.backend_port
-#         security_groups = [aws_security_group.lb.id]
-#     }
-
-#     # Allowing service access to all IP addresses
-#     egress {
-#         from_port   = 0
-#         to_port     = 0
-#         protocol    = "-1"                  # All protocols
-#         cidr_blocks = ["0.0.0.0/0"]         # All IP addresses
-#     }
-# }
-
-# Sources: 
-# - Using Terraform and Fargate to create Amazon’s ECS: https://medium.com/@olayinkasamuel44/using-terraform-and-fargate-to-create-amazons-ecs-e3308c1b9166
+    ingress {
+        description = "Supabase dashboard traffic"
+        from_port   = 8000
+        to_port     = 8000
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+}

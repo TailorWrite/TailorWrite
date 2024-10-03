@@ -1,59 +1,47 @@
 # # Includes the configuration for the Supabase services. 
 
-# Provision an RDS Arora instance for the Supabase database
+# Defining an Elastic IP for the supabase EC2 instance to ensure a static IP
+resource "aws_eip" "supabase_eip" {
+    instance = aws_instance.supabase.id
+    domain = "vpc"
+    
+    tags = {
+        Name = "Supabase-EIP"
+    }
+}
 
+# Defining an EC2 instance to clone repo, build and run the supabase backend service
+# via docker compose 
+resource "aws_instance" "supabase" {
+    ami           = "ami-033067239f2d2bfbc"
+    instance_type = "t3.small"
+    key_name      = aws_key_pair.tailorwrite_key_pair.key_name
+    subnet_id     = aws_subnet.public_subnets[0].id
+    vpc_security_group_ids = [
+        aws_security_group.allow_ssh.id,
+        aws_security_group.allow_http.id,
+        aws_security_group.allow_supabase_dashboard.id,
+    ]
 
-# # Connecting: `ssh -i ./key/tailorwrite_database_key_pair ec2-user@<instance-public-ip>`
+    # Help running docker in EC2 instance: https://stackoverflow.com/a/63516616
+    user_data     = <<-EOF
+        #!/bin/bash
+        sudo yum update -y
+        sudo yum install git docker -y
+        sudo systemctl enable docker
+        sudo systemctl start docker
 
-# resource "aws_instance" "supabase_instance" {
-#     ami           = "ami-0ebfd941bbafe70c6"     # Default free tier Amazon Linux 2023 AMI
-#     instance_type = "t2.micro"
-#     key_name      = aws_key_pair.database_key_pair.database_key_pair
+        sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+        docker-compose version
 
-#     # User Data Script to install Git, Docker, and Docker Compose, then clone the repository
-#     user_data = <<-EOF
-#         #!/bin/bash
-#         # Update and install required packages
-#         sudo yum update -y
-#         sudo yum install -y git docker
-#         sudo service docker start
-#         sudo usermod -aG docker ec2-user
+        git clone ${var.github_repo}
+        cd ${var.repo_name}/database
+        docker-compose up -d --build
+    EOF
 
-#         # Install Docker Compose
-#         sudo curl -L "https://github.com/docker/compose/releases/download/v2.0.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-#         sudo chmod +x /usr/local/bin/docker-compose
-
-#         # Clone your Git repository (replace with your repo URL)
-#         git clone ${var.github_repo} /home/ec2-user
-
-#         # Navigate to the cloned repository and run Docker Compose
-#         cd /home/ec2-user/${var.repo_name}
-#         docker-compose up -d --build
-#     EOF
-
-#     # Ensure that the instance has an IAM role if needed
-#     iam_instance_profile = aws_iam_instance_profile.database_instance_role.name
-
-#     tags = {
-#         Name = "SupabaseInstance"
-#     }
-# }
-
-# # IAM role and policy setup (if needed for other AWS resources)
-# resource "aws_iam_role" "database_instance_role" {
-#     name               = "database-instance-role"
-#     assume_role_policy = jsonencode({
-#         Version = "2012-10-17",
-#         Statement = [{
-#         Action    = "sts:AssumeRole",
-#         Effect    = "Allow",
-#         Principal = { Service = "ec2.amazonaws.com" }
-#         }]
-#     })
-# }
-
-# resource "aws_iam_instance_profile" "database_instance_role" {
-#   name = "database-instance-profile"
-#   role = aws_iam_role.database_instance_role.name
-# }
+    tags = {
+        Name = "${var.project_name}-supabase"
+    }
+}
 
