@@ -30,6 +30,71 @@ interface ActionProps {
 
 type ActionReturn = Promise<{ error?: string; success?: string }>;
 
+export async function handleLogin({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
+    console.log("Handling login...");
+    const toastId = toast.loading('Logging in...');
+
+    const formData = await request.formData();
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    if (!email || !password) {
+        toast.update(toastId, {
+            render: 'Email and password required ',
+            type: 'info',
+            ...toastSettings,
+        });
+
+        return { error: "All fields are required." };
+    }
+    
+    const payload = {
+        email: email,
+        password: password
+    };
+
+    try {
+        const response = await axios.post(APIConstants.LOGIN, payload);
+
+        if (!response.data) {
+            const errorMessage = response.data.error || "Failed to login.";
+            console.log("Error:", errorMessage);
+            return { error: errorMessage };
+        }
+
+        const basicAuth = response.data.basic_auth_token;
+        const userId = response.data.user_id;
+
+        if (!basicAuth || !userId) return { error: "Failed to login." };
+
+        sessionStorage.setItem('basic_auth_token', basicAuth);
+        sessionStorage.setItem('user_id', userId);
+
+
+        toast.update(toastId, {
+            render: 'Login successful',
+            type: 'success',
+            ...toastSettings,
+        });
+
+
+        return { success: "Login successful!" };
+    }
+
+    catch (error) {
+        const errorMessage = (error as AxiosError).response.data.error || "Failed to login.";
+
+        toast.update(toastId, {
+            render: errorMessage,
+            type: 'error',
+            ...toastSettings,
+        });
+
+        return { error: errorMessage };
+    }
+}
+
+
 export async function handleAddApplication({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
     const toastId = toast.loading('Uploading application...');
     const userId = sessionStorage.getItem("user_id");

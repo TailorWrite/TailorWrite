@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ThemeProvider } from "@material-tailwind/react";
+import { Bounce, ToastContainer } from 'react-toastify';
 
 import { LandingPage, LoginPage, SignupPage, ErrorPage } from './pages';
 import NotFound from "./components/common/NotFound";
@@ -19,7 +20,7 @@ import GeneralSettings from './views/settings/GeneralSettings';
 import DataSettings from './views/settings/DataSettings';
 
 import PathConstants from './pathConstants';
-import { handleAddApplication, handleApplicationSubmit } from './actions';
+import { handleAddApplication, handleApplicationSubmit, handleLogin } from './actions';
 import { allApplicationLoader, applicationLoader } from './loaders';
 
 import './index.css';
@@ -39,6 +40,7 @@ const router = createBrowserRouter([
       {
         path: PathConstants.LOGIN,
         element: <LoginPage />,
+        action: handleLogin,
       },
       {
         path: PathConstants.SIGNUP,
@@ -113,6 +115,22 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
           <RouterProvider router={router}/>
+          
+          <ToastContainer
+            stacked
+            position="bottom-right"
+            autoClose={5000}
+            hideProgressBar={true}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+            transition={Bounce}
+          />
+          
       </ThemeProvider>
     </QueryClientProvider>
   </React.StrictMode>,
