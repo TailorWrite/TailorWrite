@@ -31,7 +31,6 @@ interface ActionProps {
 type ActionReturn = Promise<{ error?: string; success?: string }>;
 
 export async function handleLogin({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
-    console.log("Handling login...");
     const toastId = toast.loading('Logging in...');
 
     const formData = await request.formData();
@@ -77,7 +76,7 @@ export async function handleLogin({ request }: { request: Request }): Promise<{ 
             ...toastSettings,
         });
 
-
+        window.location.href = '/dashboard/applications';
         return { success: "Login successful!" };
     }
 
@@ -174,8 +173,6 @@ export async function handleAddApplication({ request }: { request: Request }): P
 export async function handleApplicationSubmit({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
     // Clone the request to read the body
     const requestPassOn = request.clone(); 
-
-    // TODO: Implement this function with checking for the request method (POST, PUT, DELETE)
 
     // Checking what the intent of the form submission was
     const formData = await request.formData();

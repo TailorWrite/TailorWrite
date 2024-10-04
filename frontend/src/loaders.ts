@@ -43,7 +43,7 @@ export async function applicationLoader({ params }: LoaderFunctionArgs) {
 
 export async function allApplicationLoader() {
     const user_id = sessionStorage.getItem('user_id') ?? 'no-id';
-    debugger;
+    
     try { 
         const response = await axios.get(APIConstants.ALL_APPLICATIONS(user_id), { headers });
 

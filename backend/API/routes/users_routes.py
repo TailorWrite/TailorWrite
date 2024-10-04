@@ -141,7 +141,7 @@ class UserLogin(Resource):
 
         try:
             response = login_user(email, password)
-            if response == None:
+            if response is None:
                 return {'error': 'Invalid credentials'}, 401
             access_token = response[0]
             user_id = response[1]
