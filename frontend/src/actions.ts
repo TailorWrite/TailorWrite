@@ -7,6 +7,7 @@
 
 import axios from "axios";
 import { Bounce, toast } from "react-toastify";
+import { redirect } from "react-router-dom";
 
 import { parseDateString } from "./utils";
 import { AxiosError } from "./types";
@@ -30,7 +31,7 @@ interface ActionProps {
 
 type ActionReturn = Promise<{ error?: string; success?: string }>;
 
-export async function handleLogin({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
+export async function handleLogin({ request }: { request: Request }) {
     const toastId = toast.loading('Logging in...');
 
     const formData = await request.formData();
@@ -69,6 +70,8 @@ export async function handleLogin({ request }: { request: Request }): Promise<{ 
         sessionStorage.setItem('basic_auth_token', basicAuth);
         sessionStorage.setItem('user_id', userId);
 
+        setUserInformation();
+
 
         toast.update(toastId, {
             render: 'Login successful',
@@ -76,8 +79,8 @@ export async function handleLogin({ request }: { request: Request }): Promise<{ 
             ...toastSettings,
         });
 
-        window.location.href = '/dashboard/applications';
-        return { success: "Login successful!" };
+        
+        return redirect("/dashboard/applications");
     }
 
     catch (error) {
@@ -402,4 +405,35 @@ export async function handleUploadApplicationDocument({ request }: ActionProps):
         return { error: "Failed to upload document" };
     }
 
+}
+
+export async function setUserInformation() {
+    const userId = sessionStorage.getItem("user_id");
+    const basicAuth = sessionStorage.getItem("basic_auth_token");
+
+    if (!userId || !basicAuth) return;
+
+    try {
+        const userResponse = await axios.get(APIConstants.USER(userId), {
+            headers: {
+                'Authorization': `Basic ${basicAuth}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!userResponse.data) {
+            throw new Error('Failed to fetch user information');
+        }
+
+        const userData = userResponse.data;
+        
+
+        sessionStorage.setItem('first_name', userData.first_name);
+        sessionStorage.setItem('last_name', userData.last_name);
+        sessionStorage.setItem('email', userData.email);
+
+    }
+    catch (error) {
+        console.error('Failed to fetch user information');
+    }
 }
