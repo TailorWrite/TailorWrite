@@ -70,4 +70,13 @@ CREATE TABLE IF NOT EXISTS job_applications (
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS file_uploads (
+    link TEXT PRIMARY KEY,
+    application_id INT REFERENCES job_applications(id) ON DELETE CASCADE,
+    size VARCHAR(32),
+    name VARCHAR(32),
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
 DROP FUNCTION IF EXISTS public.handle_new_user;

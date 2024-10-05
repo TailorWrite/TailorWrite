@@ -23,7 +23,6 @@ export async function applicationLoader({ params }: LoaderFunctionArgs) {
     const fetchApplication = async () => {
         try {
             const response = await axios.get(APIConstants.APPLICATION(uuid), { headers });
-            setTimeout(() => console.log(response), 5000);
 
             if (!response.data) {
                 throw new Error(`Failed to fetch application with id = ${uuid}`);

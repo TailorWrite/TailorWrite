@@ -11,7 +11,6 @@ def create_user(data):
     )
     
 def create_account(data):
-    print(data)
     return supabase.table('accounts').insert(data).execute()
 
 def get_user(user_id: str):

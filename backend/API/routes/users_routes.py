@@ -54,7 +54,6 @@ class UserList(Resource):
         data = request.json
         try:
             response = create_user(data)
-            print(response)
             user_id = response.user.id
             email = response.user.email
             account = data.get('account_info', {})
@@ -62,7 +61,6 @@ class UserList(Resource):
             account['email'] = email
             hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             account['password'] = hashed_password
-            print(account)
             create_account(account)
             return {'message': 'User created successfully', 'id': user_id}, 201
         except Exception as e:
@@ -82,7 +80,6 @@ class User(Resource):
                 return {'error': 'No you\'re not allowed this with that auth key'}, 403
             user = get_user(user_id).data[0]
             if user:
-                print(user)
                 if 'password' in user:
                     del user['password']
                 return jsonify(user)

@@ -6,7 +6,7 @@ from flask import request, jsonify
 from werkzeug.utils import secure_filename
 
 from config import Config
-from models.applications import create_application, get_application, update_application, delete_application, get_applications_by_user
+from models.applications import create_application, get_application, update_application, delete_application, get_applications_by_user, create_file_upload, get_file_uploads_by_application
 from models.authentication import token_required
 
 # Define the namespace
@@ -62,12 +62,15 @@ class JobApplication(Resource):
     def get(self, application_id, token_user_id):
         """Fetch a job application by ID"""
         try:
+            file_uploads = get_file_uploads_by_application(application_id).data
             response = get_application(application_id)
+            application = response.data
+            application[0]['documents'] = file_uploads
             user_id = response.data[0]['user_id']
             if user_id != token_user_id:
                 return {'error': 'No you\'re not allowed this with that auth key'}, 403
             if response.data:
-                return jsonify(response.data)
+                return jsonify(application)
             else:
                 return {'message': 'Job application not found'}, 404
         except Exception as e:
@@ -151,44 +154,71 @@ class JobApplicationDocuments(Resource):
             return {'error': 'No file provided in the request'}, 400
         
         document = request.files['document']
-
         if document.filename == '':
             return {'error': 'No file selected for uploading'}, 400
         
-
         if document and self.allowed_file(document.filename):
             
             filename = secure_filename(document.filename)
             new_filename = self.get_unique_filename(filename)
 
             try:
+                
                 Config.s3.upload_fileobj(
                     document, 
                     Config.BUCKET_NAME, 
                     new_filename,
                     ExtraArgs={
-                        "ContentType": document.content_type
+                        "ContentType": document.content_type,
+                        "ACL": "public-read"
                     }
                 )
             except Exception as e:
+                print(e)
                 return {'error': str(e)}, 400
-            
             try: 
                 # Upload the new filename to the database
+                print(document.content_length)
+                print(round(int(request.form.get("size")) / 1024, 2))
                 data = {
-                    "user_id": token_user_id,
+                    # "name": new_filename,
                     "application_id": application_id,
-                    'link': f"https://{Config.BUCKET_NAME}.s3.amazonaws.com/{new_filename}"
-                    
+                    "link": f"https://{Config.BUCKET_NAME}.s3.amazonaws.com/{new_filename}",
+                    "size": f"{round(int(request.form.get("size")) / 1024, 2)} KB",
+                    "name": filename
                 }
+                print(data)
+                create_file_upload(data)
+                
 
             except Exception as e:
+                print(e)
                 return {'error': str(e)}, 400
 
 
         print("Document uploaded successfully")
         return {'message': 'Document uploaded successfully'}, 200
-
+    
+    @token_required
+    @applications_ns.doc(security='apikey')
+    @applications_ns.response(200, 'Success', [application_model])
+    @applications_ns.response(404, 'No job applications found')
+    @applications_ns.response(403, 'Forbidden')
+    def get(self, application_id, token_user_id):
+        """Fetch all files for a specific application"""
+        response = get_application(application_id)
+        print(response)
+        user_id = response.data[0]['user_id']
+        if user_id != token_user_id:
+            return {'error': 'No you\'re not allowed this with that auth key'}, 403
+        try:
+            response = get_file_uploads_by_application(application_id)
+            if response.data:
+                return jsonify(response.data)
+            else:
+                return [], 200
+        except Exception as e:
+            return {'error': str(e)}, 400
         
     def allowed_file(self, filename):
         ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}

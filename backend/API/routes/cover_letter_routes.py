@@ -104,7 +104,6 @@ class GenerateCoverLetter(Resource):
                     }]
                 }]
             }
-            print(payload)
 
             # Send POST request to Gemini API
             response = requests.post(f"{Config.GEMINI_API_URL}?key={Config.GEMINI_API_KEY}", json=payload)

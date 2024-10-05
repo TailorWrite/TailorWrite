@@ -413,6 +413,7 @@ const DocumentUploadSection = ({ applicationData, documents }: DocumentUploadPro
         formData.append('intent', 'upload-document');
         formData.append('application_id', applicationData.id);
         formData.append('document', files[0]);
+        formData.append('size', files[0].size.toString());
 
         // Adding it to the list of documents
         setAllDocuments([
