@@ -132,5 +132,5 @@ class JobApplicationsByUser(Resource):
             else:
                 return {'message': 'No job applications found for this user'}, 404
         except Exception as e:
-            return {'error': str(e)}, 400
+            return {'error': str(e)}, 401
 
