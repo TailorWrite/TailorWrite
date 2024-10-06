@@ -33,6 +33,8 @@ const APIConstants = {
     APPLICATION: (application_id: string) => `${API_BASE_URL}/applications/${application_id}`,
     ALL_APPLICATIONS: (user_id: string) => `${API_BASE_URL}/applications/user/${user_id}`,
     DOCUMENTS: (application_id: string) => `${API_BASE_URL}/applications/${application_id}/documents`,
+
+    APPLICATIONS_SCRAPE: `${API_BASE_URL}/applications/scrape`,
 }
 
 export default PathConstants;

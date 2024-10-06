@@ -1,11 +1,11 @@
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { Link, Form, useNavigate, useLoaderData, useSubmit, Await, useLocation, useAsyncValue, useActionData } from 'react-router-dom';
 import { Field, Menu, MenuButton, MenuItem, MenuItems, Textarea } from '@headlessui/react';
 import { PlusIcon, CheckIcon, ChevronDownIcon, ClockIcon, LinkIcon, CalendarDaysIcon, PaperClipIcon } from '@heroicons/react/20/solid';
 import { DocumentTextIcon } from '@heroicons/react/24/outline';
 import { BuildingOffice2Icon, NoSymbolIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Breadcrumbs, Drawer, Timeline, TimelineBody, TimelineConnector, TimelineHeader, TimelineIcon, TimelineItem } from '@material-tailwind/react';
-import { toast } from 'react-toastify';
+import { Bounce, toast } from 'react-toastify';
 
 import StatusSelector from '../components/common/StatusSelector';
 import DateSelector from '../components/common/DateSelector';
@@ -16,15 +16,16 @@ import ApplicationDetailsSkeleton from '../components/skeletons/ApplicationDetai
 
 import { appendHttpsToLink, formatDate, getCompanyLogoUrl } from '../utils';
 
-import PathConstants from '../pathConstants';
+import PathConstants, { APIConstants } from '../pathConstants';
 import { ApplicationAction, ApplicationData, ApplicationDocuments, ApplicationStatus, suppressMissingAttributes } from '../types';
+import axios from 'axios';
 
 
 export default function ApplicationDetails() {
     const navigate = useNavigate();
     const data = useLoaderData() as { application: ApplicationData };
 
-    
+
 
     const [showDrawer, setShowDrawer] = useState(true);
     const handleCloseDrawer = () => {
@@ -46,18 +47,18 @@ export default function ApplicationDetails() {
             {...suppressMissingAttributes}
         >
 
-            { !isNewApplication ? ( 
+            {!isNewApplication ? (
                 <Suspense fallback={<ApplicationDetailsSkeleton />}>
                     <Await
                         resolve={data.application}
                         errorElement={<NotFound />}
                     >
-                        <ApplicationView setShowDrawer={setShowDrawer}/>
+                        <ApplicationView setShowDrawer={setShowDrawer} />
                     </Await>
                 </Suspense>
-                ) : (
-                    <ApplicationView setShowDrawer={setShowDrawer}/>
-                )
+            ) : (
+                <ApplicationView setShowDrawer={setShowDrawer} />
+            )
             }
 
         </Drawer>
@@ -72,8 +73,10 @@ interface ApplicationViewProps {
 const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
     const submit = useSubmit();
     const navigate = useNavigate();
+    const location = useLocation();
     const application = useAsyncValue() as ApplicationData;
 
+    const isNewApplication = location.pathname === PathConstants.NEW_APPLICATION;
     const [applicationData] = useState<ApplicationData>(application ?? {} as ApplicationData);
     applicationData.img = getCompanyLogoUrl(applicationData.company_name);
 
@@ -106,6 +109,89 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
     const handleDeleteApplication = () => setWarningModelOpen(true);
     const handleComingSoon = () => toast('🚀 Feature coming soon!');
 
+    const jobTitleRef = useRef<HTMLInputElement>(null);
+    const companyNameRef = useRef<HTMLInputElement>(null);
+    const jobDescriptionTextAreaRef = useRef<HTMLTextAreaElement>(null);
+
+    const applicationUrlRef = useRef<HTMLInputElement>(null);
+    const handleScrapeJobDescription = async () => {
+        // Check if the url is a valid URL
+        const url = applicationUrlRef.current?.value;
+        const isSeekJobUrl = url?.includes("seek.co.nz/job");
+        if (!isSeekJobUrl) return;
+
+        if (!jobDescriptionTextAreaRef.current || jobDescriptionTextAreaRef.current.value) return;
+
+        // Check if the the jobDescriptionTextAreaRef is not null and does not have a value
+        // if (jobDescriptionTextAreaRef.current && !jobDescriptionTextAreaRef.current.value) {
+        // Scrape the job description from the application URL
+        const toastId = toast.loading('🔍 Scraping job description...', { autoClose: false });
+        try {
+            const lambdaFunctionUrl = import.meta.env.VITE_LAMBDA_WEB_SCRAPING_URL;
+            if (!lambdaFunctionUrl) return;
+
+            const payload = { url: url };
+            const response = await axios.post(APIConstants.APPLICATIONS_SCRAPE, payload);
+
+            toast.update(toastId, {
+                render: 'Job description scraped successfully',
+                type: 'success',
+                isLoading: false,
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+                transition: Bounce,
+            });
+
+            // Replace the job description with the scraped job description
+            jobDescriptionTextAreaRef.current.value = response.data.body.job_description;
+
+            if (jobTitleRef.current && jobTitleRef.current.value === '') {
+                jobTitleRef.current.value = response.data.body.job_title;
+            }
+
+            if (companyNameRef.current && companyNameRef.current.value === '') {
+                companyNameRef.current.value = response.data.body.company_name;
+            }
+
+        } catch (error) {
+            toast.update(toastId, {
+                render: '🚫 Error scraping job description',
+                type: 'error',
+                isLoading: false,
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+                transition: Bounce,
+            });
+            console.error('Error scraping job description:', error);
+        }
+    }
+
+    const toastFiredRef = useRef(false);
+    useEffect(() => {
+        if (!isNewApplication || toastFiredRef.current) return;
+        // Initial toast message to prompt the user to paste a seek url
+        toast.info('Paste a seek.co.nz job link to scrape the job description', { 
+            isLoading: false,
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "light",
+            transition: Bounce,
+        });
+        toastFiredRef.current = true;
+    });
+
+
     const ACTIONS: ApplicationAction[] = [
         { name: 'Add event to timeline', color: 'text-gray-500 dark:text-secondaryDarkText', icon: PlusIcon, action: () => handleComingSoon() },
         { name: 'Mark as Rejected', color: 'text-red-500', icon: NoSymbolIcon, action: () => handleStatusSelect('Rejected') },
@@ -135,6 +221,7 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
                                 <input
                                     name="job"
                                     type="text"
+                                    ref={jobTitleRef}
                                     defaultValue={applicationData.job_title}
                                     placeholder="Job Title"
                                     className="-m-2 p-2 w-full flex-grow text-2xl font-bold leading-7 bg-transparent text-gray-900 dark:text-primaryDarkText dark:placeholder-secondaryDarkText border-transparent focus:border-transparent md:text-3xl"
@@ -217,6 +304,7 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
                                         id="hs-leading-icon"
                                         type="text"
                                         name="company"
+                                        ref={companyNameRef}
                                         placeholder="Company name"
                                         defaultValue={applicationData.company_name}
                                         className="py-1 px-4 ps-11 block w-full border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-primaryDark dark:border-darkBorder dark:text-primaryDarkText dark:placeholder-secondaryDarkText/50 dark:focus:ring-blue-600"
@@ -263,8 +351,10 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
                                     <input
                                         type="text"
                                         name="url"
+                                        ref={applicationUrlRef}
                                         placeholder="www.application-link.com"
                                         defaultValue={applicationData.application_url}
+                                        onChange={handleScrapeJobDescription}
                                         className="py-1 px-4 ps-14 block w-full border-gray-200 shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-primaryDark dark:border-darkBorder dark:text-primaryDarkText dark:placeholder-secondaryDarkText/50 dark:focus:ring-blue-600"
                                     />
                                     <div className="absolute inset-y-0 start-0 flex items-center pointer-events-none z-20 ps-4">
@@ -288,6 +378,7 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
                             <Field className=" ">
                                 <Textarea
                                     name="description"
+                                    ref={jobDescriptionTextAreaRef}
                                     defaultValue={applicationData.description}
                                     placeholder="No job description provided"
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 dark:bg-primaryDark dark:ring-darkBorder dark:text-primaryDarkText dark:placeholder-secondaryDarkText/60"
@@ -332,11 +423,12 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
                             </Field>
                         </section>
 
-
-                        <DocumentUploadSection 
-                            applicationData={applicationData}
-                            documents={applicationData.documents ?? []} 
-                        />
+                        {!isNewApplication && (
+                            <DocumentUploadSection
+                                applicationData={applicationData}
+                                documents={applicationData.documents ?? []}
+                            />
+                        )}
                     </div>
 
                     <div className="flex flex-col gap-y-10">
@@ -383,8 +475,8 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
 
                 </div>
             </Form>
-            
-            <WarningModal open={warningModelOpen} onClose={handleWarningModalClose} onConfirm={handleWarningModalConfirm}/>
+
+            <WarningModal open={warningModelOpen} onClose={handleWarningModalClose} onConfirm={handleWarningModalConfirm} />
         </>
     )
 }
@@ -396,7 +488,7 @@ interface DocumentUploadProps {
 
 const DocumentUploadSection = ({ applicationData, documents }: DocumentUploadProps) => {
     const submit = useSubmit();
-    const actionData = useActionData(); 
+    const actionData = useActionData();
     console.log('actionData:', actionData);
 
     const [allDocuments, setAllDocuments] = useState<ApplicationDocuments[]>(documents)
@@ -417,10 +509,10 @@ const DocumentUploadSection = ({ applicationData, documents }: DocumentUploadPro
 
         // Adding it to the list of documents
         setAllDocuments([
-            ...allDocuments, 
-            { 
-                name: files[0].name, 
-                size: `${(files[0].size / 1024).toFixed(2)}KB`, 
+            ...allDocuments,
+            {
+                name: files[0].name,
+                size: `${(files[0].size / 1024).toFixed(2)}KB`,
                 link: '',
                 uploaded: false
             }
@@ -473,9 +565,9 @@ const DocumentUploadSection = ({ applicationData, documents }: DocumentUploadPro
                                         </div>
                                     </div>
                                     <div className="flex flex-row gap-x-3 items-center ml-4 flex-shrink-0">
-                                        { document.uploaded ? (
+                                        {document.uploaded ? (
                                             <CheckIcon aria-hidden="true" className="h-5 w-5 text-green-400 dark:text-green-400" />
-                                        ): (
+                                        ) : (
                                             // <div className="relative">
                                             //     <span className="absolute top-0 size-2 bg-orange-400 rounded-full"></span>
                                             //     <span className="absolute top-0 animate-ping size-2 bg-orange-400 rounded-full"></span>
