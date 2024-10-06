@@ -7,6 +7,7 @@
 
 import axios from "axios";
 import { Bounce, toast } from "react-toastify";
+import { redirect } from "react-router-dom";
 
 import { parseDateString } from "./utils";
 import { AxiosError } from "./types";
@@ -30,8 +31,7 @@ interface ActionProps {
 
 type ActionReturn = Promise<{ error?: string; success?: string }>;
 
-export async function handleLogin({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
-    console.log("Handling login...");
+export async function handleLogin({ request }: { request: Request }) {
     const toastId = toast.loading('Logging in...');
 
     const formData = await request.formData();
@@ -70,6 +70,8 @@ export async function handleLogin({ request }: { request: Request }): Promise<{ 
         sessionStorage.setItem('basic_auth_token', basicAuth);
         sessionStorage.setItem('user_id', userId);
 
+        setUserInformation();
+
 
         toast.update(toastId, {
             render: 'Login successful',
@@ -77,8 +79,8 @@ export async function handleLogin({ request }: { request: Request }): Promise<{ 
             ...toastSettings,
         });
 
-
-        return { success: "Login successful!" };
+        
+        return redirect("/dashboard/applications");
     }
 
     catch (error) {
@@ -160,7 +162,7 @@ export async function handleAddApplication({ request }: { request: Request }): P
             transition: Bounce,
         });
 
-        return { success: "Application added successfully!" };
+        return redirect("/dashboard/applications");
     }
     catch (error) {
         const errorMessage = (error as AxiosError).response.data.error || "Failed to fetch applications.";
@@ -174,8 +176,6 @@ export async function handleAddApplication({ request }: { request: Request }): P
 export async function handleApplicationSubmit({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
     // Clone the request to read the body
     const requestPassOn = request.clone(); 
-
-    // TODO: Implement this function with checking for the request method (POST, PUT, DELETE)
 
     // Checking what the intent of the form submission was
     const formData = await request.formData();
@@ -349,6 +349,7 @@ export async function handleUploadApplicationDocument({ request }: ActionProps):
 
     // Extract form fields from formData
     const document = formData.get("document");
+    const size = formData.get("size");
     const applicationId = formData.get("application_id") as string;
 
     // Perform validation or API request
@@ -364,6 +365,7 @@ export async function handleUploadApplicationDocument({ request }: ActionProps):
 
     const payload = {
         document: document,
+        size: size
     };
 
     console.log("Payload:", payload);
@@ -405,4 +407,35 @@ export async function handleUploadApplicationDocument({ request }: ActionProps):
         return { error: "Failed to upload document" };
     }
 
+}
+
+export async function setUserInformation() {
+    const userId = sessionStorage.getItem("user_id");
+    const basicAuth = sessionStorage.getItem("basic_auth_token");
+
+    if (!userId || !basicAuth) return;
+
+    try {
+        const userResponse = await axios.get(APIConstants.USER(userId), {
+            headers: {
+                'Authorization': `Basic ${basicAuth}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!userResponse.data) {
+            throw new Error('Failed to fetch user information');
+        }
+
+        const userData = userResponse.data;
+        
+
+        sessionStorage.setItem('first_name', userData.first_name);
+        sessionStorage.setItem('last_name', userData.last_name);
+        sessionStorage.setItem('email', userData.email);
+
+    }
+    catch (error) {
+        console.error('Failed to fetch user information');
+    }
 }

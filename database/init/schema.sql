@@ -1,12 +1,13 @@
 -- Create accounts table
 CREATE TABLE IF NOT EXISTS accounts (
     id uuid PRIMARY KEY,
+    email VARCHAR(128) UNIQUE,
+    password TEXT,
     first_name VARCHAR(100),
     last_name VARCHAR(100),
     bio TEXT,
     profile_picture_url TEXT,
     phone VARCHAR(20),
-    email VARCHAR(128),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     -- Foreign key constraint
@@ -65,6 +66,15 @@ CREATE TABLE IF NOT EXISTS job_applications (
     status VARCHAR(50),
     description TEXT,
     notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS file_uploads (
+    link TEXT PRIMARY KEY,
+    application_id INT REFERENCES job_applications(id) ON DELETE CASCADE,
+    size VARCHAR(32),
+    name VARCHAR(100),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );

@@ -15,3 +15,9 @@ def delete_application(application_id):
 
 def get_applications_by_user(user_id):
     return supabase.table('job_applications').select('*').eq('user_id', user_id).order(column='updated_at', desc=True).execute()
+
+def create_file_upload(data):
+    return supabase.table('file_uploads').insert(data).execute()
+
+def get_file_uploads_by_application(application_id):
+    return supabase.table('file_uploads').select('*').eq('application_id', application_id).order(column='updated_at', desc=True).execute()

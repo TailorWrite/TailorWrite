@@ -1,80 +1,8 @@
-import { Form, Link, useActionData, useNavigate } from 'react-router-dom';
+import { Form, Link } from 'react-router-dom';
 
 import { Logo } from '../components/icons';
 
-export default function LoginPage() {
-    const navigate = useNavigate();
-    
-    const actionData = useActionData() as { error? : string, success? : string };
-
-    // Check if actionData has property success on it and navigate to /dashboard/applications
-    if (actionData && actionData.success !== undefined) navigate('/dashboard/applications');
-
-
-    // const signIn = async (e: { preventDefault: () => void; }) => {
-    //     e.preventDefault(); // Prevent default form submission
-    
-    //     const payload = {
-    //         email: email,
-    //         password: password
-    //     };
-    
-    //     try {
-    //         // Send login request
-    //         const response = await fetch(APIConstants.LOGIN, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json'
-    //             },
-    //             body: JSON.stringify(payload)
-    //         });
-    
-    //         if (!response.ok) {
-    //             throw new Error('Network response was not ok');
-    //         }
-    
-    //         const result = await response.json();
-    
-    //         // Save tokens and user ID in sessionStorage
-    //         if (result.basic_auth_token) {
-    //             sessionStorage.setItem('basic_auth_token', result.basic_auth_token);
-    //         }
-    //         if (result.user_id) {
-    //             sessionStorage.setItem('user_id', result.user_id);
-    
-    //             // Fetch user information
-    //             const userResponse = await fetch(APIConstants.USER(result.user_id), {
-    //                 method: 'GET',
-    //                 headers: {
-    //                     'Authorization': `Basic ${result.basic_auth_token}`,
-    //                     'Content-Type': 'application/json'
-    //                 }
-    //             });
-    
-    //             if (!userResponse.ok) {
-    //                 throw new Error('Failed to fetch user information');
-    //             }
-    
-    //             const userData = await userResponse.json();
-    
-    //             // Store user information in sessionStorage
-    //             if (userData[0].first_name) {
-    //                 sessionStorage.setItem('first_name', userData[0].first_name);
-    //             }
-    //             if (userData[0].last_name) {
-    //                 sessionStorage.setItem('last_name', userData[0].last_name);
-    //             }
-    //             if (userData[0].email) {
-    //                 sessionStorage.setItem('email', userData[0].email);
-    //             }
-    
-    //             window.location.href = '/dashboard/applications';
-    //         }
-    //     } catch (error) {
-    //         console.error('There was a problem with the fetch operation:', error);
-    //     }
-    // };
-    
+export default function LoginPage() {    
 
     return (
         <>
