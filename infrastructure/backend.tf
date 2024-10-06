@@ -21,7 +21,7 @@ resource "null_resource" "update_backend_config" {
         command = <<-EOT
         #!/bin/bash
         ENV_FILE="${path.module}/../backend/API/.env"
-        NEW_URL="SUPABASE_URL=${aws_eip.supabase_eip.public_ip}:8000"
+        NEW_URL="SUPABASE_URL=http://${aws_eip.supabase_eip.public_ip}:8000"
         
         # Check if the file exists
         if [ -f "$${ENV_FILE}" ]; then
