@@ -1,4 +1,5 @@
 import datetime
+import json
 import pytz
 import uuid
 from flask_restx import Namespace, Resource, fields
@@ -184,7 +185,7 @@ class JobApplicationDocuments(Resource):
                     # "name": new_filename,
                     "application_id": application_id,
                     "link": f"https://{Config.BUCKET_NAME}.s3.amazonaws.com/{new_filename}",
-                    "size": f"{round(int(request.form.get("size")) / 1024, 2)} KB",
+                    "size": f"{round(int(request.form.get('size')) / 1024, 2)} KB",
                     "name": filename
                 }
                 print(data)
@@ -228,3 +229,39 @@ class JobApplicationDocuments(Resource):
         ext = filename.rsplit(".", 1)[1].lower()
         unique_filename = uuid.uuid4().hex
         return f"{unique_filename}.{ext}"
+
+
+@applications_ns.route('/scrape')
+class WebscrapeJobApplication(Resource): 
+    @applications_ns.expect(application_model)
+    @applications_ns.response(200, 'Success', application_model)
+    @applications_ns.response(404, 'Job application not found')
+    @applications_ns.response(403, 'Forbidden')
+    def post(self):
+        """Using AWS Lambda, web scrape a job application from Seek"""
+        data = request.json
+        url = data['url']
+
+        if "seek.co.nz/job" not in url:
+            return {'error': 'Invalid URL. Please provide a valid Seek job URL'}, 400
+
+        payload = json.dumps({
+            'body': json.dumps({'url': url})
+        })
+
+        print(payload)
+
+        try:
+            response = Config.lambda_client.invoke(
+                FunctionName="tailorwrite-webScrapeJobDescription",
+                InvocationType='RequestResponse',
+                Payload=payload
+            )
+
+            response_payload = json.loads(response['Payload'].read())
+            response_payload['body'] = json.loads(response_payload['body'])
+            return response_payload, 200
+        except Exception as e:
+            return {'error': str(e)}, 400
+
+
