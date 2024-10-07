@@ -40,8 +40,8 @@
 \newcommand{\projectDemoVideoURL}{sdsd}
 
 % AWS Cost Calculator URLs
-\newcommand{\estimatedCostInIdleURL}{https://calculator.aws/\#/estimate?id=d3e602b082d82bd97aafcc93904ce67516634eb8}
-\newcommand{\estimatedCostInUseURL}{https://calculator.aws/\#/estimate?id=b4dc230cd3bee2c549dd81bb9eece77d7a694213}
+\newcommand{\estimatedCostInIdleURL}{https://calculator.aws/\#/estimate?id=0f82526574f81e22825462ca5893dc9b7381e9a7}
+\newcommand{\estimatedCostInUseURL}{https://calculator.aws/\#/estimate?id=33078729fb24a4066ea8e14f12bfd1392267dc69}
 
 % Suppressing \hbox overflow warnings up to 35pt
 \hfuzz=35pt
@@ -85,12 +85,12 @@ The application uses a range of AWS services to deploy the application to AWS. T
 
 The cloud architecture used to deploy TailorWrite involves several components deployed on AWS. The backend, hosted on an EC2 instance, manages the core business logic and interactions between the other services. 
 
-The cloud architecture dipected in the diagram to the right shows the deployment of TailorWrite to AWS. It is deployed in the Oregon (us-west-2) region and utilises multiple AWS services to host the application. The Virtual Private Cloud (VPC) is the core networking composnent of this architecture, providing an isolated environment where the services are hosted. The VPC uses the default CIDR block of \texttt{10.0.0.0/16} to allocate IP addresses. Supabase, also running on an EC2 instance, handles the application's PostgreSQL database, user authentication and provides an administration interface for managing the database. A web scraping function, deployed on AWS Lambda, retrieves job listing data, which is used to auto-populate the application tracking form for users. The frontend is hosted on Amazon S3, where the user interface is served to users, while file storage for job applications and related documents is also managed through S3, though a separate bucket.
+The cloud architecture depicted in the diagram to the right shows the deployment of TailorWrite to AWS. It is deployed in the Oregon (us-west-2) region and utilises multiple AWS services to host the application. The Virtual Private Cloud (VPC) is the core networking composnent of this architecture, providing an isolated environment where the services are hosted. The VPC uses the default CIDR block of \texttt{10.0.0.0/16} to allocate IP addresses. Supabase, also running on an EC2 instance, handles the application's PostgreSQL database, user authentication and provides an administration interface for managing the database. A web scraping function, deployed on AWS Lambda, retrieves job listing data, which is used to auto-populate the application tracking form for users. The frontend is hosted on Amazon S3, where the user interface is served to users, while file storage for job applications and related documents is also managed through S3, though a separate bucket.
 
 Communication between components follows a clear structure. The frontend interacts with the backend via the public Elastic IP of the EC2 instance. The backend then handles interactions with the Supabase database using it's public Elastic IP. The python library \texttt{boto3} is used to interact with file storage service implemented ith S3 and the web scraping Lambda function. 
 
 
-EC2 was chosen for both the backend and Supabase to allow greater control over server configurations and resources in addition to maintaining our current implementation via Docker and Docker Compose. S3 was selected for it's cost effective file storage and ability to host static web files, while Lambda provided serverless compute power to execute the web scraping function on demand, avoiding the need for constantly allocated resources. 
+EC2 was chosen for both the backend and Database to allow greater control over server configurations and resources in addition to maintaining our current implementation via Docker and Docker Compose. S3 was selected for it's cost effective file storage and ability to host static web files, while Lambda provided serverless compute power to execute the web scraping function on demand, avoiding the need for constantly allocated resources. 
 
 \section{Deployment via Infrastructure as Code}
 
@@ -141,14 +141,14 @@ Using the AWS Pricing Calculator, we have estimated the monthly running costs of
     \toprule
     Service             & AWS Service       & Upfront Cost & Monthly Cost \\
     \midrule
-    Backend             & EC2 (t2.micro)    &               & \$8.47      \\ \addlinespace[\tableRowSpacing]
+    Backend             & EC2 (t3.small)    &               & \$15.18     \\ \addlinespace[\tableRowSpacing]
     Supabase Database   & EC2 (t3.small)    &               & \$15.18     \\ \addlinespace[\tableRowSpacing]
     Frontend            & S3                &               & \$0.02      \\ \addlinespace[\tableRowSpacing]
     File Storage        & S3                & \$0.26        & \$0.23      \\ \addlinespace[\tableRowSpacing]
-    Web Scraping        & Lambda            & Free Tire Usage & \$0.00    \\ 
+    Web Scraping        & Lambda            & Free Teir Usage & \$0.00    \\ 
     \midrule
-    \textbf{Total Monthly Cost}   &&& \$23.90 \\    \addlinespace[\tableRowSpacing]
-    \textbf{Total Yearly Cost}   &&& \$287.06 \\
+    \textbf{Total Monthly Cost}   &&& \$30.61 \\    \addlinespace[\tableRowSpacing]
+    \textbf{Total Yearly Cost}   &&& \$367.58 \\
     \bottomrule
     \end{tabularx}
     % \caption{Approximate running costs of the TailorWrite application on AWS when idle.}
@@ -169,14 +169,14 @@ Using the AWS Pricing Calculator, we have estimated the monthly running costs of
         \toprule
         Service             & AWS Service       & Upfront Cost & Monthly Cost \\
         \midrule
-        Backend             & EC2 (t2.micro)    &               & \$8.47      \\ \addlinespace[\tableRowSpacing]
+        Backend             & EC2 (t3.small)    &               & \$15.18      \\ \addlinespace[\tableRowSpacing]
         Supabase Database   & EC2 (t3.small)    &               & \$15.18     \\ \addlinespace[\tableRowSpacing]
         Frontend            & S3                &               & \$0.04      \\ \addlinespace[\tableRowSpacing]
         File Storage        & S3                & \$0.26        & \$0.27      \\ \addlinespace[\tableRowSpacing]
-        Web Scraping        & Lambda            & Free Tire Usage & \$0.00    \\ 
-        % \midrule \addlinespace[2\tableRowSpacing]
-        % \textbf{Total Monthly Cost}   &&& \$23.96 \\    \addlinespace[\tableRowSpacing]
-        % \textbf{Total Yearly Cost}   &&& \$287.78 \\
+        Web Scraping        & Lambda            & Free Tier Usage & \$0.00    \\ 
+        \midrule \addlinespace[2\tableRowSpacing]
+        \textbf{Total Monthly Cost}   &&& \$30.61 \\    \addlinespace[\tableRowSpacing]
+        \textbf{Total Yearly Cost}   &&& \$368.30 \\
     \end{tabularx}
 \end{table}
 
