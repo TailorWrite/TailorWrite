@@ -10,3 +10,8 @@ frontend_old/
 # Excluding everything from the services/web_scraping folder that is not a .py file
 services/web_scraping/*
 !services/web_scraping/*.py
+
+# Excluding all output LaTeX files
+*.aux
+*.pdfsync
+*.synctex.gz

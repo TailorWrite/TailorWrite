@@ -1,0 +1,262 @@
+% LaTeX Template for short student reports.
+% Citations should be in bibtex format and go in references.bib
+\documentclass[a4paper, 11pt]{article}
+\setlength{\headheight}{13.59999pt}
+\addtolength{\topmargin}{-1.59999pt}
+\usepackage[top=2cm, bottom=2cm, left = 2cm, right = 2cm]{geometry} 
+\geometry{a4paper} 
+\usepackage[utf8]{inputenc}
+\usepackage{textcomp}
+\usepackage{graphicx} 
+\usepackage{amsmath,amssymb}  
+\usepackage{bm}  
+\usepackage[pdftex,bookmarks,colorlinks,breaklinks]{hyperref}  
+%\hypersetup{linkcolor=black,citecolor=black,filecolor=black,urlcolor=black} % black links, for printed output
+\usepackage{memhfixc} 
+\usepackage{pdfsync}  
+\usepackage{fancyhdr}
+\usepackage[parfill]{parskip}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{color,soul}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{wrapfig} % For wrapping figures
+\usepackage{hyperref}
+\usepackage{verbatim}
+
+\newcommand{\customSubfigure}[3]{%
+    \begin{subfigure}{#2}
+        \centering
+        \includegraphics[width=\linewidth]{#1}
+        \phantomcaption{#3}
+    \end{subfigure}%
+}
+
+\newcommand{\projectRepoURL}{https://github.com/JamesRobionyRogers/Assignment02-CloudDeployment}
+\newcommand{\projectDemoVideoURL}{sdsd}
+
+% AWS Cost Calculator URLs
+\newcommand{\estimatedCostInIdleURL}{https://calculator.aws/\#/estimate?id=d3e602b082d82bd97aafcc93904ce67516634eb8}
+\newcommand{\estimatedCostInUseURL}{https://calculator.aws/\#/estimate?id=b4dc230cd3bee2c549dd81bb9eece77d7a694213}
+
+% Suppressing \hbox overflow warnings up to 35pt
+\hfuzz=35pt
+
+\pagestyle{fancy}
+
+\title{COSC349 Assignment 2: Deploying to AWS}
+\author{James Robiony-Rogers (5793901) \& Corban Surtees (4658948)} 
+
+
+\begin{document}
+\begin{titlepage}
+    \maketitle
+    \vfill
+    \tableofcontents
+\end{titlepage}
+
+\pagebreak
+
+\section{Introduction}
+
+This report details the design, development and deployment of TailorWrite, a job application tracker, to the Amazon Web Services (AWS) cloud. TailorWrite was developed with modern cloud virtualisation practices and is designed to help students and job seekers manage their job search by recording key information about their applications, such as job roles, companies, statuses, and dates of submission. The project demonstrates the use of infrastructure as code (IaC) to automate the deployment of the application to AWS. 
+
+The application uses a range of AWS services to deploy the application to AWS. These including:
+
+\begin{itemize}
+    \item Elastic Compute Cloud (EC2) for hosting the application.
+    \item Simple Storage Service (S3) for storing static assets.
+    \item AWS Lambda for a serverless function.
+\end{itemize}
+
+\section{Cloud Architecture}
+
+% Params: (number of lines to span, alignment {right,left}, width)
+\begin{wrapfigure}[21]{r}{0.5\textwidth} 
+    \vspace{-1\baselineskip}
+    \centering
+    \customSubfigure{./imgs/CloudArchitecture-NoUser}{0.48\textwidth}{AWS Cloud Architecture Diagram}
+    % \customSubfigure{./imgs/CloudArchitecture}{0.48\textwidth}{AWS Cloud Architecture Diagram}
+\end{wrapfigure}
+
+The cloud architecture used to deploy TailorWrite involves several components deployed on AWS. The backend, hosted on an EC2 instance, manages the core business logic and interactions between the other services. 
+
+The cloud architecture dipected in the diagram to the right shows the deployment of TailorWrite to AWS. It is deployed in the Oregon (us-west-2) region and utilises multiple AWS services to host the application. The Virtual Private Cloud (VPC) is the core networking composnent of this architecture, providing an isolated environment where the services are hosted. The VPC uses the default CIDR block of \texttt{10.0.0.0/16} to allocate IP addresses. Supabase, also running on an EC2 instance, handles the application's PostgreSQL database, user authentication and provides an administration interface for managing the database. A web scraping function, deployed on AWS Lambda, retrieves job listing data, which is used to auto-populate the application tracking form for users. The frontend is hosted on Amazon S3, where the user interface is served to users, while file storage for job applications and related documents is also managed through S3, though a separate bucket.
+
+Communication between components follows a clear structure. The frontend interacts with the backend via the public Elastic IP of the EC2 instance. The backend then handles interactions with the Supabase database using it's public Elastic IP. The python library \texttt{boto3} is used to interact with file storage service implemented ith S3 and the web scraping Lambda function. 
+
+
+EC2 was chosen for both the backend and Supabase to allow greater control over server configurations and resources in addition to maintaining our current implementation via Docker and Docker Compose. S3 was selected for it's cost effective file storage and ability to host static web files, while Lambda provided serverless compute power to execute the web scraping function on demand, avoiding the need for constantly allocated resources. 
+
+\section{Deployment via Infrastructure as Code}
+
+The infrastructure of TailorWrite was automated using Terraform, an Infrastructure as Code (IaC) tool. Terraform scripts were used to provision the virtual networking components, security groups, Elastic IP addresses and upload the user interface's static build to S3, in addition to deploying the core services outlined above. Although most deployment steps are automated, the frontend build process remains manual prior to running the Terraform scripts. This is a limitation of the current implementation and could be improved in future iterations.
+
+A detailed README file in the project repository offers step-by-step instructions for setting up the development environment and deploying the application. This documentation ensures that new developers can quickly onboard and contribute to the project.
+
+% The deployment of TailorWrite to AWS is automated using Infrastructure as Code (IaC). The project uses Terraform to define the infrastructure components and automate the deployment process. The Terraform configuration files are stored in the \texttt{infrastructure} directory of the project repository.
+
+% Unfortunatley, the deployment process is not fully automated due to an issue ith running a fontend build through Terraform. As a result, the frontend build must be done manually before running the Terraform scripts. This is a limitation of the current implementation and could be improved in future iterations.
+
+% Prior to running the Terraform scripts, a \texttt{terraform.tfvars} file must be created in the \texttt{infrastructure} directory. This file should contain AWS CLI cradentials to be used to authenticate with AWS. The file should be structured as follows:
+
+% \begin{verbatim}
+%     access_key = ""
+%     secret_key = ""
+%     session_token = ""
+% \end{verbatim}
+
+% Running the terraform scripts is done by navigating to the \texttt{infrastructure} directory and running the following commands:
+
+% \begin{verbatim}
+%     terraform init
+%     terraform apply
+% \end{verbatim}
+
+% Confirmting the deployment will provision the necessary resources in AWS, including the EC2 instance, S3 buckets, and Lambda function. The application can then be accessed via the public IP address of the EC2 instance.
+
+\section{User Interaction \& Application Usage}
+
+Users can access TailorWrite via the frontend hosted in an S3 bucket. This provides a simple and intuitive interface for users to manage their job applications. After logging-in users can track their the status and details of their job applications and upload documents such as resumes, cover letters or on-boarding documents. The two minute screen recording demonstrates key functionalities such as navigating the job application tracker, using the web scraping feature to auto-populate forms, and uploading documents. 
+
+
+\section{Estimated Running Costs} 
+
+Using the AWS Pricing Calculator, we have estimated the monthly running costs of the TailorWrite application when the system is idle and when the system is in light use. 
+
+% When the system is idle, the cost is determined by the baseline prices for the EC2 instances and S3 storage. Below is a breakdown of the estimated costs:
+
+\begin{table}[htbp]
+    \subsubsection*{Estimated Costs When Idle}
+
+    \newlength{\tableRowSpacing}
+    \setlength{\tableRowSpacing}{3pt}   % 3pt = 0.3em
+
+    \centering
+    \begin{tabularx}{\textwidth}{XXrr}
+    \toprule
+    Service             & AWS Service       & Upfront Cost & Monthly Cost \\
+    \midrule
+    Backend             & EC2 (t2.micro)    &               & \$8.47      \\ \addlinespace[\tableRowSpacing]
+    Supabase Database   & EC2 (t3.small)    &               & \$15.18     \\ \addlinespace[\tableRowSpacing]
+    Frontend            & S3                &               & \$0.02      \\ \addlinespace[\tableRowSpacing]
+    File Storage        & S3                & \$0.26        & \$0.23      \\ \addlinespace[\tableRowSpacing]
+    Web Scraping        & Lambda            & Free Tire Usage & \$0.00    \\ 
+    \midrule
+    \textbf{Total Monthly Cost}   &&& \$23.90 \\    \addlinespace[\tableRowSpacing]
+    \textbf{Total Yearly Cost}   &&& \$287.06 \\
+    \bottomrule
+    \end{tabularx}
+    % \caption{Approximate running costs of the TailorWrite application on AWS when idle.}
+    
+    \raggedright \vspace{1em}
+    An instance of the AWS Cost Pricing calculator used to estimate the costs can be accessed \href{\estimatedCostInIdleURL}{here}.
+\end{table}
+
+% Under light usage, the overall cost may slightly increase due to additional CPU and memory usage on the EC2 instances. Increased file uploads to S3 would also raise costs, while Lambda incurs charges based on the number of invocations, though these remain low.
+
+\vfill
+\begin{table}[htbp]
+    \subsubsection*{Estimated Costs When In Light Use}
+    
+    \setlength{\tableRowSpacing}{3pt}   % 3pt = 0.3em
+    \centering
+    \begin{tabularx}{\textwidth}{XXrr}
+        \toprule
+        Service             & AWS Service       & Upfront Cost & Monthly Cost \\
+        \midrule
+        Backend             & EC2 (t2.micro)    &               & \$8.47      \\ \addlinespace[\tableRowSpacing]
+        Supabase Database   & EC2 (t3.small)    &               & \$15.18     \\ \addlinespace[\tableRowSpacing]
+        Frontend            & S3                &               & \$0.04      \\ \addlinespace[\tableRowSpacing]
+        File Storage        & S3                & \$0.26        & \$0.27      \\ \addlinespace[\tableRowSpacing]
+        Web Scraping        & Lambda            & Free Tire Usage & \$0.00    \\ 
+        % \midrule \addlinespace[2\tableRowSpacing]
+        % \textbf{Total Monthly Cost}   &&& \$23.96 \\    \addlinespace[\tableRowSpacing]
+        % \textbf{Total Yearly Cost}   &&& \$287.78 \\
+    \end{tabularx}
+\end{table}
+
+
+\begin{table}[htbp]
+    \setlength{\tableRowSpacing}{3pt}   % 3pt = 0.3em
+    
+    \centering
+    \begin{tabularx}{\textwidth}{XXrr}
+        % \toprule
+        % Service             & AWS Service       & Upfront Cost & Monthly Cost \\
+        % Service             & AWS Service       & Upfront Cost & Monthly Cost \\
+        % \midrule
+        % Supabase Database   & EC2 (t3.small)    &               & \$15.18     \\ \addlinespace[\tableRowSpacing]
+        % Frontend            & S3                &               & \$0.04      \\ \addlinespace[\tableRowSpacing]
+        % File Storage        & S3                & \$0.26        & \$0.27      \\ \addlinespace[\tableRowSpacing]
+        % Web Scraping        & Lambda            & Free Tire Usage & \$0.00    \\ 
+        \midrule \addlinespace[2\tableRowSpacing]
+        \textbf{Total Monthly Cost}   &&& \$23.96 \\    \addlinespace[\tableRowSpacing]
+        \textbf{Total Yearly Cost}   &&& \$287.78 \\
+        \bottomrule
+    \end{tabularx}
+    % \caption{Approximate running costs of the TailorWrite application on AWS}
+\end{table}
+
+Instances of the AWS Cost Pricing calculator used to estimate the costs can when the system is idle can be accessed \href{\estimatedCostInIdleURL}{here}, and when the system is in light use can be accessed \href{\estimatedCostInUseURL}{here}.
+
+% \begin{table}[htbp]
+%     \setlength{\tableRowSpacing}{3pt}   % 3pt = 0.3em
+    
+%     \centering
+%     \begin{tabularx}{\textwidth}{Xrrr}
+%         \toprule
+%         Usage           & Total Monthly Cost    & Total Yearly Cost \\
+%         \midrule
+%         Idle            & $\$23.90$               & \$287.06          \\ \addlinespace[\tableRowSpacing]
+%         Light Usage     & $\$23.96$               & \$287.78          \\ \addlinespace[\tableRowSpacing]
+%     \end{tabularx}
+%     % \caption{Approximate running costs of the TailorWrite application on AWS}
+    
+%     \raggedright \vspace{1em}
+%     An instance of the AWS Cost Pricing calculator used to estimate the costs can be accessed \href{\estimatedCostInUseURL}{here}.
+% \end{table}
+
+\section{Development Process}
+
+Development of TailorWrite followed an incremental approach, with the commit history in the Git repository reflecting each stage of feature development and debugging. As this was a group project, we used a feature branch workflow to manage the development process. This structure ensured clarity and traceability throughout the development cycle.
+
+Many challenges arose during development. Configuring security groups for the Ec2 instances proved difficult initially, as ingress and egress rules needed to be configured correctly to allow communication between EC2 instances, in addition to allowing SSH access for debugging. While provisioning an API Gateway to invoke the Lambda function was initially planned, issues with IAM permissions surfaced when attempting to invoke the Lambda function via API Gateway leading us to pivot away from API Gateway towards Lambda's function URL. This however, posed a new challenge as we were now facing CORS (Cross Origin Resource Sharing) issues when trying to invoke the Lambda function from the frontend. After hours of debugging, we decided to pivot for a third time to invoke the Lambda function directly via our backend (using the \texttt{boto3} library), which resolved the issue.
+
+\section{Project Links}
+Below are links to the project demo video and the GitHub repository:
+
+\begin{itemize}
+    \item Repository: \url{\projectRepoURL}
+    \item Project demo video: \url{\projectDemoVideoURL}
+\end{itemize}
+
+\section{Attribution}
+This project was developed by James Robiony-Rogers and Corban Surtees for COSC349 at the University of Otago. The project would not have been made possible without various open-source projects, libraries and websites. These include: 
+
+\subsection*{Development Tools}
+
+
+\begin{itemize}
+    \item Frontend: TailwindCSS components \url{https://tailwindui.com/components}
+    \item Frontend: Material Tailwind \url{https://material-tailwind.com/}
+    \item Frontend: Preline UI \url{https://preline.co}
+    \item Backend: Flask \url{https://flask.palletsprojects.com/en/2.0.x/}
+    \item Database: Supabase \url{https://supabase.io/}
+\end{itemize}
+
+\subsection*{Deployment Tools}
+
+\begin{itemize}
+    \item Terraform \url{https://www.terraform.io/}
+    \item AWS \url{https://aws.amazon.com/}
+    \item Docker \url{https://www.docker.com/}
+    \item Docker Compose \url{https://docs.docker.com/compose/}
+    \item Spacelift \url{https://spacelift.io} 
+\end{itemize}
+
+\end{document}
