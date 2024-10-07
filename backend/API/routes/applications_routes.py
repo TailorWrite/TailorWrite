@@ -255,7 +255,7 @@ class WebscrapeJobApplication(Resource):
             response = Config.lambda_client.invoke(
                 FunctionName="tailorwrite-webScrapeJobDescription",
                 InvocationType='RequestResponse',
-                Payload=payload
+                Payload=json.dumps({'url': url})
             )
 
             response_payload = json.loads(response['Payload'].read())
