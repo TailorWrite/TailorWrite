@@ -27,6 +27,12 @@ const APIConstants = {
     SKILLS: (uuid: string) => `${API_BASE_URL}/skills/user/${uuid}`,
     EDUCATION: (uuid: string) => `${API_BASE_URL}/educations/user/${uuid}`,
     EXPERIENCE: (uuid: string) => `${API_BASE_URL}/experiences/user/${uuid}`,
+    SKILLS_BY_ID: (id: string) => `${API_BASE_URL}/skills/${id}`,
+    EDUCATION_BY_ID: (id: string) => `${API_BASE_URL}/educations/${id}`,
+    EXPERIENCE_BY_ID: (id: string) => `${API_BASE_URL}/experiences/${id}`,
+    ADD_SKILL: () => `${API_BASE_URL}/skills`,
+    ADD_EDUCATION: () => `${API_BASE_URL}/educations`,
+    ADD_EXPERIENCE: () => `${API_BASE_URL}/experiences`,
     USERS: `${API_BASE_URL}/users`,
     USER: (uuid: string) => `${API_BASE_URL}/users/${uuid}`,
 }

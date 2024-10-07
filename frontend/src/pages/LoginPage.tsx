@@ -57,14 +57,14 @@ export default function LoginPage() {
                 console.log('User Data:', userData);
     
                 // Store user information in sessionStorage
-                if (userData[0].first_name) {
-                    sessionStorage.setItem('first_name', userData[0].first_name);
+                if (userData.first_name) {
+                    sessionStorage.setItem('first_name', userData.first_name);
                 }
-                if (userData[0].last_name) {
-                    sessionStorage.setItem('last_name', userData[0].last_name);
+                if (userData.last_name) {
+                    sessionStorage.setItem('last_name', userData.last_name);
                 }
-                if (userData[0].email) {
-                    sessionStorage.setItem('email', userData[0].email);
+                if (userData.email) {
+                    sessionStorage.setItem('email', userData.email);
                 }
     
                 window.location.href = '/dashboard/applications';

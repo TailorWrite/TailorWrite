@@ -28,6 +28,7 @@ const formatDate = (date) => {
 
 function ExperienceForm({ index, initialData = {} }) {
   const [formData, setFormData] = useState({
+    id: initialData.id || '',
     job_title: initialData.job_title || '',
     company_name: initialData.company_name || '',
     is_current_job: initialData.is_current_job || false,
@@ -36,11 +37,26 @@ function ExperienceForm({ index, initialData = {} }) {
     description: initialData.description || '',
   });
 
+  const [is_current_job, setIsCurrentJob] = useState(formData.is_current_job);
+
+  // Effect to update the local state when formData changes
+  useEffect(() => {
+    setIsCurrentJob(formData.is_current_job);
+  }, [formData.is_current_job]);
+
   const handleInputChange = (event) => {
     const { name, value, type, checked } = event.target;
     setFormData(prevData => ({
       ...prevData,
       [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleCheckBoxChange = (event, fieldName) => {
+    const { name, value, type, checked } = event.target;
+    setFormData(prevData => ({
+      ...prevData,
+      [fieldName]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -52,112 +68,113 @@ function ExperienceForm({ index, initialData = {} }) {
   };
 
   return (
-    <Form method="post">
-      <div className="border-b border-gray-900/10 pb-12">
-        <h3 className="text-base font-semibold leading-7 text-gray-900 mt-5">Experience {index + 1}</h3>
-        <p className="mt-1 text-sm leading-6 text-gray-600">Please add your previous experience</p>
+    <div className="border-b border-gray-900/10 pb-12">
+      <h3 className="text-base font-semibold leading-7 text-gray-900 mt-5 text-center">Experience {index + 1}</h3>
+      <p className="mt-1 text-sm leading-6 text-gray-600 text-center">Please add your previous experience</p>
 
-        <div className="mt-2 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-          <div className="sm:col-span-3">
-            <label htmlFor={`job_title-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
-              Job Title
-            </label>
-            <div className="mt-2">
-              <input
-                id={`job_title-${index}`}
-                name="job_title"
-                type="text"
-                value={formData.job_title}
-                onChange={handleInputChange}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                required
-              />
-            </div>
-          </div>
+      <input hidden name={`experience-id-${index}`} value={formData.id} />
 
-          <div className="sm:col-span-3">
-            <label htmlFor={`company_name-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
-              Company Name
-            </label>
-            <div className="mt-2">
-              <input
-                id={`company_name-${index}`}
-                name="company_name"
-                type="text"
-                value={formData.company_name}
-                onChange={handleInputChange}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center mb-2 col-span-full">
+      <div className="mt-2 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
+        <div className="sm:col-span-2 sm:col-start-3">
+          <label htmlFor={`job_title-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
+            Job Title
+          </label>
+          <div className="mt-2">
             <input
-              id={`is_current_job-${index}`}
-              name="is_current_job"
-              type="checkbox"
-              checked={formData.is_current_job}
+              id={`job_title-${index}`}
+              name={`job_title-${index}`}
+              type="text"
+              defaultValue={formData.job_title}
               onChange={handleInputChange}
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor={`is_current_job-${index}`} className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-              I currently work here
-            </label>
-          </div>
-
-          <div className="sm:col-span-2 sm:col-start-1">
-            <label htmlFor={`start_date-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
-              Start Date
-            </label>
-            <DatePicker
-              id={`start_date-${index}`}
-              name="start_date"
-              onSelectedDateChanged={(date) => handleDateChange(date, 'start_date')}
-              value={formData.start_date}
-              placeholderText="Start Date"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              />
-          </div>
-
-          {!formData.is_current_job && (
-            <div className="sm:col-span-2 sm:col-start-1">
-              <label htmlFor={`end_date-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
-                End Date
-              </label>
-              <DatePicker
-                id={`end_date-${index}`}
-                name="end_date"
-                onSelectedDateChanged={(date) => handleDateChange(date, 'end_date')}
-                value={formData.end_date}
-                className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 ${formData.is_current_job ? 'bg-gray-200 cursor-not-allowed' : ''}`}
-                placeholderText="End Date"
-                disabled={formData.is_current_job}
-                required={!formData.is_current_job}
-              />
-            </div>
-          )}
-
-          <div className="col-span-full mt-2">
-            <label htmlFor={`description-${index}`} className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-            <textarea
-              id={`description-${index}`}
-              name="description"
-              maxLength={2000}
-              rows={4}
-              value={formData.description}
-              onChange={handleInputChange}
-              className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              required
             />
           </div>
         </div>
+
+        <div className="sm:col-span-2 sm:col-start-5">
+          <label htmlFor={`company_name-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
+            Company Name
+          </label>
+          <div className="mt-2">
+            <input
+              id={`company_name-${index}`}
+              name={`company_name-${index}`}
+              type="text"
+              defaultValue={formData.company_name}
+              onChange={handleInputChange}
+              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center mb-2 col-span-full sm:col-start-3">
+          <input
+            id={`is_current_job-${index}`}
+            name={`is_current_job-${index}`}
+            type="checkbox"
+            defaultChecked={formData.is_current_job}
+            onChange={(event) => handleCheckBoxChange(event, 'is_current_job')}
+            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+          />
+          <label htmlFor={`is_current_job-${index}`} className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+            I currently work here
+          </label>
+        </div>
+
+        <div className="sm:col-span-4 sm:col-start-3">
+          <label htmlFor={`start_date-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
+            Start Date
+          </label>
+            <DatePicker
+              id={`experience-start_date-${index}`}
+              name={`experience-start_date-${index}`}
+              defaultValue={formData.start_date}
+              onSelectedDateChanged={(date) => handleDateChange(date, 'start_date')}
+              placeholderText="Start Date"
+              className="block w-full rounded-md py-1.5 text-gray-900"
+              required
+            />
+        </div>
+
+        {!formData.is_current_job && (
+          <div className="sm:col-span-4 sm:col-start-3">
+          <label htmlFor={`start_date-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
+            End Date
+          </label>
+            <DatePicker
+              id={`education-end_date-${index}`}
+              name={`education-end_date-${index}`}
+              defaultValue={formData.end_date}
+              onSelectedDateChanged={(date) => handleDateChange(date, 'end_date')}
+              placeholderText="End Date"
+              className="block w-full rounded-md py-1.5 text-gray-900"
+              required
+            />
+        </div>
+        )}
+
+        <div className="col-span-4 col-start-3 mt-2">
+          <label htmlFor={`description-${index}`} className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+          <textarea
+            id={`experience-description-${index}`}
+            name={`experience-description-${index}`}
+            maxLength={2000}
+            rows={4}
+            defaultValue={formData.description}
+            onChange={handleInputChange}
+            className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          />
+        </div>
       </div>
-    </Form>
+    </div>
   );
 }
 
 export function SkillForm({ index, initialData = {} }) {
   const [formData, setFormData] = useState({
+    id: initialData.id || '',
     skill_name: initialData.skill_name || '',
     proficiency_level: initialData.proficiency_level || ''
   });
@@ -171,52 +188,57 @@ export function SkillForm({ index, initialData = {} }) {
   };
 
   return (
-    <div className="border-b border-gray-900/10 pb-12 mb-4">
-      <h2 className="text-base font-semibold leading-7 text-gray-900">
+    <div className="border-b border-gray-900/10 pb-12 mb-4 ">
+      <h2 className="text-base font-semibold leading-7 text-gray-900 text-center">
         Skill {index + 1}
       </h2>
-      <p className="mt-1 text-sm leading-6 text-gray-600">
+      <p className="mt-1 text-sm leading-6 text-gray-600 text-center">
         Please provide skills you have
       </p>
 
-      <div className="sm:col-span-3">
-        <label
-          htmlFor={`skill_name-${index}`}
-          className="block text-sm font-medium leading-6 text-gray-900 mt-2"
-        >
-          Skill Name
-        </label>
-        <div className="mt-2">
-          <input
-            id={`skill_name-${index}`}
-            name="skill_name"
-            type="text"
-            value={formData.skill_name}
-            onChange={handleInputChange}
-            autoComplete="skill"
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            required
-          />
-        </div>
-      </div>
+      <input hidden name={`skill-id-${index}`} value={formData.id} />
 
-      <div className="sm:col-span-3">
-        <label
-          htmlFor={`proficiency_level-${index}`}
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          Proficiency Level
-        </label>
-        <div className="mt-2">
-          <input
-            id={`proficiency_level-${index}`}
-            name="proficiency_level"
-            type="text"
-            value={formData.proficiency_level}
-            onChange={handleInputChange}
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            required
-          />
+      <div className="mt-2 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
+
+        <div className="sm:col-span-2 sm:col-start-3">
+          <label
+            htmlFor={`skill_name-${index}`}
+            className="block text-sm font-medium leading-6 text-gray-900 mt-2"
+          >
+            Skill Name
+          </label>
+          <div className="mt-2">
+            <input
+              id={`skill_name-${index}`}
+              name={`skill_name-${index}`}
+              type="text"
+              defaultValue={formData.skill_name}
+              onChange={handleInputChange}
+              autoComplete="skill"
+              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="sm:col-span-2 sm:col-start-5">
+          <label
+            htmlFor={`proficiency_level-${index}`}
+            className="block text-sm font-medium leading-6 text-gray-900 mt-2"
+          >
+            Proficiency Level
+          </label>
+          <div className="mt-2">
+            <input
+              id={`proficiency_level-${index}`}
+              name={`proficiency_level-${index}`}
+              type="text"
+              defaultValue={formData.proficiency_level}
+              onChange={handleInputChange}
+              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              required
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -226,6 +248,7 @@ export function SkillForm({ index, initialData = {} }) {
 
 function EducationForm({ index, initialData = {} }) {
   const [formData, setFormData] = useState({
+    id: initialData.id || '',
     institution_name: initialData.institution_name || '',
     degree: initialData.degree || '',
     field_of_study: initialData.field_of_study || '',
@@ -250,124 +273,122 @@ function EducationForm({ index, initialData = {} }) {
   };
 
   return (
-    <Form method="post">
-      <div className="border-b border-gray-900/10 pb-12">
-        <h2 className="text-base font-semibold leading-7 text-gray-900">
-          Previous Education {index + 1}
-        </h2>
-        <p className="mt-1 text-sm leading-6 text-gray-600">
-          Please add your previous education
-        </p>
+    <div className="border-b border-gray-900/10 pb-12">
+      <h2 className="text-base font-semibold leading-7 text-gray-900 text-center">
+        Previous Education {index + 1}
+      </h2>
+      <p className="mt-1 text-sm leading-6 text-gray-600 text-center">
+        Please add your previous education
+      </p>
 
-        <div className="mt-2 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-          <div className="sm:col-span-3">
-            <label
-              htmlFor={`institution_name-${index}`}
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Institution Name
-            </label>
-            <div className="mt-2">
-              <input
-                id={`institution_name-${index}`}
-                name="institution_name"
-                type="text"
-                value={formData.institution_name}
-                onChange={handleInputChange}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                required
-              />
-            </div>
+      <input hidden name={`education-id-${index}`} value={formData.id} />
+
+      <div className="mt-2 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
+        <div className="sm:col-span-2 sm:col-start-4">
+          <label
+            htmlFor={`institution_name-${index}`}
+            className="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Institution Name
+          </label>
+          <div className="mt-2">
+            <input
+              id={`institution_name-${index}`}
+              name={`institution_name-${index}`}
+              type="text"
+              defaultValue={formData.institution_name}
+              onChange={handleInputChange}
+              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              required
+            />
           </div>
+        </div>
 
-          <div className="sm:col-span-3">
-            <label htmlFor={`degree-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
-              Degree
-            </label>
-            <div className="mt-2">
-              <input
-                id={`degree-${index}`}
-                name="degree"
-                type="text"
-                value={formData.degree}
-                onChange={handleInputChange}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-            </div>
+        <div className="sm:col-span-2 sm:col-start-3">
+          <label htmlFor={`degree-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
+            Degree
+          </label>
+          <div className="mt-2">
+            <input
+              id={`degree-${index}`}
+              name={`degree-${index}`}
+              type="text"
+              defaultValue={formData.degree}
+              onChange={handleInputChange}
+              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
           </div>
+        </div>
 
-          <div className="sm:col-span-3">
-            <label htmlFor={`field_of_study-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
-              Field of Study
-            </label>
-            <div className="mt-2">
-              <input
-                id={`field_of_study-${index}`}
-                name="field_of_study"
-                type="text"
-                value={formData.field_of_study}
-                onChange={handleInputChange}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-            </div>
+        <div className="sm:col-span-2 sm:col-start-5">
+          <label htmlFor={`field_of_study-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
+            Field of Study
+          </label>
+          <div className="mt-2">
+            <input
+              id={`field_of_study-${index}`}
+              name={`field_of_study-${index}`}
+              type="text"
+              defaultValue={formData.field_of_study}
+              onChange={handleInputChange}
+              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
           </div>
+        </div>
 
-          <div className="sm:col-span-3">
-            <label htmlFor={`start_date-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
-              Start Date
-            </label>
-            <div className="mt-2">
-              <DatePicker
-                id={`start_date-${index}`}
-                name="start_date"
-                value={formData.start_date}
-                onSelectedDateChanged={(date) => handleDateChange(date, 'start_date')}
-                placeholderText="Start Date"
-                className="block w-full rounded-md py-1.5 text-gray-900"
-                required
-              />
-            </div>
+        <div className="sm:col-span-4 sm:col-start-3">
+          <label htmlFor={`start_date-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
+            Start Date
+          </label>
+            <DatePicker
+              id={`education_start_date-${index}`}
+              name={`education_start_date-${index}`}
+              defaultValue={formData.start_date}
+              onSelectedDateChanged={(date) => handleDateChange(date, 'start_date')}
+              placeholderText="Start Date"
+              className="block w-full rounded-md py-1.5 text-gray-900"
+              required
+            />
+        </div>
+
+        <div className="sm:col-span-4 sm:col-start-3">
+          <label htmlFor={`end_date-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
+            End Date
+          </label>
+          <div className="mt-2">
+            <DatePicker
+              id={`education_end_date-${index}`}
+              name={`education_end_date-${index}`}
+              defaultValue={formData.end_date}
+              onSelectedDateChanged={(date) => handleDateChange(date, 'end_date')}
+              placeholderText="End Date"
+              className="block w-full rounded-md py-1.5 text-gray-900"
+              required
+            />
           </div>
+        </div>
 
-          <div className="sm:col-span-3">
-            <label htmlFor={`end_date-${index}`} className="block text-sm font-medium leading-6 text-gray-900">
-              End Date
-            </label>
-            <div className="mt-2">
-              <DatePicker
-                id={`end_date-${index}`}
-                name="end_date"
-                value={formData.end_date}
-                onSelectedDateChanged={(date) => handleDateChange(date, 'end_date')}
-                placeholderText="End Date"
-                className="block w-full rounded-md py-1.5 text-gray-900"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="col-span-full">
-            <label
-              htmlFor={`education-description-${index}`}
-              className="block text-sm font-medium leading-6 text-gray-900"
-            >
-              Description
-            </label>
-            <div className="mt-2">
-              <textarea
-                id={`education-description-${index}`}
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                maxLength={2000}
-                rows={4}
-                className="block w-full p-2.5 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
+        <div className="sm:col-span-4 sm:col-start-3">
+          <label
+            htmlFor={`education-description-${index}`}
+            className="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Description
+          </label>
+          <div className="mt-2">
+            <textarea
+              id={`education_description_${index}`}
+              name={`education_description_${index}`}
+              defaultValue={formData.description}
+              onChange={handleInputChange}
+              maxLength={2000}
+              rows={4}
+              className="block w-full p-2.5 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+            />
           </div>
         </div>
       </div>
-    </Form>
+    </div>
   );
 }
 
@@ -383,9 +404,6 @@ export default function ProfilePage() {
   const [experienceForms, setExperienceForms] = useState([]);
   const [skillForms, setSkillForms] = useState([]);
   const [educationForms, setEducationForms] = useState([]);
-
-
-  console.log(data);
 
   useEffect(() => {
     // Initialize experience forms with existing data
@@ -426,23 +444,21 @@ export default function ProfilePage() {
 
   return (
     <Form method="post">
-      <div className="space-y-12">
+      <div className="ml-8 mt-8 space-y-12">
         <div className="border-b border-gray-900/10 pb-12">
-          <h2 className="text-base font-semibold leading-7 text-gray-900">Profile</h2>
-          <p className="mt-1 text-sm leading-6 text-gray-600">
+          <h2 className="text-base font-semibold leading-7 text-gray-900 text-center">Profile</h2>
+          <p className="mt-1 text-sm leading-6 text-gray-600 text-center">
             This information will be displayed publicly so be careful what you share.
           </p>
         </div>
 
         <div className="border-b border-gray-900/10 pb-12">
-          <h2 className="text-base font-semibold leading-7 text-gray-900">Personal Information</h2>
-          <p className="mt-1 text-sm leading-6 text-gray-600">Use a permanent address where you can receive mail.</p>
+          <h2 className="text-base font-semibold leading-7 text-gray-900 text-center">Personal Information</h2>
+          <p className="mt-1 text-sm leading-6 text-gray-600 text-center">Use a permanent address where you can receive mail.</p>
 
-          {/* Add other personal information fields here */}
-
-
-          <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            <div className="sm:col-span-3">
+          <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
+            {/* First Name */}
+            <div className="sm:col-span-2 sm:col-start-3">
               <label htmlFor="first-name" className="block text-sm font-medium leading-6 text-gray-900">
                 First name
               </label>
@@ -458,8 +474,8 @@ export default function ProfilePage() {
               </div>
             </div>
 
-
-            <div className="sm:col-span-3">
+            {/* Last Name */}
+            <div className="sm:col-span-2 sm:col-start-5">
               <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-gray-900">
                 Last name
               </label>
@@ -475,10 +491,10 @@ export default function ProfilePage() {
               </div>
             </div>
 
-
-            <div className="sm:col-span-4">
+            {/* Email */}
+            <div className="sm:col-span-4 sm:col-start-3"> {/* Set to span all columns, making it a single column row */}
               <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-                Email address
+                Email address (Locked)
               </label>
               <div className="mt-2">
                 <input
@@ -486,15 +502,15 @@ export default function ProfilePage() {
                   name="email"
                   type="email"
                   autoComplete="email"
+                  readOnly
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   defaultValue={data.get('user').email}
                 />
               </div>
             </div>
           </div>
-
-
         </div>
+
 
 
         {/* Show the experience form when button is clicked */}
@@ -502,7 +518,7 @@ export default function ProfilePage() {
           <ExperienceForm key={index} index={index} initialData={experience} />
         ))}
 
-        <div className="flex shrink-0 flex-col gap-2 sm:flex-row mt-4">
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row mt-4 justify-center">
           <Button
             className="flex items-center gap-3 dark:bg-white dark:text-black"
             size="sm"
@@ -516,7 +532,7 @@ export default function ProfilePage() {
           <SkillForm key={index} index={index} initialData={skill} />
         ))}
 
-        <div className="flex shrink-0 flex-col gap-2 sm:flex-row mt-4">
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row mt-4 justify-center">
           <Button
             className="flex items-center gap-3 dark:bg-white dark:text-black"
             size="sm"
@@ -530,7 +546,7 @@ export default function ProfilePage() {
           <EducationForm key={index} index={index} initialData={education} />
         ))}
 
-        <div className="flex shrink-0 flex-col gap-2 sm:flex-row mt-4">
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row mt-4 justify-center">
           <Button
             className="flex items-center gap-3 dark:bg-white dark:text-black"
             size="sm"

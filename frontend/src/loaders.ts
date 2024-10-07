@@ -104,7 +104,7 @@ export async function profileLoader() {
         if (!response4.data) {
             return json({ error: 'No data found' }, { status: 404 });
         }
-        data.set("user", response4.data[0]);        
+        data.set("user", response4.data);        
 
         // Return the data to the component
         return data;

@@ -16,7 +16,7 @@ import { APIConstants } from "./pathConstants";
 export async function handleAddApplication({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
     const toastId = toast.loading('Uploading application...');
     const userId = sessionStorage.getItem("user_id");
-    
+
     const formData = await request.formData();
 
     // Extract form fields from formData
@@ -91,7 +91,7 @@ export async function handleAddApplication({ request }: { request: Request }): P
 
 export async function handleApplicationSubmit({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
     // Clone the request to read the body
-    const requestPassOn = request.clone(); 
+    const requestPassOn = request.clone();
 
     // TODO: Implement this function with checking for the request method (POST, PUT, DELETE)
 
@@ -100,7 +100,7 @@ export async function handleApplicationSubmit({ request }: { request: Request })
     const intent = formData.get("intent") as string;
 
     // Call the appropriate function based on the intent
-    if ( intent == "delete") {
+    if (intent == "delete") {
         return handleDeleteApplication({ request: requestPassOn });
     }
 
@@ -194,73 +194,110 @@ export async function handleUpdateApplication({ request }: { request: Request })
 }
 
 export async function handleProfile({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
-
-    console.log("test");
-
     // OPTIONAL: Extract the userId from the session storage
-    const userId = sessionStorage.getItem('userId') as string;
-    
+    const userId = sessionStorage.getItem('user_id') as string;
+
     // Get the form data from the request
     const formData = await request.formData();
+    const formEntries = Object.fromEntries(formData);
 
-    // Extract the fields from the form data
-    const job_title = formData.get('job_title-name-${index}');
-    const company_name = formData.get('company_name');
-    const is_current_job = formData.get('is_current_job ');
-    const start_date = formData.get('start_data');
-    const end_date = formData.get('end_data');
-    const description = formData.get('description');
-
-    // OPTIONAL: Implement parameter validation here
-    if (!job_title || !company_name || !is_current_job || !start_date || !end_date || !description ) {
-        return json({ error: 'Invalid parameters' }, { status: 400 });
+    // Helper function to make an API request
+    async function makeAPIRequest(url: string, method: 'POST' | 'PUT', data: any) {
+        const response = await fetch(url, {
+            method,
+            headers: headers,
+            body: JSON.stringify(data),
+        });
+        return response.json();
     }
 
-    // Construct the payload to be sent to the backend
-    const payload = {
-        user_id: userId,    // OPTIONAL: Include only if userId is required
-        job_title,
-        company_name,
-        is_current_job,
-        start_date,
-        end_date,
-        description
+    // Update user profile (first name, last name, and email)
+    const userProfile = {
+        first_name: formEntries['first-name'],
+        last_name: formEntries['last-name']
     };
 
-
-    try { 
-        // Query the backend api via the path defined in APIConstants 
-        const response = await axios.post(APIConstants.EXPERIENCE(userId), payload, { headers });
-
-        // Handle any errors here ...
-        if (!response.data) {
-            return json({ error: 'Failed to update profile' }, { status: 500 });
-        }
-
-        // Implement a toast notification here ...
-        if (!job_title || !company_name) {
-            toast.info('Job title and company name required ', {
-                position: "bottom-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                theme: "light",
-                transition: Bounce,
-            });
-            return { error: "All fields are required." };
-        }
-
-        // Return the data to the component
-        return json(response.data);
-    } catch (error) {
-        // Extracting the error message from the database
-        const errorMessage = (error as AxiosError).response.data.error || "Failed to create application";
-
-        // Handle any errors here ...
-        return json({ error: errorMessage }, { status: 500 });
+    if (userId) {
+        // Update existing user profile
+        await makeAPIRequest(APIConstants.USER(userId), 'PUT', userProfile);
+    } else {
+        // Handle case if the user ID is not found or needs to be created
+        // Optionally, you could throw an error or handle profile creation here
+        return { error: "User ID not found. Cannot update profile." };
     }
+
+
+    // Process experiences
+    let i = 0;
+    while (formEntries[`experience-id-${i}`] || formEntries[`job_title-${i}`]) {
+        const experience = {
+            job_title: formEntries[`job_title-${i}`],
+            company_name: formEntries[`company_name-${i}`],
+            start_date: formEntries[`experience-start_date-${i}`],
+            end_date: formEntries[`end_date-${i}`],
+            description: formEntries[`experience-description-${i}`],
+            is_current_job: formEntries[`is_current_job-${i}`] === 'on',
+        };
+
+        const experienceId = formEntries[`experience-id-${i}`];
+        if (experienceId) {
+            // Update existing experience
+            await makeAPIRequest(APIConstants.EXPERIENCE_BY_ID(experienceId.toString()), 'PUT', experience);
+        } else {
+            // Create new experience
+            const newExperience = { ...experience, user_id: userId };
+            await makeAPIRequest(APIConstants.ADD_EXPERIENCE(), 'POST', newExperience);
+        }
+        i++;
+    }
+
+    // Process skills
+    i = 0;
+    while (formEntries[`skill_name-${i}`]) {
+        const skill = {
+            skill_name: formEntries[`skill_name-${i}`],
+            proficiency_level: formEntries[`proficiency_level-${i}`],
+        };
+
+        const skillId = formEntries[`skill-id-${i}`];
+        if (skillId) {
+            // Update existing skill
+            await makeAPIRequest(APIConstants.SKILLS_BY_ID(skillId.toString()), 'PUT', skill);
+        } else {
+            // Create new skill
+            const newSkill = { ...skill, user_id: userId };
+            await makeAPIRequest(APIConstants.ADD_SKILL(), 'POST', newSkill);
+        }
+        i++;
+    }
+
+    // Process education
+    i = 0;
+    while (formEntries[`institution_name-${i}`]) {
+        const education = {
+            institution_name: formEntries[`institution_name-${i}`],
+            degree: formEntries[`degree-${i}`],
+            field_of_study: formEntries[`field_of_study-${i}`],
+            start_date: formEntries[`education_start_date-${i}`],
+            end_date: formEntries[`education_end_date-${i}`],
+            description: formEntries[`education_description_${i}`],
+        };
+
+        const educationId = formEntries[`education-id-${i}`];
+        if (educationId) {
+            // Update existing education
+            await makeAPIRequest(APIConstants.EDUCATION_BY_ID(educationId.toString()), 'PUT', education);
+        } else {
+            // Create new education
+            const newEducation = { ...education, user_id: userId };
+            await makeAPIRequest(APIConstants.ADD_EDUCATION(), 'POST', newEducation);
+        }
+        i++;
+    }
+
+    return { success: "Profile successfully updated" };
 }
+
 
 
 export async function handleDeleteApplication({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
