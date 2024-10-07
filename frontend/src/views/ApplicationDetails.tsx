@@ -1,12 +1,13 @@
 import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, Form, useNavigate, useLoaderData, useSubmit, Await, useLocation, useAsyncValue, useActionData } from 'react-router-dom';
-import { DialogBackdrop, DialogPanel, Field, Menu, MenuButton, MenuItem, MenuItems, Textarea } from '@headlessui/react';
+import { Dialog, DialogBackdrop, DialogPanel, Field, Menu, MenuButton, MenuItem, MenuItems, Textarea } from '@headlessui/react';
 import { PlusIcon, CheckIcon, ChevronDownIcon, ClockIcon, LinkIcon, CalendarDaysIcon, PaperClipIcon } from '@heroicons/react/20/solid';
 import { ArrowDownTrayIcon, DocumentTextIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { BuildingOffice2Icon, NoSymbolIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { Breadcrumbs, Dialog, Drawer, Timeline, TimelineBody, TimelineConnector, TimelineHeader, TimelineIcon, TimelineItem } from '@material-tailwind/react';
+import { Breadcrumbs, Drawer, Timeline, TimelineBody, TimelineConnector, TimelineHeader, TimelineIcon, TimelineItem } from '@material-tailwind/react';
 import { Bounce, toast } from 'react-toastify';
 import { Document, Page } from 'react-pdf';
+import clsx from 'clsx';
 
 
 import StatusSelector from '../components/common/StatusSelector';
@@ -632,6 +633,7 @@ const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
         axios.post(APIConstants.COVER_LETTER_GENERATE, payload, { headers, responseType: 'blob' })
             .then(response => response.data)
             .then(blob => {
+                debugger;
                 const file = new Blob([blob], { type: 'application/pdf' });
                 const fileURL = URL.createObjectURL(file);
                 setFile(fileURL);
@@ -690,7 +692,7 @@ const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
             )}>
                 { file ? (
                     // <object data={file} type="application/pdf" className="w-full h-full"></object>
-                    <Document onClick={() => setIsModalOpen(true)} className="aspect=[3/4] hover:cursor-pointer" file={file}>
+                    <Document onClick={() => setIsModalOpen(true)} className="w-full h-full hover:cursor-pointer" file={file}>
                         <Page pageNumber={1} height={coverLetterPageHeight + 20}/>
                     </Document>
                 ) : (
@@ -784,18 +786,22 @@ const CoverLetterModal = ({ file, open, onClose, onDownload }: CoverLetterModalP
                                 </button>
                             </div>
 
+                            <div className="flex justify-start">
+    <button 
+        onClick={() => onDownload()} 
+        className="ml-20 mt-10 inline-flex gap-2 items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all duration-200 ease-in-out">
+        <span>Download</span>
+        <ArrowDownTrayIcon className="h-5 w-5" />
+    </button>
+</div>
+
+                            
                             <div ref={coverLetterModalContainerRef} className="flex justify-around rounded-lg overflow-hidden">
                                 <Document file={file}>
-                                    <Page pageNumber={1} width={coverLetterPageWidth} />
+                                    <Page renderTextLayer={false} renderAnnotationLayer={false} pageNumber={1} width={coverLetterPageWidth} />
                                 </Document>
                             </div>
 
-                            <div className="flex justify-end">
-                                <button onClick={() => onDownload()} className="inline-flex gap-2 rounded-md bg-primaryLightAccent px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaryLightAccent">
-                                    <span>Download</span>
-                                    <ArrowDownTrayIcon className="size-4" />
-                                </button>
-                            </div>
                         </div>
                     </DialogPanel>
                 </div>

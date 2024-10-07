@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ThemeProvider } from "@material-tailwind/react";
 import { Bounce, ToastContainer } from 'react-toastify';
+import { pdfjs } from 'react-pdf';
 
 import { LandingPage, LoginPage, SignupPage, ErrorPage } from './pages';
 import NotFound from "./components/common/NotFound";
@@ -25,6 +26,8 @@ import { allApplicationLoader, applicationLoader } from './loaders';
 
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
