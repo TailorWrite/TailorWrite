@@ -6,6 +6,11 @@ import PathConstants from '../pathConstants';
 import Sidebar from '../components/dashboard/Sidebar';
 import DashboardNav from '../components/dashboard/DashboardNav';
 
+const logOut = () => {
+    sessionStorage.clear();
+    window.location.href = PathConstants.HOME;
+};
+
 export default function DashboardLayout() {
     const navigation = [
         { name: 'Dashboard', route: PathConstants.DASHBOARD, current: true, icon: <PresentationChartBarIcon className="h-5 w-5" /> },
@@ -16,7 +21,7 @@ export default function DashboardLayout() {
     const userNavigation = [
         { name: 'Your Profile', route: PathConstants.PROFILE, current: false, icon: <UserCircleIcon className="h-5 w-5" /> },
         { name: 'Settings', route: PathConstants.SETTINGS, current: false, icon: <Cog6ToothIcon className="h-5 w-5" /> },
-        { name: 'Sign out', route: '#', current: false, icon: <PowerIcon className="h-5 w-5" /> },
+        { name: 'Sign out', route: PathConstants.HOME, current: false, icon: <PowerIcon className="h-5 w-5" />, onClick: logOut }, // Call logOut here
     ];
 
     return (
