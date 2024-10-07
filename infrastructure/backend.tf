@@ -44,7 +44,7 @@ resource "null_resource" "update_backend_config" {
 # Defining an EC2 instance for to clone repo, build and run the backend service
 resource "aws_instance" "backend" {
     ami           = "ami-033067239f2d2bfbc"
-    instance_type = "t2.micro"
+    instance_type = "t3.small"
     key_name      = aws_key_pair.tailorwrite_key_pair.key_name
     subnet_id     = aws_subnet.public_subnets[0].id
     vpc_security_group_ids = [
