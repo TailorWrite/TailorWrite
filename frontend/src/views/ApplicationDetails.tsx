@@ -1,11 +1,14 @@
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, Form, useNavigate, useLoaderData, useSubmit, Await, useLocation, useAsyncValue, useActionData } from 'react-router-dom';
-import { Field, Menu, MenuButton, MenuItem, MenuItems, Textarea } from '@headlessui/react';
+import { Dialog, DialogBackdrop, DialogPanel, Field, Menu, MenuButton, MenuItem, MenuItems, Textarea } from '@headlessui/react';
 import { PlusIcon, CheckIcon, ChevronDownIcon, ClockIcon, LinkIcon, CalendarDaysIcon, PaperClipIcon } from '@heroicons/react/20/solid';
-import { DocumentTextIcon } from '@heroicons/react/24/outline';
+import { ArrowDownTrayIcon, DocumentTextIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { BuildingOffice2Icon, NoSymbolIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Breadcrumbs, Drawer, Timeline, TimelineBody, TimelineConnector, TimelineHeader, TimelineIcon, TimelineItem } from '@material-tailwind/react';
 import { Bounce, toast } from 'react-toastify';
+import { Document, Page } from 'react-pdf';
+import clsx from 'clsx';
+
 
 import StatusSelector from '../components/common/StatusSelector';
 import DateSelector from '../components/common/DateSelector';
@@ -19,6 +22,7 @@ import { appendHttpsToLink, formatDate, getCompanyLogoUrl } from '../utils';
 import PathConstants, { APIConstants } from '../pathConstants';
 import { ApplicationAction, ApplicationData, ApplicationDocuments, ApplicationStatus, suppressMissingAttributes } from '../types';
 import axios from 'axios';
+import { headers } from '../api';
 
 
 export default function ApplicationDetails() {
@@ -433,25 +437,7 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
 
                     <div className="flex flex-col gap-y-10">
                         {/* Cover Letter */}
-                        <section onClick={handleComingSoon} className="relative row-span-6 flex flex-col sm:order-4 sm:row-span-4 md:order-none">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-primaryDarkText">Cover Letter</h3>
-                            <div className="flex-grow mt-2 flex justify-center items-center rounded-lg border border-dashed border-gray-900/25 px-6 dark:border-secondaryDarkText/60">
-                                <div className="text-center py-32 pb-[8.25rem] text-gray-600 dark:text-secondaryDarkText">
-                                    <DocumentTextIcon aria-hidden="true" className="mx-auto h-12 w-12 text-gray-300 dark:text-secondaryDarkText" />
-                                    <div className="mt-4 flex text-sm leading-6">
-                                        <label
-                                            htmlFor="file-upload"
-                                            className="relative cursor-pointer rounded-md font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500 dark:text-primaryDarkAccent"
-                                        >
-                                            <span>Generate</span>
-                                            <input id="file-upload" name="file-upload" type="file" className="sr-only" />
-                                        </label>
-                                        <p className="pl-1">a cover letter here</p>
-                                    </div>
-                                    <p className="text-xs leading-5">TXT or PDF. Up to 3 options</p>
-                                </div>
-                            </div>
-                        </section>
+                        <CoverLetterSection application={applicationData} />
 
                         {/* Actions section */}
                         <section className="row-span-2 sm:order-last md:order-none">
@@ -602,5 +588,222 @@ const DocumentUploadSection = ({ applicationData, documents }: DocumentUploadPro
             }
 
         </section>
+    )
+}
+
+
+
+interface CoverLetterProps {
+    document?: string;
+    application: ApplicationData;
+}
+const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
+
+    const downloadLinkRef = useRef<HTMLAnchorElement>(null);
+    const coverLetterContainerRef = useRef<HTMLDivElement>(null);
+    const [file, setFile] = useState<string | undefined>(document);
+    const [coverLetterPageHeight, setCoverLetterPageHeight] = useState<number>(0);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false); 
+
+    // When the page loads and window resizes, set the width of the page
+    useEffect(() => {
+        // Check if the cover letter container exists and set the width of the page 
+        if (coverLetterContainerRef.current) {
+            setCoverLetterPageHeight(coverLetterContainerRef.current.offsetHeight);
+        }
+
+        // Add event listener to resize the window and set the width of the page
+        window.addEventListener('resize', () => {
+            if (coverLetterContainerRef.current) {
+                setCoverLetterPageHeight(coverLetterContainerRef.current.offsetHeight);
+            }
+        });
+    }, [file]);
+
+    const handleGenerateCoverLetter = () => {
+        const toastId = toast('Generating cover letter...', { autoClose: false });
+        // Get the cover letter from the server
+        console.log(application.id)
+        const payload = {
+            user_id: sessionStorage.getItem('user_id'),
+            application_id: application.id
+        }
+
+        axios.post(APIConstants.COVER_LETTER_GENERATE, payload, { headers, responseType: 'blob' })
+            .then(response => response.data)
+            .then(blob => {
+                const file = new Blob([blob], { type: 'application/pdf' });
+                const fileURL = URL.createObjectURL(file);
+                setFile(fileURL);
+                toast.update(toastId, {
+                    render: 'Cover letter generated successfully',
+                    type: 'success',
+                    isLoading: false,
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    theme: "light",
+                    transition: Bounce,
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching PDF:', error)
+                toast.update(toastId, {
+                    render: `Error generating cover letter: ${error}`,
+                    type: 'error',
+                    isLoading: false,
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    theme: "light",
+                    transition: Bounce,
+                });
+            });
+    }; 
+
+    const handleDownloadCoverLetter = () => {
+        if (file) {
+            downloadLinkRef.current?.click();
+        }
+    }
+
+    return (
+
+        <section className="relative row-span-6 flex flex-col sm:order-4 sm:row-span-4 md:order-none">
+            <div className="flex flex-row justify-between">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-primaryDarkText">Cover Letter</h3>
+                { file && <button
+                    type="button"
+                    className="inline-flex gap-2 items-center rounded-md bg-primaryLightAccent px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaryLightAccent"
+                    onClick={() => downloadLinkRef.current?.click()}
+                >
+                    Download
+                    <ArrowDownTrayIcon className="size-4" />
+                </button> } 
+                <a ref={downloadLinkRef} href={file} className="hidden" download="cover-letter.pdf">Download</a>
+            </div>
+            <div ref={coverLetterContainerRef} className={clsx(
+                "flex-grow mt-2 flex justify-center items-center rounded-lg overflow-hidden border border-dashed border-gray-900/25 dark:border-secondaryDarkText/60",
+                file ? "aspect-[3/4]" : "px-6"
+            )}>
+                { file ? (
+                    // <object data={file} type="application/pdf" className="w-full h-full"></object>
+                    <Document onClick={() => setIsModalOpen(true)} className="w-full h-full hover:cursor-pointer" file={file}>
+                        <Page pageNumber={1} height={coverLetterPageHeight + 20}/>
+                    </Document>
+                ) : (
+                    <div className="text-center py-32 pb-[8.25rem] text-gray-600 dark:text-secondaryDarkText">
+                        <DocumentTextIcon aria-hidden="true" className="mx-auto h-12 w-12 text-gray-300 dark:text-secondaryDarkText" />
+                        <div className="mt-4 flex text-sm leading-6">
+                            <label
+                                htmlFor="file-upload"
+                                className="relative cursor-pointer rounded-md font-semibold text-primaryLightAccent focus-within:outline-none focus-within:ring-2 focus-within:ring-primaryLightAccent focus-within:ring-offset-2 hover:text-indigo-500 dark:text-primaryDarkAccent"
+                            >
+                                <span onClick={handleGenerateCoverLetter}>Generate</span>
+                                {/* <input id="file-upload" name="file-upload" type="file" className="sr-only" /> */}
+                            </label>
+                            <p className="pl-1">a cover letter here</p>
+                        </div>
+                        <p className="text-xs leading-5">TXT or PDF. Up to 3 options</p>
+                    </div>
+                )}
+            </div>
+
+
+            { file && <CoverLetterModal file={file} open={isModalOpen} onClose={setIsModalOpen} onDownload={handleDownloadCoverLetter} /> }
+
+        </section>
+    )
+}
+
+interface CoverLetterModalProps {
+    file: string;
+    open: boolean;
+    onClose: (value: boolean) => void;
+    onDownload: () => void;
+}
+const CoverLetterModal = ({ file, open, onClose, onDownload }: CoverLetterModalProps ) => {
+
+    const coverLetterModalContainerRef = useRef<HTMLDivElement>(null);
+    const [coverLetterPageWidth, setCoverLetterPageWidth] = useState<number>(0)
+    const [isModalMounted, setIsModalMounted] = useState<boolean>(false);
+    
+    const updatePageWidth = useCallback(() => {
+        if (coverLetterModalContainerRef.current) {
+            const width = coverLetterModalContainerRef.current.offsetWidth;
+            console.log("Width: ", width);
+            setCoverLetterPageWidth(width);
+        }
+    }, []);
+
+    useLayoutEffect(() => {
+        if (open) {
+            setIsModalMounted(true);
+        }
+    }, [open]);
+
+    useLayoutEffect(() => {
+        console.log('Calculating width');
+        console.log('Open:', open, 'Mounted:', isModalMounted);
+
+        if (open && isModalMounted) {
+            // Add a small delay to ensure the DOM has rendered
+            const timer = setTimeout(() => {
+                updatePageWidth();
+            }, 0);
+
+            window.addEventListener('resize', updatePageWidth);
+
+            return () => {
+                clearTimeout(timer);
+                window.removeEventListener('resize', updatePageWidth);
+            };
+        }
+    }, [open, isModalMounted, updatePageWidth]);
+
+    return (
+        <Dialog open={open} onClose={onClose} className="relative z-50">
+            <DialogBackdrop
+                transition
+                className="fixed inset-0 bg-gray-500/75 dark:bg-primaryDark/75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+            />
+
+            <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0 ">
+                    <DialogPanel
+                        transition
+                        className="relative p-4 transform overflow-hidden rounded-lg bg-white dark:transparent text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-lg data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95 md:max-w-4xl"
+                    >
+                        <div className="flex flex-col">
+                            <div className="flex justify-end">
+                                <button onClick={() => onClose(false)} className="text-gray-400 dark:text-secondaryDarkText">
+                                    <span className="sr-only">Close</span>
+                                    <XMarkIcon className="size-6" />
+                                </button>
+                            </div>
+
+                            <div className="flex justify-start">
+    <button 
+        onClick={() => onDownload()} 
+        className="ml-20 mt-10 inline-flex gap-2 items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all duration-200 ease-in-out">
+        <span>Download</span>
+        <ArrowDownTrayIcon className="h-5 w-5" />
+    </button>
+</div>
+
+                            
+                            <div ref={coverLetterModalContainerRef} className="flex justify-around rounded-lg overflow-hidden">
+                                <Document file={file}>
+                                    <Page renderTextLayer={false} renderAnnotationLayer={false} pageNumber={1} width={coverLetterPageWidth} />
+                                </Document>
+                            </div>
+
+                        </div>
+                    </DialogPanel>
+                </div>
+            </div>
+        </Dialog>
     )
 }
