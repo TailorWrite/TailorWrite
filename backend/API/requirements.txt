@@ -7,3 +7,4 @@ routes
 requests
 boto3
 pytest
+bcrypt
