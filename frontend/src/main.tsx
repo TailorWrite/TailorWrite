@@ -14,15 +14,15 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import ApplicationsLayout from './layouts/ApplicationsLayout';
 import SettingsLayout from './layouts/SettingsLayout';
 
-import ProfilePage from './routes/ProfilePage';
+import ProfilePage from './views/ProfilePage';
 import DashboardHome from './views/DashboardHome';
 import ApplicationDetails from './views/ApplicationDetails';
 import GeneralSettings from './views/settings/GeneralSettings';
 import DataSettings from './views/settings/DataSettings';
 
 import PathConstants from './pathConstants';
-import { handleAddApplication, handleApplicationSubmit, handleLogin } from './actions';
-import { allApplicationLoader, applicationLoader } from './loaders';
+import { handleAddApplication, handleApplicationSubmit, handleLogin, handleProfile } from './actions';
+import { allApplicationLoader, applicationLoader, profileLoader } from './loaders';
 
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
@@ -101,6 +101,8 @@ const router = createBrowserRouter([
           {
             path: PathConstants.PROFILE,
             element: <ProfilePage />,
+            loader: profileLoader,
+            action: handleProfile,
           }, 
           {
             path: PathConstants.SETTINGS_DATA,
