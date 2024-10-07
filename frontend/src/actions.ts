@@ -476,7 +476,6 @@ export async function handleProfile({ request }: { request: Request }): Promise<
 
     // Process experiences
     let i = 0;
-    debugger
     while (formEntries[`experience-id-${i}`] || formEntries[`job_title-${i}`]) {
         const experience = {
             job_title: formEntries[`job_title-${i}`],

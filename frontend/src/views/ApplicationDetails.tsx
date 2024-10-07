@@ -621,7 +621,6 @@ const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
     }, [file]);
 
     const handleGenerateCoverLetter = () => {
-        debugger;
         const toastId = toast('Generating cover letter...', { autoClose: false });
         // Get the cover letter from the server
         console.log(application.id)
@@ -633,7 +632,6 @@ const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
         axios.post(APIConstants.COVER_LETTER_GENERATE, payload, { headers, responseType: 'blob' })
             .then(response => response.data)
             .then(blob => {
-                debugger;
                 const file = new Blob([blob], { type: 'application/pdf' });
                 const fileURL = URL.createObjectURL(file);
                 setFile(fileURL);
