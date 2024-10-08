@@ -1,0 +1,56 @@
+direction right
+
+// Define groups and nodes
+
+// Users [icon: user]
+AWS Cloud [icon: aws, color: grey] {
+  "Region: Oregon (us-west-2)" [icon: aws-region, color: 117CB8] {
+    
+
+    "VPC: 10.0.0.0/16" [icon: aws-vpc, color: 945DF3] {
+//       Internet Gateway [icon: aws-internet-gateway]
+
+      "S3 Frontend"  [icon: aws-s3]
+      "S3 File Storage"  [icon: aws-s3]
+
+      "Web Scraping Function"  [icon: aws-lambda]
+
+      "Public Subnet" [icon: aws-public-subnet, color: green] {
+        "Backend Service" [icon: aws-ec2]
+        "Database Service (Supabase)" [icon: aws-ec2]
+
+      }
+
+//       "Private Subnet" [icon: aws-private-subnet, color: blue] {}
+
+    }
+  }
+}
+
+// Defining the relationships 
+// Users <> S3 Frontend : "http" 
+
+S3 Frontend -> Backend Service 
+Backend Service -> Database Service (Supabase)
+
+
+
+S3 File Storage <> Backend Service
+Web Scraping Function <- Backend Service
+// Backend Service -> Web Scraping Function
+
+
+// Users <> Internet Gateway: http
+
+// Internet Gateway > Load Balancer 
+// Load Balancer > Auto Scaling Group
+
+// Auto Scaling Group <> RDS
+// EC2, Auto Scaled Instance <> RDS
+
+// Static website hosting 
+// Users <> CloudFront: http redirects to https
+// CloudFront < S3
+
+// Cloudwatch <> Auto Scaling Group
+
