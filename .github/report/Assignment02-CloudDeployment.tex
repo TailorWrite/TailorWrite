@@ -38,6 +38,7 @@
 
 \newcommand{\projectRepoURL}{https://github.com/JamesRobionyRogers/Assignment02-CloudDeployment}
 \newcommand{\projectDemoVideoURL}{https://youtu.be/-mD8CbiQJ6Y}
+\newcommand{\frontendURL}{http://tailorwrite-frontend.s3-website-us-west-2.amazonaws.com}
 
 % AWS Cost Calculator URLs
 \newcommand{\estimatedCostInIdleURL}{https://calculator.aws/\#/estimate?id=0f82526574f81e22825462ca5893dc9b7381e9a7}
@@ -94,7 +95,9 @@ EC2 was chosen for both the backend and Database to allow greater control over s
 
 \section{Deployment via Infrastructure as Code}
 
-The infrastructure of TailorWrite was automated using Terraform, an Infrastructure as Code (IaC) tool. Terraform scripts were used to provision the virtual networking components, security groups, Elastic IP addresses and upload the user interface's static build to S3, in addition to deploying the core services outlined above. Although most deployment steps are automated, the frontend build process remains manual prior to running the Terraform scripts. This is a limitation of the current implementation and could be improved in future iterations.
+The infrastructure of TailorWrite was automated using Terraform, an Infrastructure as Code (IaC) tool. Terraform scripts were used to provision the virtual networking components, security groups, Elastic IP addresses and upload the user interface's static build to S3, in addition to deploying the core services outlined above. Although most deployment steps are automated, the frontend build process remains a manual step to be run prior to executing the Terraform scripts. This is a limitation of the current implementation and could be improved in future iterations.
+
+As the project stands, deployed via our AWS Academy account, there are limitations. There is an additional limitation with the web scraping and document storage features. Due to the expiration of the AWS CLI credentials used to interact with the S3 bucket and Lambda function, these features are currently unavailable.
 
 A detailed README file in the project repository offers step-by-step instructions for setting up the development environment and deploying the application. This documentation ensures that new developers can quickly onboard and contribute to the project.
 
@@ -122,6 +125,8 @@ A detailed README file in the project repository offers step-by-step instruction
 \section{User Interaction \& Application Usage}
 
 Users can access TailorWrite via the frontend hosted in an S3 bucket. This provides a simple and intuitive interface for users to manage their job applications. After logging-in users can track their the status and details of their job applications and upload documents such as resumes, cover letters or on-boarding documents. The two minute screen recording demonstrates key functionalities such as navigating the job application tracker, using the web scraping feature to auto-populate forms, and uploading documents. 
+
+The TailorWrite frontend can be accessed via this link: \\\url{\frontendURL}
 
 
 \section{Estimated Running Costs} 
