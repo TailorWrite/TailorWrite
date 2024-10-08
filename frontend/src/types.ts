@@ -27,6 +27,7 @@ export interface ApplicationDocuments {
     name: string,
     size: string,
     link: string,
+    uploaded?: boolean; 
 }
 
 export interface ApplicationData {

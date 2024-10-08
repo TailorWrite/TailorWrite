@@ -1,0 +1,49 @@
+\documentclass[11pt, letterpaper]{article}
+
+% Packages:
+\usepackage[
+    top=2cm,
+    bottom=2cm,
+    left=2.2cm,
+    right=2.2cm,
+    footskip=0.5cm
+]{geometry} % for adjusting page geometry
+
+% Define variables for name, location, email and phone number
+\newcommand{\name}{INSERT-NAME-HERE}
+\newcommand{\location}{INSERT-LOCATION-HERE}
+\newcommand{\email}{INSERT-EMAIL-HERE}
+\newcommand{\phone}{INSERT-PHONE-HERE}
+
+\newcommand{\jobTitle}{INSERT-JOB-TITLE-HERE}
+
+% Some settings:
+\pagestyle{empty} % no header or footer
+\setcounter{secnumdepth}{0} % no section numbering
+\setlength{\parindent}{0pt} % no indentation
+\setlength{\parskip}{6pt} % space between paragraphs
+
+\begin{document}
+
+\noindent
+\hfill
+\begin{tabular}{@{}l@{}}
+    \name \\[0.1cm]
+    \phone \\
+    \email \\
+    \location
+\end{tabular}
+
+\vspace{0.5cm}
+
+\noindent\textit{\today}
+
+\vspace{0.2cm}
+
+\noindent\textbf{Re: \jobTitle}
+
+\vspace{0.5cm}
+
+INSERT-COVER-LETTER-HERE
+
+\end{document}

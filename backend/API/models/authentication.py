@@ -18,14 +18,14 @@ def token_required(f):
 
         try:
             result = validate_token(token)
-            print(result)
+            # print(result)
             if not result['valid']:
                 return {'message': 'Invalid authentication token'}, 401
         except Exception as e:
             return {'message': str(e)}, 401
         
         # Call the original function with the arguments
-        return f(*args, token_user_id = result['id'], **kwargs)
+        return f(*args, token_user_id=result['id'], **kwargs)
     
     return decorated
 
