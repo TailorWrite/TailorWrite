@@ -120,6 +120,7 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
     const applicationUrlRef = useRef<HTMLInputElement>(null);
     const handleScrapeJobDescription = async () => {
         // Check if the url is a valid URL
+        debugger;
         const url = applicationUrlRef.current?.value;
         const isSeekJobUrl = url?.includes("seek.co.nz/job");
         if (!isSeekJobUrl) return;

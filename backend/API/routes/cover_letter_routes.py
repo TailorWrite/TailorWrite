@@ -117,10 +117,6 @@ class GenerateCoverLetter(Resource):
             generated_text = ""
             if response.status_code == 200:
                 generated_text = response.json()['candidates'][0]['content']['parts'][0]['text']
-                        "text": f"Generate a cover letter based on the following job description and personal description. Do not include any fields for the user to fill such as [Your Name] or [platform where you found the job listing]. This cover letter is to be used in a professional manner, and will not be modified after you create it:\n\nPersonal Description: {user_description}\nJob Description: {full_application_description}\n\Education Description: {full_education_description}\n\Experience Description: {full_experience_description}\n\Skills Description: {full_skills_description}"
-                    }]
-                }]
-            }
 
             # Send POST request to Gemini API
             response = requests.post(f"{Config.GEMINI_API_URL}?key={Config.GEMINI_API_KEY}", json=payload)
