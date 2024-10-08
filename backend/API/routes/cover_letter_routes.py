@@ -80,6 +80,7 @@ class GenerateCoverLetter(Resource):
         if application_id:
             response = get_application(application_id)
             application_data = json.loads(response.json())['data'][0]
+
             full_application_description = (
                 f"Applied for {application_data['job_title']} at {application_data['company_name']} "
                 f"on {application_data['application_date']} - Status: {application_data['status']}. "
@@ -116,13 +117,22 @@ class GenerateCoverLetter(Resource):
             generated_text = ""
             if response.status_code == 200:
                 generated_text = response.json()['candidates'][0]['content']['parts'][0]['text']
+                        "text": f"Generate a cover letter based on the following job description and personal description. Do not include any fields for the user to fill such as [Your Name] or [platform where you found the job listing]. This cover letter is to be used in a professional manner, and will not be modified after you create it:\n\nPersonal Description: {user_description}\nJob Description: {full_application_description}\n\Education Description: {full_education_description}\n\Experience Description: {full_experience_description}\n\Skills Description: {full_skills_description}"
+                    }]
+                }]
+            }
+
+            # Send POST request to Gemini API
+            response = requests.post(f"{Config.GEMINI_API_URL}?key={Config.GEMINI_API_KEY}", json=payload)
+
+            if response.status_code == 200:
+                generated_text = response.json()['candidates'][0]['content']['parts'][0]['text']
+                return GeneratePDF(generated_text, user_data, application_data, style)
             else:
                 return {'error': 'Failed to generate cover letter', 'details': response.text}, response.status_code
 
         except requests.RequestException as e:
             return {'error': 'Failed to connect to cover letter generation service', 'details': str(e)}, 500
-        
-        return GeneratePDF(generated_text, user_data, application_data, style)
         
         
 def GeneratePDF(generated_text, user_data, application_data, style):
@@ -176,4 +186,4 @@ def GeneratePDF(generated_text, user_data, application_data, style):
     except subprocess.CalledProcessError as e:
         return {"error": f"LaTeX compilation failed: {str(e)}"}, 500
     except Exception as e:
-        return {"error": f"An error occurred: {str(e)}"}, 500
+            return {'error': 'Failed to connect to cover letter generation service', 'details': str(e)}, 500
