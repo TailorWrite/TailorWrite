@@ -16,7 +16,9 @@ interface NavigationItem {
     route: string;
     current: boolean;
     icon: React.ReactNode;
+    onClick?: () => void; // Optional click handler
 }
+
 
 interface SidebarProps {
     navigation: NavigationItem[];
@@ -35,8 +37,6 @@ export default function DefaultSidebar({ navigation, userNavigation }: SidebarPr
 
     const [profile] = useState<UserProfile>(getUserProfile());
 
-    console.log(profile);
-
     return (
         <Card
             className="fixed top-0 left-0 h-screen w-full max-w-[20rem] p-4 rounded-none bg-gray-50 shadow-none dark:bg-transparent"
@@ -50,7 +50,7 @@ export default function DefaultSidebar({ navigation, userNavigation }: SidebarPr
 
                     {profile.img && (
                         <img className="inline-block size-9 rounded-lg mr-2" src={profile.img} alt="Profile image" />
-                    ) }
+                    )}
 
                     <div className="flex-grow flex flex-col gap-y-1 justify-start truncate">
                         <h6 className="leading-none text-left font-semibold truncate text-neutral-800 dark:text-primaryDarkText">
@@ -59,11 +59,11 @@ export default function DefaultSidebar({ navigation, userNavigation }: SidebarPr
                         <p className="leading-none text-left text-sm font-thin truncate dark:text-secondaryDarkText">
                             {profile.email}
                         </p>
-                        
+
                     </div>
-                    
+
                     <ChevronUpDownIcon className="size-8 my-auto text-neutral-800 dark:text-secondaryDarkText" />
-                    
+
                 </MenuButton>
 
                 <MenuItems
@@ -98,11 +98,11 @@ export default function DefaultSidebar({ navigation, userNavigation }: SidebarPr
                         return (
                             <Link to={route} key={index}>
                                 <ListItem
-                                    key={index} 
+                                    key={index}
                                     className={clsx(
                                         "hover:text-blue-500 dark:hover:bg-secondaryDark",
                                         route == currentPath ? "bg-neutral-100 text-blue-500 dark:bg-secondaryDark dark:text-primaryDarkAccent" : "dark:text-primaryDarkText"
-                                    )} 
+                                    )}
                                     placeholder=""
                                     onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }}
                                 >
@@ -121,25 +121,36 @@ export default function DefaultSidebar({ navigation, userNavigation }: SidebarPr
             </List>
 
             <List className="mt-auto dark:text-primaryDarkText" placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }}>
-                <hr className=" mt-2 border-blue-gray-50 dark:border-darkBorder" />
+                <hr className="mt-2 border-blue-gray-50 dark:border-darkBorder" />
                 {
                     userNavigation.map((item, index) => {
-                        const { name, route, icon } = item;
+                        const { name, route, icon, onClick } = item;
 
                         return (
-                            <Link to={route} key={index}>
+                            <Link
+                                to={route}
+                                key={index}
+                                onClick={(event) => {
+                                    if (onClick) {
+                                        event.preventDefault(); // Prevent navigation if onClick is defined
+                                        onClick(); // Call the click handler
+                                    }
+                                }}
+                            >
                                 <ListItem
-                                    key={index} 
+                                    key={index}
                                     className={clsx(
-                                        " hover:text-blue-500 dark:hover:bg-secondaryDark",
-                                        route == currentPath ? "bg-neutral-100 text-blue-500 dark:bg-secondaryDark dark:text-primaryDarkAccent" : "dark:text-primaryDarkText"
-                                    )} 
+                                        "hover:text-blue-500 dark:hover:bg-secondaryDark",
+                                        route === currentPath ? "bg-neutral-100 text-blue-500 dark:bg-secondaryDark dark:text-primaryDarkAccent" : "dark:text-primaryDarkText"
+                                    )}
                                     placeholder=""
-                                    onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }}
+                                    onPointerEnterCapture={() => { }}
+                                    onPointerLeaveCapture={() => { }}
                                 >
                                     <ListItemPrefix
                                         placeholder=""
-                                        onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }}
+                                        onPointerEnterCapture={() => { }}
+                                        onPointerLeaveCapture={() => { }}
                                     >
                                         {icon}
                                     </ListItemPrefix>

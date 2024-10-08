@@ -51,20 +51,27 @@ interface ThemeOption {
     image: string;
 }
 
-const ThemeOptions: ThemeOption[] = [
-    {
-        title: 'Light Mode',
-        description: 'Default branding',
-        image: lightModeImage,
-    },
-    {
-        title: 'Dark Mode',
-        description: 'Dark mode for night owls',
-        image: darkModeImage, 
-    }
-];
-
 const Appearance = () => {
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+
+    const ThemeOptions: ThemeOption[] = [
+        {
+            title: 'System',
+            description: 'Match your system appearance',
+            image: systemTheme === 'dark' ? darkModeImage : lightModeImage,
+        },
+        {
+            title: 'Light Mode',
+            description: 'Default branding',
+            image: lightModeImage,
+        },
+        {
+            title: 'Dark Mode',
+            description: 'Dark mode for night owls',
+            image: darkModeImage,
+        }
+    ];
+    
     const initialTheme = sessionStorage.getItem('theme');
     const initialThemeObject = initialTheme ? JSON.parse(initialTheme) : ThemeOptions[0];
 
@@ -74,6 +81,7 @@ const Appearance = () => {
         setSelected(option);
         sessionStorage.setItem('theme', JSON.stringify(option));
     };
+
 
     return (
         <div className="grid gap-x-10 grid-cols sm:grid-cols-2 lg:grid-cols-3">

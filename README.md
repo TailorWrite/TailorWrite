@@ -99,8 +99,7 @@ The application comes preloaded with example data to demonstrate its functionali
 <!-- Create table for user data -->
 | Name | Email Address | Password |
 |---------|---------------|----------|
-| John Doe | john.doe@example.com | password123 |
-| Jane Smith | jane.smith@example.com | password123 |
+| John Doe | john.doe@example.com | password |
 
 ---
 
