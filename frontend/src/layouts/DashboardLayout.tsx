@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import { Cog6ToothIcon, CubeTransparentIcon, FolderOpenIcon, PowerIcon, PresentationChartBarIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { Cog6ToothIcon, PowerIcon, PresentationChartBarIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 
 import PathConstants from '../pathConstants';
 

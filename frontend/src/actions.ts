@@ -97,7 +97,7 @@ export async function handleLogin({ request }: { request: Request }) {
 }
 
 
-export async function handleAddApplication({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
+export async function handleAddApplication({ request }: { request: Request }) {
     const toastId = toast.loading('Uploading application...');
     const userId = sessionStorage.getItem("user_id");
     
@@ -173,7 +173,7 @@ export async function handleAddApplication({ request }: { request: Request }): P
 
 }
 
-export async function handleApplicationSubmit({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
+export async function handleApplicationSubmit({ request }: { request: Request }) {
     // Clone the request to read the body
     const requestPassOn = request.clone(); 
 

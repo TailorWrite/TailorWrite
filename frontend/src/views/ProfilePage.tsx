@@ -7,56 +7,57 @@ import { UserPlusIcon } from "@heroicons/react/24/solid";
 
 import { Form } from 'react-router-dom'
 
+import { suppressMissingAttributes } from "../types";
 import { Datepicker as DatePicker } from "flowbite-react"; // Renamed
 
 
 // Import the useLoaderData hook from react-router
 import { useLoaderData } from 'react-router-dom';
-import { ProfileData } from '../types';
+import * as types from '../types';
 
-const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('en-US', {
+const formatDate = (date: Date) => {
+  return new Date(date.toString()).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
 };
 
-function ExperienceForm({ index, initialData = {} }) {
+function ExperienceForm({ index, initialData }: {index: number, initialData: types.ExperienceData}) {
   const [formData, setFormData] = useState({
     id: initialData.id || '',
     job_title: initialData.job_title || '',
     company_name: initialData.company_name || '',
     is_current_job: initialData.is_current_job || false,
-    start_date: formatDate(initialData.start_date) || null,
-    end_date: formatDate(initialData.end_date) || null,
+    start_date: formatDate(initialData.start_date),
+    end_date: formatDate(initialData.end_date),
     description: initialData.description || '',
   });
 
-  const [is_current_job, setIsCurrentJob] = useState(formData.is_current_job);
-
+  const [, setIsCurrentJob] = useState(formData.is_current_job);
   // Effect to update the local state when formData changes
   useEffect(() => {
     setIsCurrentJob(formData.is_current_job);
   }, [formData.is_current_job]);
 
-  const handleInputChange = (event) => {
-    const { name, value, type, checked } = event.target;
+  const handleInputChange = (event: { target: { name: any; value: any; type: any; }; }) => {
+    debugger
+    const { name, value, } = event.target;
     setFormData(prevData => ({
       ...prevData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     }));
   };
 
-  const handleCheckBoxChange = (event, fieldName) => {
-    const { name, value, type, checked } = event.target;
+  const handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
+    const { value, type, checked } = event.target;
     setFormData(prevData => ({
       ...prevData,
       [fieldName]: type === 'checkbox' ? checked : value
     }));
   };
 
-  const handleDateChange = (date, fieldName) => {
+  const handleDateChange = (date: Date, fieldName: string) => {
     setFormData(prevData => ({
       ...prevData,
       [fieldName]: formatDate(date)
@@ -127,8 +128,8 @@ function ExperienceForm({ index, initialData = {} }) {
               id={`experience-start_date-${index}`}
               name={`experience-start_date-${index}`}
               defaultValue={new Date(formData.start_date)}
-              onSelectedDateChanged={(date) => handleDateChange(date, 'start_date')}
-              placeholderText="Start Date"
+              onChange={(date: Date | null) => handleDateChange(date ?? new Date(), 'start_date')}
+              placeholder="Start Date"
               className="block w-full rounded-md py-1.5 text-gray-900"
               required
             />
@@ -143,8 +144,8 @@ function ExperienceForm({ index, initialData = {} }) {
               id={`experience-end_date-${index}`}
               name={`experience-end_date-${index}`}
               defaultValue={new Date(formData.end_date)}
-              onSelectedDateChanged={(date) => handleDateChange(date, 'end_date')}
-              placeholderText="End Date"
+              onChange={(date: Date | null | Date) => handleDateChange(date ?? new Date(), 'end_date')}
+              placeholder="End Date"
               className="block w-full rounded-md py-1.5 text-gray-900"
               required
             />
@@ -168,14 +169,14 @@ function ExperienceForm({ index, initialData = {} }) {
   );
 }
 
-export function SkillForm({ index, initialData = {} }) {
+export function SkillForm({ index, initialData = {} }: { index: number, initialData: any }) {
   const [formData, setFormData] = useState({
     id: initialData.id || '',
     skill_name: initialData.skill_name || '',
     proficiency_level: initialData.proficiency_level || ''
   });
 
-  const handleInputChange = (event) => {
+  const handleInputChange = (event: { target: { name: any; value: any; }; }) => {
     const { name, value } = event.target;
     setFormData(prevData => ({
       ...prevData,
@@ -242,18 +243,26 @@ export function SkillForm({ index, initialData = {} }) {
 }
 
 
-function EducationForm({ index, initialData = {} }) {
+function EducationForm({ index, initialData }: { index: number, initialData: types.EducationData}) {
+  const formatDate = (date: Date) => {
+    return new Date(date.toString()).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  }; 
+
   const [formData, setFormData] = useState({
     id: initialData.id || '',
     institution_name: initialData.institution_name || '',
     degree: initialData.degree || '',
     field_of_study: initialData.field_of_study || '',
-    start_date: formatDate(initialData.start_date) || null,
-    end_date: formatDate(initialData.end_date) || null,
+    start_date: formatDate(initialData.start_date),
+    end_date: formatDate(initialData.end_date),
     description: initialData.description || ''
   });
 
-  const handleInputChange = (event) => {
+  const handleInputChange = (event: { target: { name: any; value: any; }; }) => {
     const { name, value } = event.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -261,7 +270,7 @@ function EducationForm({ index, initialData = {} }) {
     }));
   };
 
-  const handleDateChange = (date, fieldName) => {
+  const handleDateChange = (date: Date, fieldName: string) => {
     setFormData((prevData) => ({
       ...prevData,
       [fieldName]: formatDate(date)
@@ -340,8 +349,8 @@ function EducationForm({ index, initialData = {} }) {
               id={`education_start_date-${index}`}
               name={`education_start_date-${index}`}
               defaultValue={new Date(formData.start_date)}
-              onSelectedDateChanged={(date) => handleDateChange(date, 'start_date')}
-              placeholderText="Start Date"
+              onChange={(date: Date | null) => handleDateChange(date ?? new Date(), 'start_date')}
+              placeholder="Start Date"
               className="block w-full rounded-md py-1.5 text-gray-900"
               required
             />
@@ -356,8 +365,8 @@ function EducationForm({ index, initialData = {} }) {
               id={`education_end_date-${index}`}
               name={`education_end_date-${index}`}
               defaultValue={new Date(formData.end_date)}
-              onSelectedDateChanged={(date) => handleDateChange(date, 'end_date')}
-              placeholderText="End Date"
+              onChange={(date: Date | null) => handleDateChange(date ?? new Date(), 'end_date')}
+              placeholder="End Date"
               className="block w-full rounded-md py-1.5 text-gray-900"
               required
             />
@@ -395,11 +404,11 @@ export default function ProfilePage() {
   const loaderData = useLoaderData();
 
   // Load the data into a useState hook to access it in the component
-  const [data, setData] = useState<ProfileData>(loaderData);
+  const [data] = useState<any>(loaderData);
 
-  const [experienceForms, setExperienceForms] = useState([]);
-  const [skillForms, setSkillForms] = useState([]);
-  const [educationForms, setEducationForms] = useState([]);
+  const [experienceForms, setExperienceForms] = useState<any>([]);
+  const [skillForms, setSkillForms] = useState<any>([]);
+  const [educationForms, setEducationForms] = useState<any>([]);
 
   useEffect(() => {
     // Initialize experience forms with existing data
@@ -510,7 +519,7 @@ export default function ProfilePage() {
 
 
         {/* Show the experience form when button is clicked */}
-        {experienceForms.map((experience, index) => (
+        {experienceForms.map((experience: types.ExperienceData, index: number) => (
           <ExperienceForm key={index} index={index} initialData={experience} />
         ))}
 
@@ -519,12 +528,13 @@ export default function ProfilePage() {
             className="flex items-center gap-3 dark:bg-white dark:text-black"
             size="sm"
             onClick={addExperienceForm}
+            {...suppressMissingAttributes}
           >
             <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Experience
           </Button>
         </div>
 
-        {skillForms.map((skill, index) => (
+        {skillForms.map((skill: unknown, index: number) => (
           <SkillForm key={index} index={index} initialData={skill} />
         ))}
 
@@ -533,12 +543,13 @@ export default function ProfilePage() {
             className="flex items-center gap-3 dark:bg-white dark:text-black"
             size="sm"
             onClick={addSkillForm}
+            {...suppressMissingAttributes}
           >
             <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Skill
           </Button>
         </div>
 
-        {educationForms.map((education, index) => (
+        {educationForms.map((education: types.EducationData, index: number) => (
           <EducationForm key={index} index={index} initialData={education} />
         ))}
 
@@ -547,6 +558,8 @@ export default function ProfilePage() {
             className="flex items-center gap-3 dark:bg-white dark:text-black"
             size="sm"
             onClick={addEducationForm}
+            {...suppressMissingAttributes}
+            
           >
             <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Education
           </Button>
