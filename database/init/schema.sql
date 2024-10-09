@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS accounts (
     first_name VARCHAR(100),
     last_name VARCHAR(100),
     bio TEXT,
+    cover_letter TEXT DEFAULT '',
     profile_picture_url TEXT,
     phone VARCHAR(20),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
