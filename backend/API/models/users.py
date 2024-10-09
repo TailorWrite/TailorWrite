@@ -32,5 +32,10 @@ def login_user(email, password):
     basic_auth_token = base64.b64encode(credentials.encode()).decode()
     return [basic_auth_token, id]
 
+def get_user_cover_letter(user_id):
+    return supabase.table('accounts').select('cover_letter').eq('id', user_id).execute()
+
+def update_user_cover_letter(user_id, cover_letter):
+    return supabase.table('accounts').update({'cover_letter': cover_letter}).eq('id', user_id).execute()
 
 

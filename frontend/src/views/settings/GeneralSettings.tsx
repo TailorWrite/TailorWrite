@@ -1,13 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { PaperClipIcon } from '@heroicons/react/20/solid'
 import { toast } from 'react-toastify'
+import axios from 'axios'
 import clsx from 'clsx'
 
 import DataDisplay, { DataDisplayRow } from '../../components/common/DataDisplay'
 import lightModeImage from '../../assets/lightMode.png'
 import darkModeImage from '../../assets/darkMode.png'
+import { APIConstants } from '../../pathConstants'
+import { headers } from '../../api'
 
 
 export interface GeneralSettingsProps {
@@ -153,23 +156,62 @@ const Appearance = () => {
 
 const CoverLetter = ({ coverLetter }: { coverLetter?: string }) => {
 
-    const updateCoverLetter = () => {
+    const coverLetterTextArea = useRef<HTMLTextAreaElement>(null)
+
+    const updateCoverLetter = async () => {
+        const userId = sessionStorage.getItem('user_id') ?? ''
+
         const toastId = toast.loading('Saving cover letter...')
-        setTimeout(() => {
+
+        const payload = {
+            coverLetter: coverLetterTextArea.current?.value
+        }
+
+        try {
+            const response = await axios.put(APIConstants.USER_COVER_LETTER(userId), payload, { headers })
+
+            if (response.status !== 200) {
+                throw new Error('Failed to save cover letter. Please try again.')
+            }
+
             toast.update(toastId, {
                 type: 'success',
-                isLoading: false,
                 render: 'Cover letter saved successfully!',
+                isLoading: false,
                 autoClose: 2000,
             })
-        }, 2000)
+
+        } catch (error) {
+            toast.update(toastId, {
+                type: 'error',
+                render: 'Failed to save cover letter. Please try again.',
+                isLoading: false,
+                autoClose: 2000,
+            })
+        }
     }
+
+    useEffect(() => {
+        // Get the the user cover letter 
+        const userId = sessionStorage.getItem('user_id') ?? ''
+
+        axios.get(APIConstants.USER_COVER_LETTER(userId), { headers })
+            .then((response) => {
+                if (response.status === 200) {
+                    coverLetterTextArea.current!.value = response.data.cover_letter
+                }
+            })
+            .catch((error) => {
+                console.error('Failed to fetch cover letter:', error)
+            })
+    }) 
 
     return (
         <div className="max-w-4xl">
 
             <div className="relative">
                 <textarea
+                    ref={coverLetterTextArea}
                     className="p-4 pb-20 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-primaryDark dark:border-darkBorder dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
                     placeholder="Paste your cover letter here to get started"
                     defaultValue={coverLetter ?? ''}
@@ -181,9 +223,10 @@ const CoverLetter = ({ coverLetter }: { coverLetter?: string }) => {
 
                             <label className="inline-flex shrink-0 justify-center items-center size-8 rounded-lg text-gray-500 hover:bg-gray-100 focus:z-10 focus:outline-none focus:bg-gray-100 dark:text-neutral-500 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 cursor-pointer">
                                 <input
-                                    type="file"
+                                    // type="file"
+                                    type="button"
                                     className="hidden"
-                                    onChange={() => toast('🚀 Feature coming soon... Implement word scraping from pdf document')}
+                                    onClick={() => toast('🚀 Feature coming soon... Implement word scraping from pdf document')}
                                 />
                                 <PaperClipIcon className="shrink-0 size-4" />
                             </label>
