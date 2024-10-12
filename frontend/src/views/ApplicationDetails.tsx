@@ -2,7 +2,7 @@ import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } f
 import { Link, Form, useNavigate, useLoaderData, useSubmit, Await, useLocation, useAsyncValue, useActionData } from 'react-router-dom';
 import { Dialog, DialogBackdrop, DialogPanel, Field, Menu, MenuButton, MenuItem, MenuItems, Textarea } from '@headlessui/react';
 import { PlusIcon, CheckIcon, ChevronDownIcon, ClockIcon, LinkIcon, CalendarDaysIcon, PaperClipIcon } from '@heroicons/react/20/solid';
-import { ArrowDownTrayIcon, DocumentTextIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ArrowDownTrayIcon, ArrowPathIcon, DocumentTextIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { BuildingOffice2Icon, NoSymbolIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Breadcrumbs, Drawer, Timeline, TimelineBody, TimelineConnector, TimelineHeader, TimelineIcon, TimelineItem } from '@material-tailwind/react';
 import { Bounce, toast } from 'react-toastify';
@@ -693,16 +693,29 @@ const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
         <section className="relative row-span-6 flex flex-col sm:order-4 sm:row-span-4 md:order-none">
             <div className="flex flex-row justify-between">
                 <h3 className="text-lg font-bold text-gray-900 dark:text-primaryDarkText">Cover Letter</h3>
-                { file && <button
-                    type="button"
-                    className="inline-flex gap-2 items-center rounded-md bg-primaryLightAccent px-2 py-1 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaryLightAccent"
-                    onClick={() => downloadLinkRef.current?.click()}
-                >
-                    Download
-                    <ArrowDownTrayIcon className="size-4" />
-                </button> } 
+                    { file && (
+                        <div className="flex flex-row gap-2">
+                            <button
+                                type="button"
+                                className="inline-flex gap-2 items-center rounded-md bg-primaryLightAccent px-2 py-1 text-sm font-semibold text-white shadow-sm bg-indigo-600 hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaryLightAccent"
+                                onClick={handleGenerateCoverLetter}
+                            >
+                                <span className="hidden lg:inline-block">Regenerate</span>
+                                <ArrowPathIcon className="size-4" />
+                            </button>
+                            <button
+                                type="button"
+                            className="inline-flex gap-2 items-center rounded-md bg-primaryLightAccent px-2 py-1 text-sm font-semibold text-white shadow-sm bg-indigo-600 hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaryLightAccent"
+                                onClick={() => downloadLinkRef.current?.click()}
+                                >
+                                <span className="hidden lg:inline-block">Download</span>
+                                <ArrowDownTrayIcon className="size-4" />
+                            </button> 
+                        </div>
+                    )}
                 <a ref={downloadLinkRef} href={file} className="hidden" download="cover-letter.pdf">Download</a>
             </div>
+            
             <div ref={coverLetterContainerRef} className={clsx(
                 "flex-grow mt-2 flex justify-center items-center rounded-lg overflow-hidden border border-dashed border-gray-900/25 dark:border-secondaryDarkText/60",
                 file ? "aspect-[3/4]" : "px-6"
