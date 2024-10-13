@@ -18,7 +18,7 @@ import ArchivePage from './pages/ArchivePage'
 
 import PathConstants from './pathConstants';
 import { handleAddApplication, handleApplicationSubmit } from './actions';
-import { allApplicationLoader, applicationLoader } from './loaders';
+import { allApplicationLoader, applicationLoader, archiveLoader } from './loaders';
 
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
@@ -82,13 +82,20 @@ const router = createBrowserRouter([
       {
         path: PathConstants.ARCHIVE,
         element: <ArchivePage />,
+        loader: archiveLoader
       },
       {
         path: PathConstants.PROFILE,
         element: <ProfilePage />,
       },
     ],
-  },  
+  }, 
+  {
+    // Define the path and element to be rendered when the route is accessed
+    path: PathConstants.ARCHIVE,
+  element: <ArchivePage />,
+    loader: archiveLoader,
+}, 
 ], { basename: PathConstants.BASENAME });
 
 

@@ -56,3 +56,35 @@ export async function allApplicationLoader() {
         return json([]);
     }
 }
+
+export async function archiveLoader({ params }: LoaderFunctionArgs) {
+
+    try { 
+        const response = {
+            data: [{
+            id : "1234",
+            job_title : "Software Developer",
+            company_name : "Spotify",
+            application_date : "25 Dec, 12:01pm",
+            status : "Applied"
+        },
+        {
+            id : "1234",
+            job_title : "Software Developer",
+            company_name : "Spotify",
+            application_date : "25 Dec, 12:01pm",
+            status : "Applied"
+        }]}
+
+        if (!response.data) {
+            return json({ error: 'No data found' }, { status: 404 });
+        }
+
+        console.log("archiveLoader:", response)
+        return json(response.data);
+    } catch (error) {
+        const errorMessage = (error as AxiosError).response.data.error || "Failed to <do_operation>";
+
+        return json({ error: "Error" }, { status: 500 });
+    }
+}

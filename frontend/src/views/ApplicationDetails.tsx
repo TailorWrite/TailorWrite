@@ -20,7 +20,7 @@ import { ApplicationAction, ApplicationData, ApplicationStatus, suppressMissingA
 export default function ApplicationDetails() {
     const submit = useSubmit();
     const navigate = useNavigate();
-    const loaderData: ApplicationData[] = useLoaderData() as ApplicationData[];
+        const loaderData: ApplicationData[] = useLoaderData() as ApplicationData[];
 
     // Processing the application details from the loader function
     const application: ApplicationData = loaderData[0] as ApplicationData ?? {};

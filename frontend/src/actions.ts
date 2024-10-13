@@ -16,7 +16,7 @@ import { APIConstants } from "./pathConstants";
 export async function handleAddApplication({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
     const toastId = toast.loading('Uploading application...');
     const userId = sessionStorage.getItem("user_id");
-    
+
     const formData = await request.formData();
 
     // Extract form fields from formData
@@ -91,7 +91,7 @@ export async function handleAddApplication({ request }: { request: Request }): P
 
 export async function handleApplicationSubmit({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
     // Clone the request to read the body
-    const requestPassOn = request.clone(); 
+    const requestPassOn = request.clone();
 
     // TODO: Implement this function with checking for the request method (POST, PUT, DELETE)
 
@@ -100,7 +100,7 @@ export async function handleApplicationSubmit({ request }: { request: Request })
     const intent = formData.get("intent") as string;
 
     // Call the appropriate function based on the intent
-    if ( intent == "delete") {
+    if (intent == "delete") {
         return handleDeleteApplication({ request: requestPassOn });
     }
 
@@ -243,4 +243,47 @@ export async function handleDeleteApplication({ request }: { request: Request })
         console.error(errorMessage);
         return { error: errorMessage };
     }
-} 
+}
+
+export async function handleAddArchive({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
+    // Get the form data from the request
+    const formData = await request.formData();
+
+    // Extract the fields from the form data
+    const user_id = formData.get('id');
+    const job_title = formData.get('job_title');
+    const company_name = formData.get('company_name');
+    const application_date = formData.get('application_date');
+    const status = formData.get('status');
+
+    // Construct the payload to be sent to the backend
+    const payload = {
+        user_id,
+        job_title,
+        company_name,
+        application_date,
+        status,
+    };
+
+    try {
+        // Query the backend api via the path defined in APIConstants 
+        const response = await axios.post(APIConstants.APPLICATION, payload, { headers });
+
+        // Handle any errors here ...
+        if (!response.data) {
+            return json({ error: 'Failed to create application' }, { status: 500 });
+        }
+
+        // Implement a toast notification here ...
+
+        // Return the data to the component
+        return json(response.data);
+    } catch (error) {
+        // Extracting the error message from the database
+        const errorMessage = (error as AxiosError).response.data.error || "Failed to create application";
+
+        // Handle any errors here ...
+        return json({ error: error.message }, { status: 500 });
+
+    }
+}
