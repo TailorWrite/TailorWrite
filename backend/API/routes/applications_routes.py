@@ -5,13 +5,17 @@ import uuid
 from flask_restx import Namespace, Resource, fields
 from flask import request, jsonify
 from werkzeug.utils import secure_filename
+import requests
+from bs4 import BeautifulSoup
+
 
 from config import Config
 from models.applications import create_application, get_application, update_application, delete_application, get_applications_by_user, create_file_upload, get_file_uploads_by_application
 from models.authentication import token_required
 
 # Define the namespace
-applications_ns = Namespace('applications', description='Job application operations')
+applications_ns = Namespace(
+    'applications', description='Job application operations')
 
 # Define the job application model
 application_model = applications_ns.model('JobApplication', {
@@ -34,6 +38,7 @@ update_application_model = applications_ns.model('UpdateJobApplication', {
     'notes': fields.String(required=False, description='Additional notes', example='Submitted resume and cover letter.')
 })
 
+
 @applications_ns.route('')
 class JobApplicationList(Resource):
     @token_required
@@ -52,6 +57,7 @@ class JobApplicationList(Resource):
             return {'message': 'Job application created successfully', 'application_id': response.data[0]['id']}, 201
         except Exception as e:
             return {'error': str(e)}, 400
+
 
 @applications_ns.route('/<int:application_id>')
 class JobApplication(Resource):
@@ -121,7 +127,8 @@ class JobApplication(Resource):
                 return {'message': 'Failed to delete job application'}, response.status_code
         except Exception as e:
             return {'error': str(e)}, 400
-        
+
+
 @applications_ns.route('/user/<string:user_id>')
 class JobApplicationsByUser(Resource):
     @token_required
@@ -142,8 +149,9 @@ class JobApplicationsByUser(Resource):
         except Exception as e:
             return {'error': str(e)}, 400
 
+
 @applications_ns.route('/<int:application_id>/documents')
-class JobApplicationDocuments(Resource): 
+class JobApplicationDocuments(Resource):
     @token_required
     @applications_ns.doc(security='apikey')
     @applications_ns.response(200, 'Success', application_model)
@@ -153,21 +161,21 @@ class JobApplicationDocuments(Resource):
         """Upload a document to S3"""
         if 'document' not in request.files:
             return {'error': 'No file provided in the request'}, 400
-        
+
         document = request.files['document']
         if document.filename == '':
             return {'error': 'No file selected for uploading'}, 400
-        
+
         if document and self.allowed_file(document.filename):
-            
+
             filename = secure_filename(document.filename)
             new_filename = self.get_unique_filename(filename)
 
             try:
-                
+
                 Config.s3.upload_fileobj(
-                    document, 
-                    Config.BUCKET_NAME, 
+                    document,
+                    Config.BUCKET_NAME,
                     new_filename,
                     ExtraArgs={
                         "ContentType": document.content_type,
@@ -177,7 +185,7 @@ class JobApplicationDocuments(Resource):
             except Exception as e:
                 print(e)
                 return {'error': str(e)}, 400
-            try: 
+            try:
                 # Upload the new filename to the database
                 print(document.content_length)
                 print(round(int(request.form.get("size")) / 1024, 2))
@@ -190,16 +198,14 @@ class JobApplicationDocuments(Resource):
                 }
                 print(data)
                 create_file_upload(data)
-                
 
             except Exception as e:
                 print(e)
                 return {'error': str(e)}, 400
 
-
         print("Document uploaded successfully")
         return {'message': 'Document uploaded successfully'}, 200
-    
+
     @token_required
     @applications_ns.doc(security='apikey')
     @applications_ns.response(200, 'Success', [application_model])
@@ -220,7 +226,7 @@ class JobApplicationDocuments(Resource):
                 return [], 200
         except Exception as e:
             return {'error': str(e)}, 400
-        
+
     def allowed_file(self, filename):
         ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -232,7 +238,7 @@ class JobApplicationDocuments(Resource):
 
 
 @applications_ns.route('/scrape')
-class WebscrapeJobApplication(Resource): 
+class WebscrapeJobApplication(Resource):
     @applications_ns.expect(application_model)
     @applications_ns.response(200, 'Success', application_model)
     @applications_ns.response(404, 'Job application not found')
@@ -240,28 +246,56 @@ class WebscrapeJobApplication(Resource):
     def post(self):
         """Using AWS Lambda, web scrape a job application from Seek"""
         data = request.json
-        url = data['url']
+        url = str(data['url'])
+        if not url.startswith("https://") and not url.startswith("http://"):
+            url = f'https://{url}'
+        
+        print(url)
 
-        if "seek.co.nz/job" not in url:
-            return {'error': 'Invalid URL. Please provide a valid Seek job URL'}, 400
+        # Check if the URL is not an seek.co.nz/jobs URL
+        if 'seek.co.nz/job' not in url:
+            return {
+                'statusCode': 400,
+                'body': 'Invalid URL. Please provide a valid seek.co.nz/job URL'
+            }
 
-        payload = json.dumps({
-            'body': json.dumps({'url': url})
-        })
+        # Send a GET request to the URL
+        response = requests.get(url)
 
-        print(payload)
+        # Check if the request was successful
+        if response.status_code == 200:
+            # Parse the page content with BeautifulSoup
+            soup = BeautifulSoup(response.text, 'html.parser')
 
-        try:
-            response = Config.lambda_client.invoke(
-                FunctionName="tailorwrite-webScrapeJobDescription",
-                InvocationType='RequestResponse',
-                Payload=json.dumps({'url': url})
-            )
+            # Extract the job title
+            job_title_advert = soup.find('h1')
+            job_title = job_title_advert.get_text(
+                strip=True) if job_title_advert else "No job title found"
 
-            response_payload = json.loads(response['Payload'].read())
-            response_payload['body'] = json.loads(response_payload['body'])
-            return response_payload, 200
-        except Exception as e:
-            return {'error': str(e)}, 400
+            # Extract the job description
+            job_description_section = soup.find('section')
+            job_description = job_description_section.get_text(
+                strip=True) if job_description_section else "No job description found"
 
+            # Extract the company name via the element with data-automation="advertiser-name"
+            company_name = soup.find(
+                'span', {'data-automation': 'advertiser-name'}).get_text(strip=True)
 
+            payload = {
+                "job_title": job_title,
+                "company_name": company_name,
+                "job_description": job_description
+            }
+
+            # Return the data as a JSON object
+            return {
+                'statusCode': 200,
+                'body': payload
+            }
+
+        else:
+            # Handle the error when the page couldn't be retrieved
+            return {
+                'statusCode': response.status_code,
+                'body': f"Failed to retrieve the page. Status code: {response.status_code}"
+            }

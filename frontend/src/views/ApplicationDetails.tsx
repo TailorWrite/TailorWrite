@@ -120,6 +120,7 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
     const applicationUrlRef = useRef<HTMLInputElement>(null);
     const handleScrapeJobDescription = async () => {
         // Check if the url is a valid URL
+        debugger;
         const url = applicationUrlRef.current?.value;
         const isSeekJobUrl = url?.includes("seek.co.nz/job");
         if (!isSeekJobUrl) return;
@@ -205,6 +206,11 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
     return (
         <>
             <Form method="post" className="relative h-full ">
+                
+                <div className="absolute z-50 bottom-0 left-0 mb-5 ml-5 flex flex-row gap-x-5 md:hidden">
+                    <ApplicationButtons applicationData={applicationData} />
+                </div>
+
                 <Breadcrumbs
                     className="mx-5 px-0 bg-transparent "
                     separator={<span className="mx-2 dark:text-secondaryDarkText">/</span>}
@@ -217,10 +223,10 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
                 <input type="hidden" name="id" value={applicationData.id} />
 
                 {/* Heading */}
-                <div className="m-5 mt-0">
-                    <div className="lg:flex lg:items-center lg:justify-between">
+                <div className="flex flex-col gap-y-5 m-5 mt-0">
+                    <div className="flex items-center justify-between">
                         <div className="flex flex-row gap-5 min-w-0 flex-1">
-                            {applicationData.img && (<img className="inline-block size-9 rounded-full" src={applicationData.img} alt={applicationData.company_name} />)}
+                            {applicationData.img && (<img className="size-9 rounded-full inline-block" src={applicationData.img} alt={applicationData.company_name} />)}
                             <h2 className="w-full text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
                                 <input
                                     name="job"
@@ -234,61 +240,11 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
                         </div>
 
                         {/* Save & View Listing Buttons */}
-                        <div className="mt-5 flex lg:ml-4 lg:mt-0">
-
-                            {
-                                // Display application link button only if the application has a link
-                                applicationData.application_url && (
-                                    <span className="ml-3 hidden sm:block">
-                                        <a
-                                            href={appendHttpsToLink(applicationData.application_url)}
-                                            target="_blank"
-                                            className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-primaryDark dark:text-primaryDarkText dark:hover:bg-primaryDark dark:hover:text-white dark:ring-darkBorder"
-                                        >
-
-                                            <LinkIcon aria-hidden="true" className="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400" />
-                                            View Listing
-                                        </a>
-                                    </span>
-                                )
-
-                            }
-
-                            <span className="sm:ml-3">
-                                <button
-                                    type="submit"
-                                    name="intent"
-                                    value="save"
-                                    className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                                >
-                                    <CheckIcon aria-hidden="true" className="-ml-0.5 mr-1.5 h-5 w-5" />
-                                    Save
-                                </button>
-                            </span>
-
-                            {/* Dropdown */}
-                            <Menu as="div" className="relative ml-3 sm:hidden">
-                                <MenuButton className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:ring-gray-400">
-                                    More
-                                    <ChevronDownIcon aria-hidden="true" className="-mr-1 ml-1.5 h-5 w-5 text-gray-400" />
-                                </MenuButton>
-
-                                <MenuItems
-                                    transition
-                                    className="absolute right-0 z-10 -mr-1 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-200 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-                                >
-                                    <MenuItem>
-                                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
-                                            View
-                                        </a>
-                                    </MenuItem>
-                                </MenuItems>
-                            </Menu>
-                        </div>
+                        <ApplicationButtons className="hidden md:flex" applicationData={applicationData} />
                     </div>
 
                     {/* Form components  */}
-                    <div className="flex flex-col align-baseline sm:mt-3 sm:flex-row sm:flex-wrap sm:space-x-6">
+                    <div className="flex flex-col justify-between gap-x-5 gap-y-3 sm:flex-row sm:flex-wrap">
 
                         {/* Application Status */}
                         <div className="mt-auto mb-[0.125rem]">
@@ -348,7 +304,7 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
                         </div>
 
                         {/* Application URL */}
-                        <div className="max-w-sm space-y-3 mt-auto">
+                        <div className="flex-grow">
                             <div>
                                 {/* <label htmlFor="hs-inline-add-on" className="block text-sm font-medium mb-2 dark:text-white">Website URL</label> */}
                                 <div className="relative">
@@ -464,6 +420,69 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
 
             <WarningModal open={warningModelOpen} onClose={handleWarningModalClose} onConfirm={handleWarningModalConfirm} />
         </>
+    )
+}
+
+interface ApplicationButtonsProps {
+    className?: string;
+    applicationData: ApplicationData;
+}
+
+const ApplicationButtons = ({ className, applicationData } : ApplicationButtonsProps) => {
+    return (
+        <div className={clsx(
+            "flex flex-row gap-2 items-center",
+            className, 
+        )}>
+            {
+                // Display application link button only if the application has a link
+                applicationData.application_url && (
+                    <span className="hidden md:block">
+                        <a
+                            href={appendHttpsToLink(applicationData.application_url)}
+                            target="_blank"
+                            className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-primaryDark dark:text-primaryDarkText dark:hover:bg-primaryDark dark:hover:text-white dark:ring-darkBorder"
+                        >
+
+                            <LinkIcon aria-hidden="true" className="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400" />
+                            View Listing
+                        </a>
+                    </span>
+                )
+
+            }
+
+            <span className="">
+                <button
+                    type="submit"
+                    name="intent"
+                    value="save"
+                    className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                    <CheckIcon aria-hidden="true" className="-ml-0.5 mr-1.5 h-5 w-5" />
+                    Save
+                </button>
+            </span>
+
+            {/* Dropdown */}
+            <Menu as="div" className="relative md:hidden">
+                <MenuButton className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:ring-gray-400">
+                    More
+                    <ChevronDownIcon aria-hidden="true" className="-mr-1 ml-1.5 h-5 w-5 text-gray-400" />
+                </MenuButton>
+
+                <MenuItems
+                    transition
+                    className="absolute bottom-full right-0 z-10 -mr-1 mb-2 w-48 origin-bottom-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-200 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                >
+                    <MenuItem>
+                        <a href={appendHttpsToLink(applicationData.application_url)} className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
+                            View Listing
+                        </a>
+                    </MenuItem>
+                </MenuItems>
+            </Menu>
+        </div>
     )
 }
 

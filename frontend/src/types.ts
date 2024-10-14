@@ -43,6 +43,26 @@ export interface ApplicationData {
     documents?: ApplicationDocuments[],
 }
 
+export interface ExperienceData {
+    id: string,
+    job_title: string,
+    company_name: string,
+    is_current_job: boolean,
+    start_date: Date,
+    end_date: Date,
+    description: string,
+}
+
+export interface EducationData {
+    id: string,
+    institution_name: string,
+    degree: string,
+    field_of_study: string,
+    start_date: Date,
+    end_date: Date,
+    description: string,
+}
+
 export interface ApplicationAction {
     name: string,
     color: string,
