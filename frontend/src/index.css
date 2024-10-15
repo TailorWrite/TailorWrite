@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 html {
+    @apply bg-white dark:bg-primaryDark;
     scrollbar-color: #c2c2c2 transparent;
 }
 
@@ -43,4 +44,29 @@ html.dark .shiki span {
 
 .skeleton {
     @apply animate-pulse bg-gray-200 dark:bg-neutral-700; ;
+}
+
+/* For Safari */
+::-webkit-scrollbar {
+    @apply w-3;
+    /* Increase width to accommodate padding */
+}
+
+::-webkit-scrollbar-track,
+::-webkit-resizer {
+    @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+    border: 4px solid transparent; /* Adjust this value for more or less padding */
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-corner {
+    background: rgba(0, 0, 0, 0);
+}
+
+::-webkit-scrollbar-resize {
+    background: rgba(0, 0, 0, 0.5);
 }
