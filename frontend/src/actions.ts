@@ -141,7 +141,7 @@ export async function handleAddApplication({ request }: { request: Request }) {
     };
 
     try {
-        const response = await axios.post(APIConstants.APPLICATIONS, payload, { headers });
+        const response = await axios.post(APIConstants.APPLICATIONS, payload, { headers: headers() });
 
         if (!response.data) {
             const errorMessage = response.data.error || "Failed to add application.";
@@ -247,7 +247,7 @@ export async function handleUpdateApplication({ request }: { request: Request })
     };
 
     try {
-        const response = await axios.put(APIConstants.APPLICATION(applicationId), payload, { headers });
+        const response = await axios.put(APIConstants.APPLICATION(applicationId), payload, { headers: headers() });
 
         if (!response.data) {
             const errorMessage = response.data.error || "Failed to update application.";
@@ -299,7 +299,7 @@ export async function handleDeleteApplication({ request }: { request: Request })
     const applicationId = formData.get("id") as string;
 
     try {
-        const response = await axios.delete(APIConstants.APPLICATION(applicationId), { headers });
+        const response = await axios.delete(APIConstants.APPLICATION(applicationId), { headers: headers() });
 
         if (!response.data) {
             const errorMessage = response.data.error || "Failed to delete application.";
@@ -452,7 +452,7 @@ export async function handleProfile({ request }: { request: Request }): Promise<
     async function makeAPIRequest(url: string, method: 'POST' | 'PUT', data: any) {
         const response = await fetch(url, {
             method,
-            headers: headers,
+            headers: headers(),
             body: JSON.stringify(data),
         });
         return response.json();

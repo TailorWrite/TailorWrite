@@ -2,7 +2,7 @@ import datetime
 import pytz
 from flask_restx import Namespace, Resource, fields, reqparse, api
 from flask import request, jsonify
-from models.users import create_user, create_account, get_user, update_user, delete_user, login_user
+from models.users import *  # create_user, create_account, get_user, update_user, delete_user, login_user
 from models.authentication import token_required
 import bcrypt
 
@@ -123,6 +123,50 @@ class User(Resource):
                 return {'error': 'No you\'re not allowed this with that auth key'}, 403
             delete_user(user_id)
             return {'message': 'User deleted successfully'}, 200
+        except Exception as e:
+            return {'error': str(e)}, 400
+
+# Implement a route for updating the user's cover letter 
+@users_ns.route('/<string:user_id>/cover-letter')
+class UserCoverLetter(Resource):
+    @token_required
+    @users_ns.doc(security='apikey')
+    @users_ns.expect({'cover_letter': fields.String(required=True, description='The user cover letter')})
+    @users_ns.response(200, 'Cover letter updated successfully')
+    @users_ns.response(400, 'Bad Request')
+    @users_ns.response(403, 'Forbidden')
+    def get(self, user_id, token_user_id):
+        """Update a user's cover letter"""
+        try:
+            user_id = get_user(user_id).data[0]['id']
+
+            if user_id != token_user_id:
+                return {'error': 'No you\'re not allowed this with that auth key'}, 403
+            
+            cover_letter = get_user_cover_letter(user_id).data[0]
+            
+            return cover_letter, 200
+        except Exception as e:
+            return {'error': str(e)}, 400
+
+    @token_required
+    @users_ns.doc(security='apikey')
+    @users_ns.expect({'cover_letter': fields.String(required=True, description='The user cover letter')})
+    @users_ns.response(200, 'Cover letter updated successfully')
+    @users_ns.response(400, 'Bad Request')
+    @users_ns.response(403, 'Forbidden')
+    def put(self, user_id, token_user_id):
+        """Update a user's cover letter"""
+        data = request.json
+        cover_letter = data.get("coverLetter")
+        try:
+            user_id = get_user(user_id).data[0]['id']
+
+            if user_id != token_user_id:
+                return {'error': 'No you\'re not allowed this with that auth key'}, 403
+            
+            response = update_user_cover_letter(user_id, cover_letter)
+            return {'success': 'Updated cover letter successfully'}, 200
         except Exception as e:
             return {'error': str(e)}, 400
 
