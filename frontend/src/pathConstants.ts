@@ -28,6 +28,7 @@ const APIConstants = {
 
     // User routes
     USER: (uuid: string) => `${API_BASE_URL}/users/${uuid}`,
+    USER_COVER_LETTER: (uuid: string) => `${API_BASE_URL}/users/${uuid}/cover-letter`,
 
     APPLICATIONS: `${API_BASE_URL}/applications`,
     APPLICATION: (application_id: string) => `${API_BASE_URL}/applications/${application_id}`,
@@ -46,6 +47,8 @@ const APIConstants = {
     COVER_LETTER_GENERATE: `${API_BASE_URL}/cover-letter/generate`,
 
     APPLICATIONS_SCRAPE: `${API_BASE_URL}/applications/scrape`,
+
+
 }
 
 export default PathConstants;
