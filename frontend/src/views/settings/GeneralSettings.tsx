@@ -251,7 +251,7 @@ const CoverLetter = ({ coverLetter }: { coverLetter?: string }) => {
         }
 
         try {
-            const response = await axios.put(APIConstants.USER_COVER_LETTER(userId), payload, { headers })
+            const response = await axios.put(APIConstants.USER_COVER_LETTER(userId), payload, { headers: headers() })
 
             if (response.status !== 200) {
                 throw new Error('Failed to save cover letter. Please try again.')
@@ -278,7 +278,7 @@ const CoverLetter = ({ coverLetter }: { coverLetter?: string }) => {
         // Get the the user cover letter 
         const userId = sessionStorage.getItem('user_id') ?? ''
 
-        axios.get(APIConstants.USER_COVER_LETTER(userId), { headers })
+        axios.get(APIConstants.USER_COVER_LETTER(userId), { headers: headers() })
             .then((response) => {
                 if (response.status === 200) {
                     coverLetterTextArea.current!.value = response.data.cover_letter
