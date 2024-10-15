@@ -13,6 +13,7 @@ import clsx from 'clsx';
 import StatusSelector from '../components/common/StatusSelector';
 import DateSelector from '../components/common/DateSelector';
 import WarningModal from '../components/modals/WarningModal';
+import CompanyLogo from '../components/common/CompanyLogo';
 import NotFound from '../components/common/NotFound';
 
 import ApplicationDetailsSkeleton from '../components/skeletons/ApplicationDetailsSkeleton';
@@ -119,8 +120,6 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
 
     const applicationUrlRef = useRef<HTMLInputElement>(null);
     const handleScrapeJobDescription = async () => {
-        // Check if the url is a valid URL
-        debugger;
         const url = applicationUrlRef.current?.value;
         const isSeekJobUrl = url?.includes("seek.co.nz/job");
         if (!isSeekJobUrl) return;
@@ -226,7 +225,12 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
                 <div className="flex flex-col gap-y-5 m-5 mt-0">
                     <div className="flex items-center justify-between">
                         <div className="flex flex-row gap-5 min-w-0 flex-1">
-                            {applicationData.img && (<img className="size-9 rounded-full inline-block" src={applicationData.img} alt={applicationData.company_name} />)}
+                            <CompanyLogo 
+                                className="!size-9 rounded-full" 
+                                url={applicationData.img}
+                                alt={applicationData.company_name} 
+                                errorComponent={<></>}
+                            />
                             <h2 className="w-full text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
                                 <input
                                     name="job"
@@ -648,7 +652,7 @@ const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
             application_id: application.id
         }
 
-        axios.post(APIConstants.COVER_LETTER_GENERATE, payload, { headers, responseType: 'blob' })
+        axios.post(APIConstants.COVER_LETTER_GENERATE, payload, { headers: headers(), responseType: 'blob' })
             .then(response => response.data)
             .then(blob => {
                 const file = new Blob([blob], { type: 'application/pdf' });
@@ -817,13 +821,13 @@ const CoverLetterModal = ({ file, open, onClose, onDownload }: CoverLetterModalP
                             </div>
 
                             <div className="flex justify-start">
-    <button 
-        onClick={() => onDownload()} 
-        className="ml-20 mt-10 inline-flex gap-2 items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all duration-200 ease-in-out">
-        <span>Download</span>
-        <ArrowDownTrayIcon className="h-5 w-5" />
-    </button>
-</div>
+                                <button 
+                                    onClick={() => onDownload()} 
+                                    className="ml-20 mt-10 inline-flex gap-2 items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all duration-200 ease-in-out">
+                                    <span>Download</span>
+                                    <ArrowDownTrayIcon className="h-5 w-5" />
+                                </button>
+                            </div>
 
                             
                             <div ref={coverLetterModalContainerRef} className="flex justify-around rounded-lg overflow-hidden">
