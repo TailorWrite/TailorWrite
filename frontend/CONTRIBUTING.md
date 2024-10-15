@@ -45,7 +45,7 @@ export async function applicationLoader({ params }: LoaderFunctionArgs) {
 
     try { 
         // Query the backend api via the path defined in APIConstants 
-        const response = await axios.get(APIConstants.APPLICATION(uuid), { headers });)
+        const response = await axios.get(APIConstants.APPLICATION(uuid), { headers: headers() });)
 
         // Handle any errors here ...
         if (!response.data) {
@@ -159,7 +159,7 @@ export async function handleAddApplication({ request }: { request: Request }): P
 
     try { 
         // Query the backend api via the path defined in APIConstants 
-        const response = await axios.post(APIConstants.APPLICATION, payload, { headers });
+        const response = await axios.post(APIConstants.APPLICATION, payload, { headers: headers() });
 
         // Handle any errors here ...
         if (!response.data) {
