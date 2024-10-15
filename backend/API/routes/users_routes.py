@@ -116,9 +116,11 @@ class User(Resource):
     @users_ns.doc(security='apikey')
     @users_ns.response(200, 'User deleted successfully')
     @users_ns.response(400, 'Bad Request')
-    def delete(self, user_id):
+    def delete(self, user_id, token_user_id):
         """Delete a user by ID"""
         try:
+            if user_id != token_user_id:
+                return {'error': 'No you\'re not allowed this with that auth key'}, 403
             delete_user(user_id)
             return {'message': 'User deleted successfully'}, 200
         except Exception as e:

@@ -5,12 +5,12 @@ from app import app
 from config import TestConfig
 
 login_data = {
-        'email': 'test@example.com',
+        'email': 'test@test.com',
         'password': 'securepassword123'
     }
 
 user_data = {
-    "email": "test@example.com",
+    "email": "test@test.com",
     "password": "securepassword123",
     "account_info": {
     "first_name": "Test",
@@ -66,7 +66,7 @@ def test_get_user(client, login):
     response_data = response.get_json()
 
     assert response.status_code == 200
-    assert response_data[0]['email'] == login_data['email']
+    assert response_data['email'] == login_data['email']
 
 # Test updating user information
 def test_update_user(client, login):
@@ -76,7 +76,7 @@ def test_update_user(client, login):
     # Define update data
     update_data = {
         'first_name': 'Test',
-        'last_name': 'Subject',
+        'last_name': 'Test',
         "bio": "Developer at XYZ Company",
         "phone": "0987654321"
     }
@@ -91,7 +91,7 @@ def test_update_user(client, login):
 
     assert response.status_code == 200
     assert response.json['first_name'] == 'Test'
-    assert response.json['last_name'] == 'Subject'
+    assert response.json['last_name'] == 'Test'
     
 # Test Delete User  
 def test_delete_user(client, login):
@@ -104,9 +104,9 @@ def test_delete_user(client, login):
     }
 
     # Send DELETE request to delete the user
-    response = client.get(f'/users/{user_id}', headers=headers)
+    response = client.delete(f'/users/{user_id}', headers=headers)
 
     response_data = response.get_json()
 
-    assert response_data.status_code == 200
+    assert response_data['message'] == "User deleted successfully"
     

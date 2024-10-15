@@ -31,14 +31,14 @@ CORS(app, resources={r"/*": {
 api = Api(
     app,
     version='1.0',
-    title='Your API Title',
+    title='API TailorWrite Swagger',
     description='Your API Description',
     authorizations=authorizations,
     security='apikey',  # Reference the security definition
     doc='/'
 )
 
-app.testing = True
+# app.testing = True
     
 # Determine if running in test mode
 if app.testing == True:
