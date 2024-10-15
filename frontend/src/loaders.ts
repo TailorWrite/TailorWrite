@@ -74,6 +74,13 @@ export async function archiveLoader({ params }: LoaderFunctionArgs) {
             company_name : "Spotify",
             application_date : "25 Dec, 12:01pm",
             status : "Applied"
+        },
+        {
+            id : "1234",
+            job_title : "Software Developer",
+            company_name : "Spotify",
+            application_date : "25 Dec, 12:01pm",
+            status : "Applied"
         }]}
 
         if (!response.data) {
