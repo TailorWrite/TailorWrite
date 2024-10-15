@@ -22,7 +22,7 @@ export async function applicationLoader({ params }: LoaderFunctionArgs) {
 
     const fetchApplication = async () => {
         try {
-            const response = await axios.get(APIConstants.APPLICATION(uuid), { headers });
+            const response = await axios.get(APIConstants.APPLICATION(uuid), { headers: headers() });
 
             if (!response.data) {
                 throw new Error(`Failed to fetch application with id = ${uuid}`);
@@ -43,8 +43,8 @@ export async function applicationLoader({ params }: LoaderFunctionArgs) {
 export async function allApplicationLoader() {
     const user_id = sessionStorage.getItem('user_id') ?? 'no-id';
     
-    try { 
-        const response = await axios.get(APIConstants.ALL_APPLICATIONS(user_id), { headers });
+    try {
+        const response = await axios.get(APIConstants.ALL_APPLICATIONS(user_id), { headers: headers() });
 
         if (!response.data) {
             return json({ error: "Failed to fetch applications." });
@@ -74,7 +74,7 @@ export async function profileLoader() {
         const data = new Map<string, any>();
 
         // Query the backend api via the path defined in APIConstants 
-        const response = await axios.get(APIConstants.SKILLS(uuid), { headers });
+        const response = await axios.get(APIConstants.SKILLS(uuid), { headers: headers() });
 
         // Handle any errors here ...
         if (!response.data) {
@@ -83,7 +83,7 @@ export async function profileLoader() {
         data.set("skills", response.data);
         
         // Query the backend api via the path defined in APIConstants 
-        const response2 = await axios.get(APIConstants.EDUCATION(uuid), { headers });
+        const response2 = await axios.get(APIConstants.EDUCATION(uuid), { headers: headers() });
 
         // Handle any errors here ...
         if (!response2.data) {
@@ -92,7 +92,7 @@ export async function profileLoader() {
         data.set("education", response2.data);
 
         // Query the backend api via the path defined in APIConstants 
-        const response3 = await axios.get(APIConstants.EXPERIENCE(uuid), { headers });
+        const response3 = await axios.get(APIConstants.EXPERIENCE(uuid), { headers: headers() });
 
         // Handle any errors here ...
         if (!response3.data) {
@@ -101,7 +101,7 @@ export async function profileLoader() {
         data.set("experience", response3.data);
 
         // Query the backend api via the path defined in APIConstants 
-        const response4 = await axios.get(APIConstants.USER(uuid), { headers });
+        const response4 = await axios.get(APIConstants.USER(uuid), { headers: headers() });
 
         // Handle any errors here ...
         if (!response4.data) {

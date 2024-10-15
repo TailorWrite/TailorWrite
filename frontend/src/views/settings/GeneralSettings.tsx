@@ -12,6 +12,8 @@ import darkModeImage from '../../assets/darkMode.png'
 import { APIConstants } from '../../pathConstants'
 import { headers } from '../../api'
 
+import { useDarkMode } from '../../hooks/useDarkMode'
+
 
 export interface GeneralSettingsProps {
     coverLetter?: string;
@@ -55,13 +57,13 @@ interface ThemeOption {
 }
 
 const Appearance = () => {
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const [isDarkMode, setIsDarkMode] = useDarkMode();
 
     const ThemeOptions: ThemeOption[] = [
         {
             title: 'System',
             description: 'Match your system appearance',
-            image: systemTheme === 'dark' ? darkModeImage : lightModeImage,
+            image: isDarkMode ? darkModeImage : lightModeImage,
         },
         {
             title: 'Light Mode',
@@ -74,22 +76,108 @@ const Appearance = () => {
             image: darkModeImage,
         }
     ];
-    
+
     const initialTheme = sessionStorage.getItem('theme');
     const initialThemeObject = initialTheme ? JSON.parse(initialTheme) : ThemeOptions[0];
 
     const [selected, setSelected] = useState(initialThemeObject);
+
+    useEffect(() => {
+        if (selected.title === 'System') {
+            setIsDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+        } else {
+            setIsDarkMode(selected.title === 'Dark Mode');
+        }
+    }, [selected, setIsDarkMode]);
 
     const handleThemeSelection = (option: ThemeOption) => {
         setSelected(option);
         sessionStorage.setItem('theme', JSON.stringify(option));
     };
 
-
     return (
         <div className="grid gap-x-10 grid-cols sm:grid-cols-2 lg:grid-cols-3">
 
-            {ThemeOptions.map((option) => (
+            <div
+                key={ThemeOptions[1].title}
+                className="flex flex-col focus:outline-none hover:cursor-pointer"
+                onClick={() => handleThemeSelection(ThemeOptions[0])}
+            >
+                <div className={clsx(
+                    "relative flex flex-col rounded-xl bg-gray-300/20 aspect-[1.54/1]",
+                    selected.title === ThemeOptions[0].title ? 'border-4 border-primaryDarkAccent' : 'border-4 border-gray-300 dark:border-darkBorder',
+                )}>
+                    <span
+                        className={clsx(
+                            "absolute p-1 z-10 -top-2 -right-2 bg-primaryDarkAccent rounded-full transition-all duration-300 ease-in-out",
+                            selected.title === ThemeOptions[0].title ? 'opacity-100' : 'opacity-0',
+                        )} >
+                        <CheckIcon className="size-3 text-white" />
+                    </span>
+
+                    <div className="flex flex-row size-full rounded-lg overflow-hidden">
+                        <div className="relative h-full w-1/2 overflow-hidden border-r-2 border-gray-300 dark:border-darkBorder ">
+                                <div className="absolute top-7 start-7">
+
+                                    <figure className="ms-auto me-20 relative z-[1] max-w-full w-[50rem] h-auto shadow-[0_2.75rem_3.5rem_-2rem_rgb(45_55_75_/_20%),_0_0_5rem_-2rem_rgb(45_55_75_/_15%)] dark:shadow-[0_2.75rem_3.5rem_-2rem_rgb(0_0_0_/_20%),_0_0_5rem_-2rem_rgb(0_0_0_/_15%)] rounded-b-lg">
+                                        <div className={clsx(
+                                            "relative flex items-center h-6 max-w-[50rem] rounded-t-lg px-32 ",
+                                            ThemeOptions[1].image.includes('light') ? 'bg-neutral-200' : 'bg-secondaryDark/95'
+                                        )}>
+                                            <div className="flex gap-x-1 absolute top-2/4 start-4 -translate-y-1">
+                                                <span className="size-2 bg-[#FF605C] rounded-full"></span>
+                                                <span className="size-2 bg-[#FFBD44] rounded-full"></span>
+                                                <span className="size-2 bg-[#00CA4E] rounded-full"></span>
+                                            </div>
+                                            <div className={clsx(
+                                                "flex justify-center items-center w-full h-3 my-4 text-[.25rem] text-gray-400 rounded-sm sm:text-[.5rem] dark:text-neutral-400",
+                                                ThemeOptions[1].image.includes('light') ? 'bg-neutral-300' : 'bg-primaryDark'
+                                            )}>
+                                                <span>www.tailorwrite.com</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-gray-800 rounded-b-lg">
+                                            <img className="max-w-full h-auto rounded-b-lg pr-[40%]" src={ThemeOptions[1].image} alt="Browser Placeholder" />
+                                        </div>
+                                    </figure>
+                                </div>
+                        </div>
+                        <div className="relative h-full w-1/2 overflow-hidden ">
+                            <div className="absolute top-7 start-7">
+
+                                <figure className="ms-auto me-20 relative z-[1] max-w-full w-[50rem] h-auto shadow-[0_2.75rem_3.5rem_-2rem_rgb(45_55_75_/_20%),_0_0_5rem_-2rem_rgb(45_55_75_/_15%)] dark:shadow-[0_2.75rem_3.5rem_-2rem_rgb(0_0_0_/_20%),_0_0_5rem_-2rem_rgb(0_0_0_/_15%)] rounded-b-lg">
+                                    <div className="relative flex items-center h-6 max-w-[50rem] rounded-t-lg px-32 bg-secondaryDark/95">
+                                        <div className="flex gap-x-1 absolute top-2/4 start-4 -translate-y-1">
+                                            <span className="size-2 bg-[#FF605C] rounded-full"></span>
+                                            <span className="size-2 bg-[#FFBD44] rounded-full"></span>
+                                            <span className="size-2 bg-[#00CA4E] rounded-full"></span>
+                                        </div>
+                                        <div className="flex justify-center items-center w-full h-3 my-4 text-[.25rem] text-gray-400 rounded-sm sm:text-[.5rem] dark:text-neutral-400 bg-primaryDark">
+                                            <span>www.tailorwrite.com</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-gray-800 rounded-b-lg">
+                                        <img className="max-w-full h-auto rounded-b-lg pr-[40%]" src={ThemeOptions[2].image} alt="Browser Placeholder" />
+                                    </div>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mt-3">
+                    <p className="font-bold text-gray-800 dark:text-primaryDarkText">
+                        {ThemeOptions[1].title}
+                    </p>
+                    <p className="font-normal text-gray-400 dark:text-secondaryDarkText">
+                        {ThemeOptions[1].description}
+                    </p>
+                </div>
+            </div>
+
+            {ThemeOptions.slice(1).map((option) => (
                 <div
                     key={option.title}
                     className="flex flex-col focus:outline-none hover:cursor-pointer"
@@ -97,18 +185,14 @@ const Appearance = () => {
                 >
                     <div className={clsx(
                         "relative flex flex-col rounded-xl bg-gray-300/20 aspect-[1.54/1]",
-                        // option.title.includes('Light') ? 'bg-gray-300/20' : 'bg-primaryDark'
                         selected.title === option.title ? 'border-4 border-primaryDarkAccent' : 'border-4 border-gray-300 dark:border-darkBorder',
                     )}>
-
-                        <span 
-                            // Implemented this way to preserve the transition effect
+                        <span
                             className={clsx(
                                 "absolute p-1 z-10 -top-2 -right-2 bg-primaryDarkAccent rounded-full transition-all duration-300 ease-in-out",
-                                // Highlight the selected theme
                                 selected.title === option.title ? 'opacity-100' : 'opacity-0',
                             )} >
-                            <CheckIcon className="size-3 text-white"/>
+                            <CheckIcon className="size-3 text-white" />
                         </span>
 
                         <div className="relative size-full overflow-hidden">
@@ -136,7 +220,6 @@ const Appearance = () => {
                                     </div>
                                 </figure>
                             </div>
-
                         </div>
                     </div>
 
