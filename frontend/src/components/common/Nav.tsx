@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import { Link } from 'react-router-dom';
 import { Dialog, DialogPanel } from '@headlessui/react';
@@ -8,6 +8,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Logo, LightModeIcon, DarkModeIcon } from "../icons";
 
 import PathConstants from '../../pathConstants';
+import { useDarkMode } from '../../hooks/useDarkMode';
 
 const navigation = [
     { name: 'Product', href: '#' },
@@ -17,20 +18,9 @@ const navigation = [
 ]
 
 export default function Nav() {
-    const [darkMode, setDarkMode] = useState(true)
+    const [isDarkMode, setIsDarkMode] = useDarkMode();
+
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-    // 
-    useEffect(() => {
-        if (darkMode) {
-            window.document.documentElement.classList.add('dark')
-            // localStorage.theme = 'dark'
-        } else {
-            window.document.documentElement.classList.remove('dark')
-            // localStorage.theme = 'light'
-        }
-    }, [darkMode])
-
 
     return (
         <header className="absolute inset-x-0 top-0 z-50">
@@ -59,12 +49,12 @@ export default function Nav() {
                     ))}
                 </div>
                 <div className="hidden lg:flex lg:flex-1 lg:gap-4 lg:justify-end">
-                    <Switch checked={darkMode} onChange={setDarkMode} className="group my-auto inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition data-[checked]:bg-blue-600 ">
+                    <Switch checked={isDarkMode} onChange={setIsDarkMode} className="group my-auto inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition data-[checked]:bg-blue-600 ">
                         <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6">
                             
                             {
                                 // Toggling between sun and moon icons within the toggle 
-                                darkMode ? 
+                                isDarkMode ? 
                                     <LightModeIcon className="size-4" /> : 
                                     <DarkModeIcon className="size-4" />
                             }
@@ -85,12 +75,12 @@ export default function Nav() {
                             <Logo className="h-8 w-auto" />
                         </Link>
                         <div className="flex     gap-2 grid-cols-2 justify-end">
-                            <Switch checked={darkMode} onChange={setDarkMode} className="group my-auto inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition data-[checked]:bg-blue-600 ">
+                            <Switch checked={isDarkMode} onChange={setIsDarkMode} className="group my-auto inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition data-[checked]:bg-blue-600 ">
                                 <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6">
 
                                     {
                                         // Toggling between sun and moon icons within the toggle 
-                                        darkMode ?
+                                        isDarkMode ?
                                             <LightModeIcon className="size-4" /> :
                                             <DarkModeIcon className="size-4" />
                                     }
