@@ -180,6 +180,7 @@ class GenerateCoverLetter(Resource):
         response = get_educations_by_user(user_id)
         education_data = json.loads(response.json())['data']
         education_descriptions = []
+        full_education_description = ""
         for entry in education_data:
             description = f"{entry['degree']} in {entry['field_of_study']} from {entry['institution_name']} (start date: {entry['start_date']}, end date: {entry['end_date']})."
             education_descriptions.append(description)
@@ -188,6 +189,7 @@ class GenerateCoverLetter(Resource):
         response = get_experiences_by_user(user_id)
         experience_data = json.loads(response.json())['data']
         experience_descriptions = []
+        full_experience_description = ""
         for entry in experience_data:
             description = f"{entry['job_title']} at {entry['company_name']} (start date: {entry['start_date']}, end date: {entry['end_date']}) - {entry['description']}"
             experience_descriptions.append(description)
@@ -196,6 +198,7 @@ class GenerateCoverLetter(Resource):
         response = get_skills_by_user(user_id)
         skills_data = json.loads(response.json())['data']
         skills_descriptions = []
+        full_skills_description = ""
         for entry in skills_data:
             description = f"{entry['skill_name']} (Proficiency: {entry['proficiency_level']})"
             skills_descriptions.append(description)
@@ -218,11 +221,17 @@ class GenerateCoverLetter(Resource):
             
         if full_application_description == "":
             full_application_description = "No Job Application"
+        if full_education_description == "":
+            full_education_description = "No Job Application"
+        if full_experience_description == "":
+            full_experience_description = "No Job Application"
+        if full_skills_description == "":
+            full_skills_description = "No Job Application"
 
         
 
         if not user_description or not full_education_description or not full_experience_description or not full_skills_description or not full_application_description:
-            return {'error': 'All user descriptions are required'}, 400
+            return {'user_description': user_description, 'full_education_description': full_education_description, 'full_experience_description': full_experience_description, 'full_skills_description': full_skills_description, 'full_application_description': full_application_description}, 400
 
         try:
             # Prepare the payload for Gemini API

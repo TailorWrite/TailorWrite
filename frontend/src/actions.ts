@@ -418,6 +418,7 @@ export async function handleUploadApplicationDocument({ request }: ActionProps):
     // Extract form fields from formData
     const document = formData.get("document");
     const size = formData.get("size");
+    debugger
     const applicationId = formData.get("application_id") as string;
 
     // Perform validation or API request
@@ -436,8 +437,6 @@ export async function handleUploadApplicationDocument({ request }: ActionProps):
         size: size
     };
 
-    console.log("Payload:", payload);
-
     try {
         const response = await axios.post(
             APIConstants.DOCUMENTS(applicationId), 
@@ -449,10 +448,15 @@ export async function handleUploadApplicationDocument({ request }: ActionProps):
                 }
             }
         );
+        debugger;
 
         if (!response.data) {
-            const errorMessage = response.data.error || "Failed to upload document.";
-            console.log("Error:", errorMessage);
+            toast.update(toastId, {
+                render: 'Document upload failed',
+                type: 'error',
+                ...toastSettings,
+            });
+            const errorMessage = "Failed to upload document.";
             return { error: errorMessage };
         }
 
