@@ -1,5 +1,5 @@
 import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Link, Form, useNavigate, useLoaderData, useSubmit, Await, useLocation, useAsyncValue, useActionData } from 'react-router-dom';
+import { Link, Form, useNavigate, useLoaderData, useSubmit, Await, useLocation, useAsyncValue } from 'react-router-dom';
 import { Dialog, DialogBackdrop, DialogPanel, Field, Menu, MenuButton, MenuItem, MenuItems, Textarea } from '@headlessui/react';
 import { PlusIcon, CheckIcon, ChevronDownIcon, ClockIcon, LinkIcon, CalendarDaysIcon, PaperClipIcon } from '@heroicons/react/20/solid';
 import { ArrowDownTrayIcon, ArrowPathIcon, DocumentTextIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -28,15 +28,18 @@ import { headers } from '../api';
 
 export default function ApplicationDetails() {
     const navigate = useNavigate();
+    const location = useLocation();
     const data = useLoaderData() as { application: ApplicationData };
-
 
 
     const [showDrawer, setShowDrawer] = useState(true);
     const handleCloseDrawer = () => {
         setShowDrawer(false);
         // Timer to allow the drawer to close before navigating
-        setTimeout(() => navigate(PathConstants.APPLICATIONS), 200);
+        setTimeout(() => {
+            // Check if the user is still on the application details page
+            if (location.pathname === PathConstants.NEW_APPLICATION) navigate(PathConstants.APPLICATIONS)
+        }, 200);
     }
 
     const isNewApplication = useLocation().pathname === PathConstants.NEW_APPLICATION;
@@ -206,7 +209,7 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
         <>
             <Form method="post" className="relative h-full ">
                 
-                <div className="absolute z-50 bottom-0 left-0 mb-5 ml-5 flex flex-row gap-x-5 md:hidden">
+                <div className="fixed z-50 bottom-0 left-0 mb-5 ml-5 flex flex-row gap-x-5 md:hidden">
                     <ApplicationButtons applicationData={applicationData} />
                 </div>
 
@@ -497,12 +500,13 @@ interface DocumentUploadProps {
 
 const DocumentUploadSection = ({ applicationData, documents }: DocumentUploadProps) => {
     const submit = useSubmit();
-    const actionData = useActionData();
-    console.log('actionData:', actionData);
+    // const actionData = useActionData();      // Used for updating the file upload status
+    // console.log('actionData:', actionData);
 
     const [allDocuments, setAllDocuments] = useState<ApplicationDocuments[]>(documents)
 
     const handleDocumentUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        debugger;
         const files = event.target.files;
 
         if (!files || files.length === 0) return;
@@ -644,7 +648,7 @@ const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
     }, [file]);
 
     const handleGenerateCoverLetter = () => {
-        const toastId = toast('Generating cover letter...', { autoClose: false });
+        const toastId = toast.loading('Generating cover letter...', { autoClose: false });
         // Get the cover letter from the server
         console.log(application.id)
         const payload = {
@@ -734,11 +738,10 @@ const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
                         <DocumentTextIcon aria-hidden="true" className="mx-auto h-12 w-12 text-gray-300 dark:text-secondaryDarkText" />
                         <div className="mt-4 flex text-sm leading-6">
                             <label
-                                htmlFor="file-upload"
+                                htmlFor="generate-cover-letter"
                                 className="relative cursor-pointer rounded-md font-semibold text-primaryLightAccent focus-within:outline-none focus-within:ring-2 focus-within:ring-primaryLightAccent focus-within:ring-offset-2 hover:text-indigo-500 dark:text-primaryDarkAccent"
                             >
-                                <span onClick={handleGenerateCoverLetter}>Generate</span>
-                                {/* <input id="file-upload" name="file-upload" type="file" className="sr-only" /> */}
+                                <span className="z-50" onClick={handleGenerateCoverLetter}>Generate</span>
                             </label>
                             <p className="pl-1">a cover letter here</p>
                         </div>
