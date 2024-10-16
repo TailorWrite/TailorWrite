@@ -30,8 +30,7 @@ jobs:
 
       - name: Run tests
         run: |
-          cd backend/API
-          pytest
+          pytest backend/API/tests
 
       - name: Debug if tests fail
         if: failure()
