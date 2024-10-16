@@ -1,12 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { handleAddApplication, handleApplicationSubmit, handleDeleteApplication, handleUpdateApplication } from '../src/actions';
+import { handleAddApplication, handleDeleteApplication, handleUpdateApplication } from '../src/actions';
 import { APIConstants } from '../src/pathConstants';
+import { redirect } from 'react-router-dom';
 
 // Mock dependencies
 vi.mock('axios');
 vi.mock('react-toastify');
+vi.mock('react-router-dom', () => ({
+    redirect: vi.fn(),
+}));
 vi.mock('../src/utils', () => ({
     parseDateString: vi.fn((date) => date),
 }));
@@ -69,6 +73,7 @@ describe('Application Actions', () => {
 
             // Mock the axios.post method to return a successful response
             vi.mocked(axios.post).mockResolvedValue({ data: { success: true } });
+            vi.mocked(redirect);
 
             // Running the method with the mock request
             const result = await handleAddApplication({ request: mockRequest });
@@ -83,7 +88,9 @@ describe('Application Actions', () => {
                 }),
                 expect.any(Object)
             );
-            expect(result).toEqual({ success: 'Application added successfully!' });
+            console.log(result);
+            // expect(result).toContainEqual({ success: 'Application added successfully!' });
+            expect(redirect).toHaveBeenCalled();
             expect(toast.update).toHaveBeenCalled();
         });
 

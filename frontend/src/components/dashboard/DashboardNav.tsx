@@ -1,25 +1,24 @@
-import { useEffect, useState } from 'react'
-
 import { Disclosure, DisclosurePanel, Switch } from '@headlessui/react'
-// import { Typography } from '@material-tailwind/react'
 
 import { DarkModeIcon, LightModeIcon } from '../icons';
+import { useDarkMode } from '../../hooks/useDarkMode';
 
 
 
 export default function DashboardNav() {
 
-    const [darkMode, setDarkMode] = useState(false)
+    const [isDarkMode, setIsDarkMode] = useDarkMode();
 
-    useEffect(() => {
-        if (darkMode) {
-            window.document.documentElement.classList.add('dark')
-            // localStorage.theme = 'dark'
-        } else {
-            window.document.documentElement.classList.remove('dark')
-            // localStorage.theme = 'light'
-        }
-    }, [darkMode])
+    // const [darkMode, setDarkMode] = useState(false)
+    // useEffect(() => {
+    //     if (darkMode) {
+    //         window.document.documentElement.classList.add('dark')
+    //         // localStorage.theme = 'dark'
+    //     } else {
+    //         window.document.documentElement.classList.remove('dark')
+    //         // localStorage.theme = 'light'
+    //     }
+    // }, [darkMode])
 
     const formatDate = () => {
         const date = new Date();
@@ -30,7 +29,7 @@ export default function DashboardNav() {
 
     return (
         <>
-            <Disclosure as="nav" className="relative flex flex-row justify-between p-3  w-full z-40 dark:bg-gray-800">
+            <Disclosure as="nav" className="relative flex flex-row justify-between p-3 w-full z-40">
 
                 <div className="flex flex-col px-3 justify-start">
                     {/* <Typography variant="h6" color="blue-gray" className="pb-1 leading-none text-left dark:text-white">
@@ -52,12 +51,12 @@ export default function DashboardNav() {
 
                 <div className="absolute inset-y-0 right-0 flex gap-2 items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
 
-                    <Switch checked={darkMode} onChange={setDarkMode} className="group my-auto inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition data-[checked]:bg-blue-600 ">
+                    <Switch checked={isDarkMode} onChange={setIsDarkMode} className="group my-auto inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition data-[checked]:bg-blue-600 ">
                         <span className="size-4 translate-x-1 rounded-full bg-white transition group-data-[checked]:translate-x-6">
 
                             {
                                 // Toggling between sun and moon icons within the toggle 
-                                darkMode ?
+                                isDarkMode ?
                                     <LightModeIcon className="size-4" /> :
                                     <DarkModeIcon className="size-4" />
                             }
@@ -72,7 +71,8 @@ export default function DashboardNav() {
                     </div>
                 </DisclosurePanel>
             </Disclosure>
-            <hr className=" my-2 pb-2 border-blue-gray-50" />
+
+            <hr className=" my-2 pb-2 border-blue-gray-50 dark:border-darkBorder" />
         </>
     )
 }

@@ -16,3 +16,6 @@ def register_routes(api: Api):
     
     from routes.skills_routes import skills_ns
     api.add_namespace(skills_ns, path='/skills')
+    
+    from routes.cover_letter_routes import cover_letters_ns
+    api.add_namespace(cover_letters_ns, path='/cover-letter')

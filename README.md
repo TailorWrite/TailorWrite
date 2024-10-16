@@ -14,7 +14,7 @@
 </p>
 
 ___
-[![Frontend Build and Test](https://github.com/TailorWrite/TailorWrite/actions/workflows/frontend-build-and-test.yml/badge.svg)](https://github.com/TailorWrite/TailorWrite/actions/workflows/frontend-build-and-test.yml)
+[![Frontend Build and Test](https://github.com/TailorWrite/TailorWrite/actions/workflows/frontend-build-and-test.yml/badge.svg)](https://github.com/TailorWrite/TailorWrite/actions/workflows/frontend-build-and-test.yml) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/dc3cb21cb3ce4eb0811637ce4ca672c2)](https://app.codacy.com/gh/TailorWrite/TailorWrite/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 ## Overview 
 TailorWrite addresses the time-consuming challenge of tailoring CVs and cover letters for each job application, a common problem for students and job seekers. By streamlining this process, TailorWrite aims to improve the chances of securing interviews in the competitive job market, particularly for students in their penultimate year, new graduates, and job seekers.
@@ -99,8 +99,7 @@ The application comes preloaded with example data to demonstrate its functionali
 <!-- Create table for user data -->
 | Name | Email Address | Password |
 |---------|---------------|----------|
-| John Doe | john.doe@example.com | password123 |
-| Jane Smith | jane.smith@example.com | password123 |
+| John Doe | john.doe@example.com | password |
 
 ---
 

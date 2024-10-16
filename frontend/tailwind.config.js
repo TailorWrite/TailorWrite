@@ -40,6 +40,17 @@ export default withMT({
       fuchsia: tailwindColors.fuchsia,
       pink: tailwindColors.pink,
       rose: tailwindColors.rose,
+
+      primaryDark: tailwindColors.neutral[900],     // "#161618",
+      secondaryDark: "#1F1F21",
+      
+      darkBorder: tailwindColors.neutral[700], 
+      lightBorder: tailwindColors.neutral[200],
+
+      primaryDarkText: tailwindColors.neutral[200],
+      secondaryDarkText: tailwindColors.neutral[400],
+
+      primaryDarkAccent: tailwindColors.blue[500],
     },
   },
   plugins: [

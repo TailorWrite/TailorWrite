@@ -1,7 +1,10 @@
+import datetime
+import pytz
 from flask_restx import Namespace, Resource, fields, reqparse, api
 from flask import request, jsonify
-from models.users import create_user, create_account, get_user, update_user, delete_user, login_user
+from models.users import *  # create_user, create_account, get_user, update_user, delete_user, login_user
 from models.authentication import token_required
+import bcrypt
 
 # Define the namespace
 users_ns = Namespace('users', description='User operations')
@@ -56,6 +59,8 @@ class UserList(Resource):
             account = data.get('account_info', {})
             account['id'] = user_id
             account['email'] = email
+            hashed_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            account['password'] = hashed_password
             create_account(account)
             return {'message': 'User created successfully', 'id': user_id}, 201
         except Exception as e:
@@ -73,8 +78,10 @@ class User(Resource):
         try:
             if user_id != token_user_id:
                 return {'error': 'No you\'re not allowed this with that auth key'}, 403
-            user = get_user(user_id).data
+            user = get_user(user_id).data[0]
             if user:
+                if 'password' in user:
+                    del user['password']
                 return jsonify(user)
             else:
                 return {'message': 'User not found'}, 404
@@ -83,12 +90,21 @@ class User(Resource):
 
     @token_required  # Require token for this route
     @users_ns.doc(security='apikey')
+    @users_ns.expect(update_account_model)
     @users_ns.response(200, 'User updated successfully', user_model)
     @users_ns.response(400, 'Bad Request')
-    def put(self, user_id):
+    @users_ns.response(403, 'Forbidden')
+    def put(self, user_id, token_user_id):
         """Update a user by ID"""
         data = request.json
         try:
+            response = get_user(user_id).data
+            user_id = response[0]['id']
+            if user_id != token_user_id:
+                return {'error': 'No you\'re not allowed this with that auth key'}, 403
+            utc_now = datetime.datetime.now(pytz.utc)
+            formatted_time = utc_now.strftime('%Y-%m-%dT%H:%M:%SZ')
+            data['updated_at'] = formatted_time
             response = update_user(user_id, data)
             response = jsonify(response.data[0])
             response.status_code = 200
@@ -100,11 +116,57 @@ class User(Resource):
     @users_ns.doc(security='apikey')
     @users_ns.response(200, 'User deleted successfully')
     @users_ns.response(400, 'Bad Request')
-    def delete(self, user_id):
+    def delete(self, user_id, token_user_id):
         """Delete a user by ID"""
         try:
+            if user_id != token_user_id:
+                return {'error': 'No you\'re not allowed this with that auth key'}, 403
             delete_user(user_id)
             return {'message': 'User deleted successfully'}, 200
+        except Exception as e:
+            return {'error': str(e)}, 400
+
+# Implement a route for updating the user's cover letter 
+@users_ns.route('/<string:user_id>/cover-letter')
+class UserCoverLetter(Resource):
+    @token_required
+    @users_ns.doc(security='apikey')
+    @users_ns.expect({'cover_letter': fields.String(required=True, description='The user cover letter')})
+    @users_ns.response(200, 'Cover letter updated successfully')
+    @users_ns.response(400, 'Bad Request')
+    @users_ns.response(403, 'Forbidden')
+    def get(self, user_id, token_user_id):
+        """Update a user's cover letter"""
+        try:
+            user_id = get_user(user_id).data[0]['id']
+
+            if user_id != token_user_id:
+                return {'error': 'No you\'re not allowed this with that auth key'}, 403
+            
+            cover_letter = get_user_cover_letter(user_id).data[0]
+            
+            return cover_letter, 200
+        except Exception as e:
+            return {'error': str(e)}, 400
+
+    @token_required
+    @users_ns.doc(security='apikey')
+    @users_ns.expect({'cover_letter': fields.String(required=True, description='The user cover letter')})
+    @users_ns.response(200, 'Cover letter updated successfully')
+    @users_ns.response(400, 'Bad Request')
+    @users_ns.response(403, 'Forbidden')
+    def put(self, user_id, token_user_id):
+        """Update a user's cover letter"""
+        data = request.json
+        cover_letter = data.get("coverLetter")
+        try:
+            user_id = get_user(user_id).data[0]['id']
+
+            if user_id != token_user_id:
+                return {'error': 'No you\'re not allowed this with that auth key'}, 403
+            
+            response = update_user_cover_letter(user_id, cover_letter)
+            return {'success': 'Updated cover letter successfully'}, 200
         except Exception as e:
             return {'error': str(e)}, 400
 
@@ -122,6 +184,8 @@ class UserLogin(Resource):
 
         try:
             response = login_user(email, password)
+            if response is None:
+                return {'error': 'Invalid credentials'}, 401
             access_token = response[0]
             user_id = response[1]
             return {'message': 'Login successful', 'user_id': user_id, 'basic_auth_token': access_token}, 200

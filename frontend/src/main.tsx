@@ -3,25 +3,32 @@ import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ThemeProvider } from "@material-tailwind/react";
+import { Bounce, ToastContainer } from 'react-toastify';
+import { pdfjs } from 'react-pdf';
 
 import { LandingPage, LoginPage, SignupPage, ErrorPage } from './pages';
 import NotFound from "./components/common/NotFound";
 
 import LandingRouter from "./layouts/MarketingLayout";
-import DashboardRouter from "./layouts/DashboardLayout";
+import DashboardLayout from "./layouts/DashboardLayout";
 import ApplicationsLayout from './layouts/ApplicationsLayout';
+import SettingsLayout from './layouts/SettingsLayout';
 
-import ProfilePage from './routes/ProfilePage';
+import ProfilePage from './views/ProfilePage';
 import DashboardHome from './views/DashboardHome';
 import ApplicationDetails from './views/ApplicationDetails';
-import ArchivePage from './pages/ArchivePage'
+import ArchivePage from './pages/ArchivePage';
+import GeneralSettings from './views/settings/GeneralSettings';
+import DataSettings from './views/settings/DataSettings';
 
 import PathConstants from './pathConstants';
-import { handleAddApplication, handleApplicationSubmit } from './actions';
-import { allApplicationLoader, applicationLoader, archiveLoader } from './loaders';
+import { handleAddApplication, handleApplicationSubmit, handleLogin, handleProfile, handleRegister } from './actions';
+import { allApplicationLoader, applicationLoader, profileLoader, archiveLoader } from './loaders';
 
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const queryClient = new QueryClient();
 const router = createBrowserRouter([
@@ -37,16 +44,18 @@ const router = createBrowserRouter([
       {
         path: PathConstants.LOGIN,
         element: <LoginPage />,
+        action: handleLogin,
       },
       {
         path: PathConstants.SIGNUP,
         element: <SignupPage />,
+        action: handleRegister,
       },
     ]
   },
   {
     path: PathConstants.DASHBOARD,
-    element: <DashboardRouter />,
+    element: <DashboardLayout />,
     children: [
       {
         index: true,
@@ -74,7 +83,6 @@ const router = createBrowserRouter([
           },
         ]
       },
-
       {
         path: PathConstants.GENERATE,
         element: <NotFound />,
@@ -85,17 +93,27 @@ const router = createBrowserRouter([
         loader: archiveLoader
       },
       {
-        path: PathConstants.PROFILE,
-        element: <ProfilePage />,
+        path: PathConstants.SETTINGS,
+        element: <SettingsLayout />,
+        children: [
+          {
+            index: true,
+            element: <GeneralSettings />,
+          },
+          {
+            path: PathConstants.PROFILE,
+            element: <ProfilePage />,
+            loader: profileLoader,
+            action: handleProfile,
+          }, 
+          {
+            path: PathConstants.SETTINGS_DATA,
+            element: <DataSettings />,
+          }
+        ]
       },
     ],
-  }, 
-  {
-    // Define the path and element to be rendered when the route is accessed
-    path: PathConstants.ARCHIVE,
-  element: <ArchivePage />,
-    loader: archiveLoader,
-}, 
+  },
 ], { basename: PathConstants.BASENAME });
 
 
@@ -103,7 +121,23 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <RouterProvider router={router} />
+          <RouterProvider router={router}/>
+          
+          <ToastContainer
+            stacked
+            position="bottom-right"
+            autoClose={5000}
+            hideProgressBar={true}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+            transition={Bounce}
+          />
+          
       </ThemeProvider>
     </QueryClientProvider>
   </React.StrictMode>,
