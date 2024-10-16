@@ -1,5 +1,5 @@
 import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Link, Form, useNavigate, useLoaderData, useSubmit, Await, useLocation, useAsyncValue } from 'react-router-dom';
+import { Link, Form, useNavigate, useLoaderData, useSubmit, Await, useLocation, useAsyncValue } from 'react-router-dom'
 import { Dialog, DialogBackdrop, DialogPanel, Field, Menu, MenuButton, MenuItem, MenuItems, Textarea } from '@headlessui/react';
 import { PlusIcon, CheckIcon, ChevronDownIcon, ClockIcon, LinkIcon, CalendarDaysIcon, PaperClipIcon } from '@heroicons/react/20/solid';
 import { ArrowDownTrayIcon, ArrowPathIcon, DocumentTextIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -21,8 +21,8 @@ import ApplicationDetailsSkeleton from '../components/skeletons/ApplicationDetai
 
 import { appendHttpsToLink, formatDate, getCompanyLogoUrl } from '../utils';
 
-import { ApplicationAction, ApplicationData, ApplicationDocuments, ApplicationStatus, suppressMissingAttributes } from '../types';
 import PathConstants, { APIConstants } from '../pathConstants';
+import { ApplicationAction, ApplicationData, ApplicationDocuments, ApplicationStatus, suppressMissingAttributes } from '../types';
 import { headers } from '../api';
 
 
@@ -506,7 +506,6 @@ const DocumentUploadSection = ({ applicationData, documents }: DocumentUploadPro
     const [allDocuments, setAllDocuments] = useState<ApplicationDocuments[]>(documents)
 
     const handleDocumentUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        debugger;
         const files = event.target.files;
 
         if (!files || files.length === 0) return;

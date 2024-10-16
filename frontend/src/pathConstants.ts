@@ -50,8 +50,6 @@ const APIConstants = {
 
     ALL_COVER_LETTERS: (user_id: string) => `${API_BASE_URL}/cover-letter/user/${user_id}`,
     COVER_LETTER_PDF: (application_id: string) => `${API_BASE_URL}/cover-letter/${application_id}/pdf`,
-
-
 }
 
 export default PathConstants;

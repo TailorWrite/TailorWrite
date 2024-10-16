@@ -436,8 +436,6 @@ export async function handleUploadApplicationDocument({ request }: ActionProps):
         size: size
     };
 
-    console.log("Payload:", payload);
-
     try {
         const response = await axios.post(
             APIConstants.DOCUMENTS(applicationId), 
@@ -451,8 +449,12 @@ export async function handleUploadApplicationDocument({ request }: ActionProps):
         );
 
         if (!response.data) {
-            const errorMessage = response.data.error || "Failed to upload document.";
-            console.log("Error:", errorMessage);
+            toast.update(toastId, {
+                render: 'Document upload failed',
+                type: 'error',
+                ...toastSettings,
+            });
+            const errorMessage = "Failed to upload document.";
             return { error: errorMessage };
         }
 
