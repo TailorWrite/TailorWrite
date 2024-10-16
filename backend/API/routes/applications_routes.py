@@ -1,15 +1,17 @@
+import base64
 import datetime
 import json
 import pytz
 import uuid
 from flask_restx import Namespace, Resource, fields
 from flask import request, jsonify
+from models import supabase
 from werkzeug.utils import secure_filename
 import requests
 from bs4 import BeautifulSoup
+import io
 
-
-from config import Config
+# from config import Config
 from models.applications import create_application, get_application, update_application, delete_application, get_applications_by_user, create_file_upload, get_file_uploads_by_application
 from models.authentication import token_required
 
@@ -38,6 +40,13 @@ update_application_model = applications_ns.model('UpdateJobApplication', {
     'notes': fields.String(required=False, description='Additional notes', example='Submitted resume and cover letter.')
 })
 
+from flask_restx import fields
+
+upload_model = applications_ns.model('UploadModel', {
+    'file_data': fields.String(required=True, description='Base64 encoded file content'),
+    'file_name': fields.String(required=True, description='Name of the file to be uploaded'),
+    'bucket_name': fields.String(required=False, description='Name of the Supabase storage bucket (default: "documents")')
+})
 
 @applications_ns.route('')
 class JobApplicationList(Resource):
@@ -158,53 +167,26 @@ class JobApplicationDocuments(Resource):
     @applications_ns.response(404, 'Job application not found')
     @applications_ns.response(403, 'Forbidden')
     def post(self, application_id, token_user_id):
-        """Upload a document to S3"""
+        """Upload a document to Supabase"""
         if 'document' not in request.files:
             return {'error': 'No file provided in the request'}, 400
-
-        document = request.files['document']
-        if document.filename == '':
-            return {'error': 'No file selected for uploading'}, 400
-
-        if document and self.allowed_file(document.filename):
-
-            filename = secure_filename(document.filename)
-            new_filename = self.get_unique_filename(filename)
-
-            try:
-
-                Config.s3.upload_fileobj(
-                    document,
-                    Config.BUCKET_NAME,
-                    new_filename,
-                    ExtraArgs={
-                        "ContentType": document.content_type,
-                        "ACL": "public-read"
-                    }
-                )
-            except Exception as e:
-                print(e)
-                return {'error': str(e)}, 400
-            try:
-                # Upload the new filename to the database
-                print(document.content_length)
-                print(round(int(request.form.get("size")) / 1024, 2))
-                data = {
-                    # "name": new_filename,
+        try:
+            document = request.files['document']
+            response = upload_document_to_supabase(token_user_id, application_id, document)
+            path = supabase.storage_url + "/object/public/file-storage/" + response[0]['path']
+            data = {
                     "application_id": application_id,
-                    "link": f"https://{Config.BUCKET_NAME}.s3.amazonaws.com/{new_filename}",
-                    "size": f"{round(int(request.form.get('size')) / 1024, 2)} KB",
-                    "name": filename
+                    "link": path,
+                    "size": f"{round(document.content_length / 1024, 2)} KB",
+                    "name": document.filename
                 }
-                print(data)
-                create_file_upload(data)
+            print(document)
+            print(data)
+            create_file_upload(data)
+        except:
+            return {'error': 'Failed to upload document'}, 400
+        
 
-            except Exception as e:
-                print(e)
-                return {'error': str(e)}, 400
-
-        print("Document uploaded successfully")
-        return {'message': 'Document uploaded successfully'}, 200
 
     @token_required
     @applications_ns.doc(security='apikey')
@@ -299,3 +281,38 @@ class WebscrapeJobApplication(Resource):
                 'statusCode': response.status_code,
                 'body': f"Failed to retrieve the page. Status code: {response.status_code}"
             }
+
+
+def upload_document_to_supabase(user_id, application_id, document) -> dict: 
+    """
+    Upload a document to Supabase Storage
+
+    Args:
+    user_id (str): The user ID
+    document (FileStorage): The document to upload
+
+    Returns:
+    dict: A dictionary containing the message and the path of the uploaded document
+    """
+
+    # Generating a 
+    supabase_storage_path = f"{user_id}/{application_id}"
+    filename = secure_filename(document.filename)
+    content_type = document.content_type
+    document = io.BufferedReader(document)
+
+    try: 
+        supabase.storage.from_("file-storage").upload(
+            file=document,
+            path=f"{supabase_storage_path}/{filename}", 
+            file_options={"content-type": content_type}
+            # file_options={"content-type": "text/markdown"}
+        )
+
+        return {
+            "message": "Document uploaded successfully", 
+            "path": f"{supabase_storage_path}/{filename}"
+        }, 200
+    except Exception as e: 
+        print(e)
+        return {"error": str(e)}, 400
