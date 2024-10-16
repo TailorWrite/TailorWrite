@@ -3,6 +3,9 @@ import { useLoaderData } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { ApplicationData } from '../types';
+import { APIConstants } from '../pathConstants';
+import axios from 'axios';
+import { headers } from '../api';
 
 
 export default function ArchivePage() {
@@ -12,9 +15,30 @@ export default function ArchivePage() {
 
     // Manage the data with useState
     const [data, ] = useState<ApplicationData[]>(loaderData);
+    debugger; 
 
-    const handleDownloadCoverLetter = (id: string) => {
-        const toastId = toast.loading(`Downloading cover letter ${id}...`);
+    const handleDownloadCoverLetter = (application_id: string) => {
+        const toastId = toast.loading(`Downloading cover letter ${application_id}...`);
+
+        const cover_letter_content = "This is a cover letter content";
+
+        const payload = {
+            user_id: sessionStorage.getItem('user_id'),
+            content: cover_letter_content,
+        }
+
+        try { 
+            const response = axios.post(APIConstants.COVER_LETTER_PDF(application_id), { application_id: application_id }, { headers: headers(), responseType: 'blob' });
+        }
+        catch (error) {
+            console.error('Error fetching PDF:', error)
+            toast.update(toastId, {
+                render: `Error generating cover letter: ${error}`,
+                type: 'error',
+                isLoading: false,
+                autoClose: 5000,
+            });
+        }
 
         // Implement the download logic here
 

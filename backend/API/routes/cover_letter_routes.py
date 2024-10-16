@@ -252,6 +252,13 @@ class GenerateCoverLetter(Resource):
             generated_text = ""
             if response.status_code == 200:
                 generated_text = response.json()['candidates'][0]['content']['parts'][0]['text']
+
+                # Add this cover letter to the database
+                response = create_cover_letter({
+                    "application_id": application_id,
+                    "content": generated_text
+                })
+
                 return GeneratePDF(generated_text, user_data, application_data, style)
             else:
                 return {'error': 'Failed to generate cover letter', 'details': response.text}, response.status_code
@@ -260,7 +267,7 @@ class GenerateCoverLetter(Resource):
             return {'error': 'Failed to connect to cover letter generation service', 'details': str(e)}, 500
         
         
-@cover_letters_ns.route('<int:application_id>/pdf')
+@cover_letters_ns.route('/<int:application_id>/pdf')
 class GeneratePDFClass(Resource):
     @token_required
     @cover_letters_ns.expect(cover_letter_model_pdf)
@@ -308,7 +315,7 @@ def GeneratePDF(generated_text, user_data, application_data, style):
         content = content.replace("INSERT-NAME-HERE", f"{user_data['first_name']} {user_data['last_name']}")
         content = content.replace("INSERT-PHONE-HERE", f"{user_data['phone']}")
         content = content.replace("INSERT-EMAIL-HERE", f"{user_data['email']}")
-        content = content.replace("INSERT-LOCATION-HERE", f"")
+        content = content.replace("INSERT-LOCATION-HERE", "")
         
         content = content.replace("INSERT-JOB-TITLE-HERE", application_data['job_title'])
         
