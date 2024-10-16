@@ -20,7 +20,7 @@ export default function ArchivePage() {
     const handleDownloadCoverLetter = (application_id: string) => {
         const toastId = toast.loading(`Downloading cover letter ${application_id}...`);
 
-        const cover_letter_content = "This is a cover letter content";
+        // const cover_letter_content = "This is a cover letter content";
 
         // const payload = {
         //     user_id: sessionStorage.getItem('user_id'),
