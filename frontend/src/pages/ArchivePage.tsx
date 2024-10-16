@@ -22,13 +22,15 @@ export default function ArchivePage() {
 
         const cover_letter_content = "This is a cover letter content";
 
-        const payload = {
-            user_id: sessionStorage.getItem('user_id'),
-            content: cover_letter_content,
-        }
+        // const payload = {
+        //     user_id: sessionStorage.getItem('user_id'),
+        //     content: cover_letter_content,
+        // }
 
         try { 
             const response = axios.post(APIConstants.COVER_LETTER_PDF(application_id), { application_id: application_id }, { headers: headers(), responseType: 'blob' });
+            toast.dismiss(toastId);
+            return response
         }
         catch (error) {
             console.error('Error fetching PDF:', error)
