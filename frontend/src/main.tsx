@@ -21,7 +21,7 @@ import GeneralSettings from './views/settings/GeneralSettings';
 import DataSettings from './views/settings/DataSettings';
 
 import PathConstants from './pathConstants';
-import { handleAddApplication, handleApplicationSubmit, handleLogin, handleProfile } from './actions';
+import { handleAddApplication, handleApplicationSubmit, handleLogin, handleProfile, handleRegister } from './actions';
 import { allApplicationLoader, applicationLoader, profileLoader } from './loaders';
 
 import './index.css';
@@ -48,6 +48,7 @@ const router = createBrowserRouter([
       {
         path: PathConstants.SIGNUP,
         element: <SignupPage />,
+        action: handleRegister,
       },
     ]
   },

@@ -3,7 +3,7 @@ const PathConstants = {
     BASENAME: '/',
     HOME: '/',
     LOGIN: '/login',
-    SIGNUP: '/signup',
+    SIGNUP: '/register',
     
     DASHBOARD: '/dashboard',
     APPLICATIONS: '/dashboard/applications',

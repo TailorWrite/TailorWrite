@@ -10,7 +10,7 @@ import { Bounce, toast } from "react-toastify";
 import { redirect } from "react-router-dom";
 
 import { parseDateString } from "./utils";
-import { AxiosError } from "./types";
+import { AxiosError, RegisterFormData } from "./types";
 import { headers } from "./api";
 import { APIConstants } from "./pathConstants";
 
@@ -85,6 +85,80 @@ export async function handleLogin({ request }: { request: Request }) {
 
     catch (error) {
         const errorMessage = (error as AxiosError).response.data.error || "Failed to login.";
+
+        toast.update(toastId, {
+            render: errorMessage,
+            type: 'error',
+            ...toastSettings,
+        });
+
+        return { error: errorMessage };
+    }
+}
+
+export async function handleRegister({ request }: { request: Request }) {
+    const toastId = toast.loading('Registering...');
+
+    const formData = await request.formData();
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirm-password") as string;
+    const firstName = formData.get("first-name") as string;
+    const lastName = formData.get("last-name") as string;
+
+    if (!email || !password || !confirmPassword || !firstName || !lastName) {
+        toast.update(toastId, {
+            render: 'All fields are required',
+            type: 'info',
+            ...toastSettings,
+        });
+
+        return { error: "All fields are required." };
+    }
+
+    if (password !== confirmPassword) {
+        toast.update(toastId, {
+            render: 'Passwords do not match',
+            type: 'info',
+            ...toastSettings,
+        });
+
+        return { error: "Passwords do not match." };
+    }
+
+    const payload: RegisterFormData = {
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword,
+        terms: true, 
+        account_info: {
+            first_name: firstName,
+            last_name: lastName,
+            bio: "",
+            phone: "",
+        }
+    };
+
+    try {
+        const response = await axios.post(APIConstants.REGISTER, payload);
+
+        if (!response.data) {
+            const errorMessage = response.data.error || "Failed to register.";
+            console.log("Error:", errorMessage);
+            return { error: errorMessage };
+        }
+
+        toast.update(toastId, {
+            render: 'Registration successful',
+            type: 'success',
+            ...toastSettings,
+        });
+
+        return redirect("/login");
+    }
+
+    catch (error) {
+        const errorMessage = (error as AxiosError).response.data.error || "Failed to register.";
 
         toast.update(toastId, {
             render: errorMessage,
@@ -195,12 +269,6 @@ export async function handleApplicationSubmit({ request }: { request: Request })
         default:
             return handleUpdateApplication({ request: requestPassOn });
     }
-
-    // if ( intent == "delete") {
-    //     return handleDeleteApplication({ request: requestPassOn });
-    // }
-
-    // return handleUpdateApplication({ request: requestPassOn });
 }
 
 export async function handleUpdateApplication({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
