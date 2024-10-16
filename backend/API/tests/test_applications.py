@@ -1,24 +1,4 @@
 import pytest
-from flask.testing import FlaskClient
-from flask import Flask
-from app import app
-
-# Sample login data for authentication
-login_data = {
-    'email': 'user@example.com',
-    'password': 'securepassword123'
-}
-
-# Sample job application data
-application_data = {
-    "user_id": "5a4245c0-5404-4be3-9061-f728d77fdb42",
-    "application_url": "https://example.com/apply",
-    "job_title": "Software Engineer",
-    "company_name": "University of Otago",
-    "application_date": "2024-08-26T14:30:00Z",
-    "status": "Pending",
-    "notes": "Submitted resume and cover letter."
-}
 
 # Sample update data for the application
 update_application_data = {
@@ -26,33 +6,40 @@ update_application_data = {
     'status': 'Interviewed',
     'notes': 'Had an interview with the hiring manager.'
 }
-
-@pytest.fixture
-def client() -> FlaskClient:
-    app.testing = True
-    with app.test_client() as client:
-        yield client
-
-@pytest.fixture
-def login(client):
-    # Perform login and yield user ID and auth token for other tests
-    response = client.post('/users/login', json=login_data)
-    assert response.status_code == 200
-    user_id = response.json['user_id']
-    basic_auth_token = response.json['basic_auth_token']
-    yield user_id, basic_auth_token
     
 @pytest.fixture
 def get_application(client, login):
     
     user_id, basic_auth_token = login
     headers = {'Authorization': f"Basic {basic_auth_token}"}
-    # Fetch all applications for the user
+    # Fetch application for the user
     response = client.get(f'/applications/user/{user_id}', headers=headers)
     
     assert response.status_code == 200
     application_id = response.json[0]['id']
     yield application_id
+    
+def test_create_experience(client, login, create_user):
+    create_response = create_user
+    user_id, basic_auth_token = login
+    headers = {'Authorization': f"Basic {basic_auth_token}"}
+    
+    # Sample job application data
+    application_data = {
+        "user_id": f"{user_id}",
+        "application_url": "https://example.com/apply",
+        "job_title": "Software Engineer",
+        "company_name": "University of Otago",
+        "application_date": "2024-08-26T14:30:00Z",
+        "status": "Pending",
+        "notes": "Submitted resume and cover letter."
+    }
+    
+    # Create Experience
+    response = client.post(f'/applications', json=application_data, headers=headers)
+    
+    assert create_response == 201
+    assert response.status_code == 201
 
 # Test fetching a job application by ID
 def test_get_application(client, login, get_application):
@@ -66,7 +53,7 @@ def test_get_application(client, login, get_application):
     response = client.get(f'/applications/{application_id}', headers=headers)
 
     assert response.status_code == 200
-    assert response.json[0]['job_title'] == application_data['job_title']
+    assert response.json[0]['job_title'] == "Software Engineer"
 
 # Test updating a job application
 def test_update_application(client, login, get_application):
@@ -94,3 +81,15 @@ def test_get_applications_by_user(client, login):
 
     assert response.status_code == 200
     assert len(response.json) > 0
+
+def test_delete_application(client, login, get_application):
+    
+    user_id, basic_auth_token = login
+    headers = {'Authorization': f"Basic {basic_auth_token}"}
+
+    application_id = get_application
+
+    # Delete the application
+    response = client.delete(f'/applications/{application_id}', headers=headers)
+    
+    assert response.status_code == 200

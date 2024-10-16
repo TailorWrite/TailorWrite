@@ -1,8 +1,3 @@
-import pytest
-from flask.testing import FlaskClient
-from flask import Flask
-from app import app
-from config import TestConfig
 
 login_data = {
         'email': 'test@test.com',
@@ -19,21 +14,6 @@ user_data = {
     "phone": "1234567890"
   }
 }
-
-@pytest.fixture
-def client() -> FlaskClient:
-    app.testing = True
-    with app.test_client() as client:     
-        yield client
-        
-@pytest.fixture
-def login(client):
-    # Perform login and yield user ID and auth token for other tests
-    response = client.post('/users/login', json=login_data)
-    assert response.status_code == 200
-    user_id = response.json['user_id']
-    basic_auth_token = response.json['basic_auth_token']
-    yield user_id, basic_auth_token
     
 def test_create_user(client):
     

@@ -1,53 +1,10 @@
 import pytest
-from flask.testing import FlaskClient
-from flask import Flask
-from app import app
-
-# Sample login data for authentication
-login_data = {
-    'email': 'user@example.com',
-    'password': 'securepassword123'
-}
 
 # Sample update data for the skill
 update_skills_data = {
     "skill_name": "Software Development",
     "proficiency_level": "Expert"
 }
-
-@pytest.fixture
-def client() -> FlaskClient:
-    app.testing = True
-    with app.test_client() as client:
-        yield client
-        
-@pytest.fixture
-def create_user(client):
-    # Create a user for testing purposes
-    user_data = {
-    "email": "test@test.com",
-    "password": "securepassword123",
-    "account_info": {
-    "first_name": "Test",
-    "last_name": "Subject",
-    "bio": "Developer at XYZ Company",
-    "phone": "1234567890"
-    }
-    }
-    
-    response = client.post('/users', json=user_data)
-    
-    assert response.status_code == 201
-    yield response.status_code
-
-@pytest.fixture
-def login(client):
-    # Perform login and yield user ID and auth token for other tests
-    response = client.post('/users/login', json=login_data)
-    assert response.status_code == 200
-    user_id = response.json['user_id']
-    basic_auth_token = response.json['basic_auth_token']
-    yield user_id, basic_auth_token
     
 @pytest.fixture
 def get_skills(client, login):
@@ -130,9 +87,3 @@ def test_delete_skills(client, login, get_skills):
     response = client.delete(f'/skills/{skill_id}', headers=headers)
     
     assert response.status_code == 200
-    
-    response_client = client.delete(f'/users/{user_id}', headers=headers)
-
-    response_data = response_client.get_json()
-
-    assert response_data['message'] == "User deleted successfully"
