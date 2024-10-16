@@ -38,7 +38,9 @@ export default function ApplicationDetails() {
         // Timer to allow the drawer to close before navigating
         setTimeout(() => {
             // Check if the user is still on the application details page
-            if (location.pathname === PathConstants.NEW_APPLICATION) navigate(PathConstants.APPLICATIONS)
+            const isAnApplication = location.pathname.includes(`${PathConstants.APPLICATIONS}/`)
+
+            if (isAnApplication) navigate(PathConstants.APPLICATIONS)
         }, 200);
     }
 
