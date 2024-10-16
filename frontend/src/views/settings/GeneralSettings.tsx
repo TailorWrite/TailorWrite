@@ -7,13 +7,16 @@ import axios from 'axios'
 import clsx from 'clsx'
 
 import DataDisplay, { DataDisplayRow } from '../../components/common/DataDisplay'
-import lightModeImage from '../../assets/lightMode.png'
-import darkModeImage from '../../assets/darkMode.png'
 import { APIConstants } from '../../pathConstants'
 import { headers } from '../../api'
-
 import { useDarkMode } from '../../hooks/useDarkMode'
 
+
+import lightModeImage from '../../assets/lightMode.png'
+import darkModeImage from '../../assets/darkMode.png'
+import professionalCoverLetterImage from '../../assets/professionalCoverLetter.jpeg'
+import modernCoverLetterImage from '../../assets/modernCoverLetter.jpeg'
+import simpleCoverLetterImage from '../../assets/simpleCoverLetter.jpeg'
 
 export interface GeneralSettingsProps {
     coverLetter?: string;
@@ -346,20 +349,20 @@ const CoverLetterTemplateOptions: CoverLetterTemplate[] = [
     {
         title: 'Professional',
         author: 'Rajib Das Bhagat',
-        image: 'https://writelatex.s3.amazonaws.com/published_ver/24156.jpeg?X-Amz-Expires=14400&X-Amz-Date=20240922T035749Z&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAWJBOALPNFPV7PVH5/20240922/us-east-1/s3/aws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=9a43b24cd2b7ffaf1ce768583fcf0ccea5d61b4e27abb64768fdcdf33ca6eb29',
+        image: professionalCoverLetterImage,
         link: 'https://www.overleaf.com/latex/templates/job-application-cover-letter/jgbntsgkcvvz'
     }, 
     {
         title: 'Modern',
         description: '',
         author: 'Apurv Mishra',
-        image: 'https://writelatex.s3.amazonaws.com/published_ver/14620.jpeg?X-Amz-Expires=14400&X-Amz-Date=20240922T035944Z&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAWJBOALPNFPV7PVH5/20240922/us-east-1/s3/aws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=3e813c9b3eb2f78161792d0d1a3e065e02bdd5f747e78a090d044ba02045f31a',
+        image: modernCoverLetterImage,
         link: 'https://www.overleaf.com/latex/templates/deedy-cover-letter/yhdwrhyvqjwy',
     },
     {
         title: 'Simple',
         author: 'Vebjørn S. Førde',
-        image: 'https://writelatex.s3.amazonaws.com/published_ver/27439.jpeg?X-Amz-Expires=14400&X-Amz-Date=20240922T041718Z&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAWJBOALPNFPV7PVH5/20240922/us-east-1/s3/aws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=740e67e01453164962d9472d59368193638d7c9296cd11832feefa47206de908',
+        image: simpleCoverLetterImage,
         link: 'https://www.overleaf.com/latex/templates/job-application-letter/yztqhwkcbnsf'
     },
 ];
@@ -371,6 +374,12 @@ const CoverLetterTemplate = () => {
     const [selected, setSelected] = useState(initialTemplateObject);
 
     const handleTemplateSelection = (option: CoverLetterTemplate) => {
+
+        if (CoverLetterTemplateOptions.slice(1).includes(option)) {
+            toast('🚀 Feature coming soon... Implement template selection for generating cover letters')
+            return;
+        }
+
         setSelected(option);
         sessionStorage.setItem('template', JSON.stringify(option));
     };
