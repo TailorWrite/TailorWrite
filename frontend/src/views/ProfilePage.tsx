@@ -16,7 +16,12 @@ import { useLoaderData } from 'react-router-dom';
 import * as types from '../types';
 
 const formatDate = (date: Date) => {
-  return new Date(date.toString()).toLocaleDateString('en-US', {
+  if (date == undefined) {
+    date = new Date
+  } else {
+    date = new Date(date.toString());
+  }
+  return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -245,7 +250,12 @@ export function SkillForm({ index, initialData = {} }: { index: number, initialD
 
 function EducationForm({ index, initialData }: { index: number, initialData: types.EducationData}) {
   const formatDate = (date: Date) => {
-    return new Date(date.toString()).toLocaleDateString('en-US', {
+    if (date == undefined) {
+      date = new Date
+    } else {
+      date = new Date(date.toString());
+    }
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

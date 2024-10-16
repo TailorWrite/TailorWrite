@@ -177,18 +177,17 @@ class JobApplicationDocuments(Resource):
             data = {
                     "application_id": application_id,
                     "link": path,
-                    "size": f"{round(document.content_length / 1024, 2)} KB",
+                    "size": f"{round(request.content_length / 1024, 2)} KB",
                     "name": document.filename
                 }
-            print(document)
-            print(data)
             create_file_upload(data)
+            return {'data': data}, 200
         except:
             return {'error': 'Failed to upload document'}, 400
         
 
 
-    @token_required
+    @token_required 
     @applications_ns.doc(security='apikey')
     @applications_ns.response(200, 'Success', [application_model])
     @applications_ns.response(404, 'No job applications found')
