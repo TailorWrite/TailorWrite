@@ -48,6 +48,8 @@ const APIConstants = {
 
     APPLICATIONS_SCRAPE: `${API_BASE_URL}/applications/scrape`,
 
+    ALL_COVER_LETTERS: (user_id: string) => `${API_BASE_URL}/cover-letter/user/${user_id}`,
+
 
 }
 

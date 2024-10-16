@@ -1,6 +1,9 @@
 import os
 import subprocess
 import requests
+import json
+import datetime
+import pytz
 from flask_restx import Namespace, Resource, fields
 from flask import request, jsonify, send_file
 from models.authentication import token_required
@@ -9,16 +12,9 @@ from models.education import get_educations_by_user
 from models.experience import get_experiences_by_user
 from models.skills import get_skills_by_user
 from models.applications import get_application
-import json
+from models.cover_letters import *
 from config import Config
 
-import datetime
-import pytz
-from flask_restx import Namespace, Resource, fields
-from flask import request, jsonify
-from models.cover_letters import create_cover_letter, get_cover_letter, update_cover_letter, delete_cover_letter, get_cover_letters_by_application
-from models.applications import get_application
-from models.authentication import token_required
 
 # Define the namespace
 cover_letters_ns = Namespace('cover_letters', description='Cover Letter operations')
@@ -62,6 +58,21 @@ class CoverLetterList(Resource):
         try:
             response = create_cover_letter(data)
             return {'message': 'Cover letter created successfully', 'CoverLetter_id': response.data[0]['id']}, 201
+        except Exception as e:
+            return {'error': str(e)}, 400
+
+@cover_letters_ns.route('/user/<string:user_id>')
+class CoverLetterListByUser(Resource):
+    @token_required
+    @cover_letters_ns.response(200, 'Success', [cover_letter_model])
+    @cover_letters_ns.response(404, 'No cover letters found')
+    @cover_letters_ns.response(403, 'Forbidden')
+    def get(self, user_id, token_user_id):
+        """Fetch all cover letters for a specific user"""
+        if user_id != token_user_id:
+            return "Not allowed"
+        try:
+            return jsonify(get_cover_letters_by_user(user_id)["data"])
         except Exception as e:
             return {'error': str(e)}, 400
 
@@ -257,6 +268,7 @@ class GeneratePDFClass(Resource):
     @cover_letters_ns.response(400, 'Bad Request')
     @cover_letters_ns.response(500, 'Internal Server Error')
     def post(self, application_id, token_user_id):
+        """Generate a PDF from a cover letter"""
         data = request.json
         user_id = data["user_id"]
         cover_letter_text = data["content"]
@@ -299,6 +311,11 @@ def GeneratePDF(generated_text, user_data, application_data, style):
         content = content.replace("INSERT-LOCATION-HERE", f"")
         
         content = content.replace("INSERT-JOB-TITLE-HERE", application_data['job_title'])
+        
+        # Replace all & with \& to escape them in LaTeX
+        content = content.replace("&", "\&")
+
+
         output.write(content)
 
     # Compile the LaTeX file to PDF
@@ -317,4 +334,4 @@ def GeneratePDF(generated_text, user_data, application_data, style):
     except subprocess.CalledProcessError as e:
         return {"error": f"LaTeX compilation failed: {str(e)}"}, 500
     except Exception as e:
-            return {'error': 'Failed to connect to cover letter generation service', 'details': str(e)}, 500
+        return {'error': 'Failed to connect to cover letter generation service', 'details': str(e)}, 500

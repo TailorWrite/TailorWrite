@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
-import { ApplicationData } from '../types';
+import { toast } from 'react-toastify';
 
+import { ApplicationData } from '../types';
 
 
 export default function ArchivePage() {
@@ -10,7 +11,18 @@ export default function ArchivePage() {
     console.log("loaderData:", loaderData)
 
     // Manage the data with useState
-    const [data, setData] = useState<ApplicationData[]>(loaderData);
+    const [data, ] = useState<ApplicationData[]>(loaderData);
+
+    const handleDownloadCoverLetter = (id: string) => {
+        const toastId = toast.loading(`Downloading cover letter ${id}...`);
+
+        // Implement the download logic here
+
+        // Remove the toast after 3 seconds
+        setTimeout(() => {
+            toast.dismiss(toastId);
+        }, 3000);
+    }
 
     // Render the archive table
     return (
@@ -31,7 +43,7 @@ export default function ArchivePage() {
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200 dark:bg-neutral-800 dark:divide-neutral-700">
                             {
-                                data.map(({ id, job_title, company_name, application_date, status }, index) => (
+                                data.map(({ id, job_title, company_name, application_date, status }) => (
                                     <tr key={id}> {/* Use id directly since it is already destructured */}
                                         <td className="px-6 py-4 whitespace-nowrap">{id}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{job_title}</td>
@@ -39,11 +51,12 @@ export default function ArchivePage() {
                                         <td className="px-6 py-4 whitespace-nowrap">{application_date}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{status}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <button
-                                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                                onClick={() => handleButtonClick(id)}  // Handle button click for each row
+                                            <p 
+                                                className="font-bold text-blue-600 decoration-2 hover:underline focus:outline-none focus:underline dark:text-blue-500"
+                                                onClick={() => handleDownloadCoverLetter(id)}  // Handle button click for each row
                                             >
-                                            </button>
+                                                Download
+                                            </p>
                                         </td>
                                     </tr>
                                 ))
