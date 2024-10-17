@@ -25,4 +25,4 @@ def get_cover_letters_by_application(application_id):
     return supabase.table('cover_letters').select('*').eq('application_id', application_id).order(column='updated_at', desc=True).execute()
 
 def get_cover_letters_by_user(user_id):
-    return supabase.table('cover_letters').select('*, job_applications(*)').eq('job_applications.user_id', user_id).execute()
+    return supabase.table('cover_letters').select('*, job_applications!inner(*)').eq('job_applications.user_id', user_id).execute()
