@@ -10,7 +10,7 @@ import { Bounce, toast } from "react-toastify";
 import { redirect } from "react-router-dom";
 
 import { parseDateString } from "./utils";
-import { AxiosError } from "./types";
+import { AxiosError, RegisterFormData } from "./types";
 import { headers } from "./api";
 import { APIConstants } from "./pathConstants";
 
@@ -96,11 +96,85 @@ export async function handleLogin({ request }: { request: Request }) {
     }
 }
 
+export async function handleRegister({ request }: { request: Request }) {
+    const toastId = toast.loading('Registering...');
+
+    const formData = await request.formData();
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirm-password") as string;
+    const firstName = formData.get("first-name") as string;
+    const lastName = formData.get("last-name") as string;
+
+    if (!email || !password || !confirmPassword || !firstName || !lastName) {
+        toast.update(toastId, {
+            render: 'All fields are required',
+            type: 'info',
+            ...toastSettings,
+        });
+
+        return { error: "All fields are required." };
+    }
+
+    if (password !== confirmPassword) {
+        toast.update(toastId, {
+            render: 'Passwords do not match',
+            type: 'info',
+            ...toastSettings,
+        });
+
+        return { error: "Passwords do not match." };
+    }
+
+    const payload: RegisterFormData = {
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword,
+        terms: true, 
+        account_info: {
+            first_name: firstName,
+            last_name: lastName,
+            bio: "",
+            phone: "",
+        }
+    };
+
+    try {
+        const response = await axios.post(APIConstants.REGISTER, payload);
+
+        if (!response.data) {
+            const errorMessage = response.data.error || "Failed to register.";
+            console.log("Error:", errorMessage);
+            return { error: errorMessage };
+        }
+
+        toast.update(toastId, {
+            render: 'Registration successful',
+            type: 'success',
+            ...toastSettings,
+        });
+
+        return redirect("/login");
+    }
+
+    catch (error) {
+        const errorMessage = (error as AxiosError).response.data.error || "Failed to register.";
+
+        toast.update(toastId, {
+            render: errorMessage,
+            type: 'error',
+            ...toastSettings,
+        });
+
+        return { error: errorMessage };
+    }
+}
+
 
 export async function handleAddApplication({ request }: { request: Request }) {
     const toastId = toast.loading('Uploading application...');
     const userId = sessionStorage.getItem("user_id");
-    
+
     const formData = await request.formData();
 
     // Extract form fields from formData
@@ -141,7 +215,7 @@ export async function handleAddApplication({ request }: { request: Request }) {
     };
 
     try {
-        const response = await axios.post(APIConstants.APPLICATIONS, payload, { headers });
+        const response = await axios.post(APIConstants.APPLICATIONS, payload, { headers: headers() });
 
         if (!response.data) {
             const errorMessage = response.data.error || "Failed to add application.";
@@ -195,12 +269,6 @@ export async function handleApplicationSubmit({ request }: { request: Request })
         default:
             return handleUpdateApplication({ request: requestPassOn });
     }
-
-    // if ( intent == "delete") {
-    //     return handleDeleteApplication({ request: requestPassOn });
-    // }
-
-    // return handleUpdateApplication({ request: requestPassOn });
 }
 
 export async function handleUpdateApplication({ request }: { request: Request }): Promise<{ error?: string; success?: string }> {
@@ -247,7 +315,7 @@ export async function handleUpdateApplication({ request }: { request: Request })
     };
 
     try {
-        const response = await axios.put(APIConstants.APPLICATION(applicationId), payload, { headers });
+        const response = await axios.put(APIConstants.APPLICATION(applicationId), payload, { headers: headers() });
 
         if (!response.data) {
             const errorMessage = response.data.error || "Failed to update application.";
@@ -299,7 +367,7 @@ export async function handleDeleteApplication({ request }: { request: Request })
     const applicationId = formData.get("id") as string;
 
     try {
-        const response = await axios.delete(APIConstants.APPLICATION(applicationId), { headers });
+        const response = await axios.delete(APIConstants.APPLICATION(applicationId), { headers: headers() });
 
         if (!response.data) {
             const errorMessage = response.data.error || "Failed to delete application.";
@@ -368,8 +436,6 @@ export async function handleUploadApplicationDocument({ request }: ActionProps):
         size: size
     };
 
-    console.log("Payload:", payload);
-
     try {
         const response = await axios.post(
             APIConstants.DOCUMENTS(applicationId), 
@@ -383,8 +449,12 @@ export async function handleUploadApplicationDocument({ request }: ActionProps):
         );
 
         if (!response.data) {
-            const errorMessage = response.data.error || "Failed to upload document.";
-            console.log("Error:", errorMessage);
+            toast.update(toastId, {
+                render: 'Document upload failed',
+                type: 'error',
+                ...toastSettings,
+            });
+            const errorMessage = "Failed to upload document.";
             return { error: errorMessage };
         }
 
@@ -452,7 +522,7 @@ export async function handleProfile({ request }: { request: Request }): Promise<
     async function makeAPIRequest(url: string, method: 'POST' | 'PUT', data: any) {
         const response = await fetch(url, {
             method,
-            headers: headers,
+            headers: headers(),
             body: JSON.stringify(data),
         });
         return response.json();

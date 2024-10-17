@@ -9,6 +9,19 @@ export const suppressMissingAttributes = {
 // Exporting Types
 export type ApplicationStatus = "Applied" | "Interview" | "Offer" | "Rejected";
 
+export interface RegisterFormData {
+    email: string;
+    password: string;
+    confirmPassword: string;
+    terms: boolean;
+    account_info: {
+        first_name: string;
+        last_name: string;
+        bio: string;
+        phone: string;
+    };
+}
+
 // Exporting Interfaces
 export interface UserProfile {
     name: string,
@@ -41,6 +54,7 @@ export interface ApplicationData {
     application_url: string,
     notes?: string,
     documents?: ApplicationDocuments[],
+    cover_letter?: any,
 }
 
 export interface ExperienceData {

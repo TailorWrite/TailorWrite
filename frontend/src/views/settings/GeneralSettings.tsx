@@ -1,14 +1,22 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { PaperClipIcon } from '@heroicons/react/20/solid'
 import { toast } from 'react-toastify'
+import axios from 'axios'
 import clsx from 'clsx'
 
 import DataDisplay, { DataDisplayRow } from '../../components/common/DataDisplay'
+import { APIConstants } from '../../pathConstants'
+import { headers } from '../../api'
+import { useDarkMode } from '../../hooks/useDarkMode'
+
+
 import lightModeImage from '../../assets/lightMode.png'
 import darkModeImage from '../../assets/darkMode.png'
-
+import professionalCoverLetterImage from '../../assets/professionalCoverLetter.jpeg'
+import modernCoverLetterImage from '../../assets/modernCoverLetter.jpeg'
+import simpleCoverLetterImage from '../../assets/simpleCoverLetter.jpeg'
 
 export interface GeneralSettingsProps {
     coverLetter?: string;
@@ -52,13 +60,13 @@ interface ThemeOption {
 }
 
 const Appearance = () => {
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const [isDarkMode, setIsDarkMode] = useDarkMode();
 
     const ThemeOptions: ThemeOption[] = [
         {
             title: 'System',
             description: 'Match your system appearance',
-            image: systemTheme === 'dark' ? darkModeImage : lightModeImage,
+            image: isDarkMode ? darkModeImage : lightModeImage,
         },
         {
             title: 'Light Mode',
@@ -71,22 +79,108 @@ const Appearance = () => {
             image: darkModeImage,
         }
     ];
-    
+
     const initialTheme = sessionStorage.getItem('theme');
     const initialThemeObject = initialTheme ? JSON.parse(initialTheme) : ThemeOptions[0];
 
     const [selected, setSelected] = useState(initialThemeObject);
+
+    useEffect(() => {
+        if (selected.title === 'System') {
+            setIsDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+        } else {
+            setIsDarkMode(selected.title === 'Dark Mode');
+        }
+    }, [selected, setIsDarkMode]);
 
     const handleThemeSelection = (option: ThemeOption) => {
         setSelected(option);
         sessionStorage.setItem('theme', JSON.stringify(option));
     };
 
-
     return (
         <div className="grid gap-x-10 grid-cols sm:grid-cols-2 lg:grid-cols-3">
 
-            {ThemeOptions.map((option) => (
+            <div
+                key={ThemeOptions[1].title}
+                className="flex flex-col focus:outline-none hover:cursor-pointer"
+                onClick={() => handleThemeSelection(ThemeOptions[0])}
+            >
+                <div className={clsx(
+                    "relative flex flex-col rounded-xl bg-gray-300/20 aspect-[1.54/1]",
+                    selected.title === ThemeOptions[0].title ? 'border-4 border-primaryDarkAccent' : 'border-4 border-gray-300 dark:border-darkBorder',
+                )}>
+                    <span
+                        className={clsx(
+                            "absolute p-1 z-10 -top-2 -right-2 bg-primaryDarkAccent rounded-full transition-all duration-300 ease-in-out",
+                            selected.title === ThemeOptions[0].title ? 'opacity-100' : 'opacity-0',
+                        )} >
+                        <CheckIcon className="size-3 text-white" />
+                    </span>
+
+                    <div className="flex flex-row size-full rounded-lg overflow-hidden">
+                        <div className="relative h-full w-1/2 overflow-hidden border-r-2 border-gray-300 dark:border-darkBorder ">
+                                <div className="absolute top-7 start-7">
+
+                                    <figure className="ms-auto me-20 relative z-[1] max-w-full w-[50rem] h-auto shadow-[0_2.75rem_3.5rem_-2rem_rgb(45_55_75_/_20%),_0_0_5rem_-2rem_rgb(45_55_75_/_15%)] dark:shadow-[0_2.75rem_3.5rem_-2rem_rgb(0_0_0_/_20%),_0_0_5rem_-2rem_rgb(0_0_0_/_15%)] rounded-b-lg">
+                                        <div className={clsx(
+                                            "relative flex items-center h-6 max-w-[50rem] rounded-t-lg px-32 ",
+                                            ThemeOptions[1].image.includes('light') ? 'bg-neutral-200' : 'bg-secondaryDark/95'
+                                        )}>
+                                            <div className="flex gap-x-1 absolute top-2/4 start-4 -translate-y-1">
+                                                <span className="size-2 bg-[#FF605C] rounded-full"></span>
+                                                <span className="size-2 bg-[#FFBD44] rounded-full"></span>
+                                                <span className="size-2 bg-[#00CA4E] rounded-full"></span>
+                                            </div>
+                                            <div className={clsx(
+                                                "flex justify-center items-center w-full h-3 my-4 text-[.25rem] text-gray-400 rounded-sm sm:text-[.5rem] dark:text-neutral-400",
+                                                ThemeOptions[1].image.includes('light') ? 'bg-neutral-300' : 'bg-primaryDark'
+                                            )}>
+                                                <span>www.tailorwrite.com</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-gray-800 rounded-b-lg">
+                                            <img className="max-w-full h-auto rounded-b-lg pr-[40%]" src={ThemeOptions[1].image} alt="Browser Placeholder" />
+                                        </div>
+                                    </figure>
+                                </div>
+                        </div>
+                        <div className="relative h-full w-1/2 overflow-hidden ">
+                            <div className="absolute top-7 start-7">
+
+                                <figure className="ms-auto me-20 relative z-[1] max-w-full w-[50rem] h-auto shadow-[0_2.75rem_3.5rem_-2rem_rgb(45_55_75_/_20%),_0_0_5rem_-2rem_rgb(45_55_75_/_15%)] dark:shadow-[0_2.75rem_3.5rem_-2rem_rgb(0_0_0_/_20%),_0_0_5rem_-2rem_rgb(0_0_0_/_15%)] rounded-b-lg">
+                                    <div className="relative flex items-center h-6 max-w-[50rem] rounded-t-lg px-32 bg-secondaryDark/95">
+                                        <div className="flex gap-x-1 absolute top-2/4 start-4 -translate-y-1">
+                                            <span className="size-2 bg-[#FF605C] rounded-full"></span>
+                                            <span className="size-2 bg-[#FFBD44] rounded-full"></span>
+                                            <span className="size-2 bg-[#00CA4E] rounded-full"></span>
+                                        </div>
+                                        <div className="flex justify-center items-center w-full h-3 my-4 text-[.25rem] text-gray-400 rounded-sm sm:text-[.5rem] dark:text-neutral-400 bg-primaryDark">
+                                            <span>www.tailorwrite.com</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-gray-800 rounded-b-lg">
+                                        <img className="max-w-full h-auto rounded-b-lg pr-[40%]" src={ThemeOptions[2].image} alt="Browser Placeholder" />
+                                    </div>
+                                </figure>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mt-3">
+                    <p className="font-bold text-gray-800 dark:text-primaryDarkText">
+                        {ThemeOptions[1].title}
+                    </p>
+                    <p className="font-normal text-gray-400 dark:text-secondaryDarkText">
+                        {ThemeOptions[1].description}
+                    </p>
+                </div>
+            </div>
+
+            {ThemeOptions.slice(1).map((option) => (
                 <div
                     key={option.title}
                     className="flex flex-col focus:outline-none hover:cursor-pointer"
@@ -94,18 +188,14 @@ const Appearance = () => {
                 >
                     <div className={clsx(
                         "relative flex flex-col rounded-xl bg-gray-300/20 aspect-[1.54/1]",
-                        // option.title.includes('Light') ? 'bg-gray-300/20' : 'bg-primaryDark'
                         selected.title === option.title ? 'border-4 border-primaryDarkAccent' : 'border-4 border-gray-300 dark:border-darkBorder',
                     )}>
-
-                        <span 
-                            // Implemented this way to preserve the transition effect
+                        <span
                             className={clsx(
                                 "absolute p-1 z-10 -top-2 -right-2 bg-primaryDarkAccent rounded-full transition-all duration-300 ease-in-out",
-                                // Highlight the selected theme
                                 selected.title === option.title ? 'opacity-100' : 'opacity-0',
                             )} >
-                            <CheckIcon className="size-3 text-white"/>
+                            <CheckIcon className="size-3 text-white" />
                         </span>
 
                         <div className="relative size-full overflow-hidden">
@@ -133,7 +223,6 @@ const Appearance = () => {
                                     </div>
                                 </figure>
                             </div>
-
                         </div>
                     </div>
 
@@ -153,23 +242,62 @@ const Appearance = () => {
 
 const CoverLetter = ({ coverLetter }: { coverLetter?: string }) => {
 
-    const updateCoverLetter = () => {
+    const coverLetterTextArea = useRef<HTMLTextAreaElement>(null)
+
+    const updateCoverLetter = async () => {
+        const userId = sessionStorage.getItem('user_id') ?? ''
+
         const toastId = toast.loading('Saving cover letter...')
-        setTimeout(() => {
+
+        const payload = {
+            coverLetter: coverLetterTextArea.current?.value
+        }
+
+        try {
+            const response = await axios.put(APIConstants.USER_COVER_LETTER(userId), payload, { headers: headers() })
+
+            if (response.status !== 200) {
+                throw new Error('Failed to save cover letter. Please try again.')
+            }
+
             toast.update(toastId, {
                 type: 'success',
-                isLoading: false,
                 render: 'Cover letter saved successfully!',
+                isLoading: false,
                 autoClose: 2000,
             })
-        }, 2000)
+
+        } catch (error) {
+            toast.update(toastId, {
+                type: 'error',
+                render: 'Failed to save cover letter. Please try again.',
+                isLoading: false,
+                autoClose: 2000,
+            })
+        }
     }
+
+    useEffect(() => {
+        // Get the the user cover letter 
+        const userId = sessionStorage.getItem('user_id') ?? ''
+
+        axios.get(APIConstants.USER_COVER_LETTER(userId), { headers: headers() })
+            .then((response) => {
+                if (response.status === 200) {
+                    coverLetterTextArea.current!.value = response.data.cover_letter
+                }
+            })
+            .catch((error) => {
+                console.error('Failed to fetch cover letter:', error)
+            })
+    }) 
 
     return (
         <div className="max-w-4xl">
 
             <div className="relative">
                 <textarea
+                    ref={coverLetterTextArea}
                     className="p-4 pb-20 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-primaryDark dark:border-darkBorder dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
                     placeholder="Paste your cover letter here to get started"
                     defaultValue={coverLetter ?? ''}
@@ -181,9 +309,10 @@ const CoverLetter = ({ coverLetter }: { coverLetter?: string }) => {
 
                             <label className="inline-flex shrink-0 justify-center items-center size-8 rounded-lg text-gray-500 hover:bg-gray-100 focus:z-10 focus:outline-none focus:bg-gray-100 dark:text-neutral-500 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 cursor-pointer">
                                 <input
-                                    type="file"
+                                    // type="file"
+                                    type="button"
                                     className="hidden"
-                                    onChange={() => toast('🚀 Feature coming soon... Implement word scraping from pdf document')}
+                                    onClick={() => toast('🚀 Feature coming soon... Implement word scraping from pdf document')}
                                 />
                                 <PaperClipIcon className="shrink-0 size-4" />
                             </label>
@@ -220,20 +349,20 @@ const CoverLetterTemplateOptions: CoverLetterTemplate[] = [
     {
         title: 'Professional',
         author: 'Rajib Das Bhagat',
-        image: 'https://writelatex.s3.amazonaws.com/published_ver/24156.jpeg?X-Amz-Expires=14400&X-Amz-Date=20240922T035749Z&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAWJBOALPNFPV7PVH5/20240922/us-east-1/s3/aws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=9a43b24cd2b7ffaf1ce768583fcf0ccea5d61b4e27abb64768fdcdf33ca6eb29',
+        image: professionalCoverLetterImage,
         link: 'https://www.overleaf.com/latex/templates/job-application-cover-letter/jgbntsgkcvvz'
     }, 
     {
         title: 'Modern',
         description: '',
         author: 'Apurv Mishra',
-        image: 'https://writelatex.s3.amazonaws.com/published_ver/14620.jpeg?X-Amz-Expires=14400&X-Amz-Date=20240922T035944Z&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAWJBOALPNFPV7PVH5/20240922/us-east-1/s3/aws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=3e813c9b3eb2f78161792d0d1a3e065e02bdd5f747e78a090d044ba02045f31a',
+        image: modernCoverLetterImage,
         link: 'https://www.overleaf.com/latex/templates/deedy-cover-letter/yhdwrhyvqjwy',
     },
     {
         title: 'Simple',
         author: 'Vebjørn S. Førde',
-        image: 'https://writelatex.s3.amazonaws.com/published_ver/27439.jpeg?X-Amz-Expires=14400&X-Amz-Date=20240922T041718Z&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAWJBOALPNFPV7PVH5/20240922/us-east-1/s3/aws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=740e67e01453164962d9472d59368193638d7c9296cd11832feefa47206de908',
+        image: simpleCoverLetterImage,
         link: 'https://www.overleaf.com/latex/templates/job-application-letter/yztqhwkcbnsf'
     },
 ];
@@ -245,6 +374,12 @@ const CoverLetterTemplate = () => {
     const [selected, setSelected] = useState(initialTemplateObject);
 
     const handleTemplateSelection = (option: CoverLetterTemplate) => {
+
+        if (CoverLetterTemplateOptions.slice(1).includes(option)) {
+            toast('🚀 Feature coming soon... Implement template selection for generating cover letters')
+            return;
+        }
+
         setSelected(option);
         sessionStorage.setItem('template', JSON.stringify(option));
     };
