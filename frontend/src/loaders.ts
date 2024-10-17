@@ -23,12 +23,24 @@ export async function applicationLoader({ params }: LoaderFunctionArgs) {
     const fetchApplication = async () => {
         try {
             const response = await axios.get(APIConstants.APPLICATION(uuid), { headers: headers() });
-
+            
             if (!response.data) {
                 throw new Error(`Failed to fetch application with id = ${uuid}`);
             }
-            
-            return response.data[0];
+            let data = response.data[0]
+            try {
+                const coverLettersResponse = await axios.get(APIConstants.APPLICATION_COVER_LETTERS(uuid), { headers: headers() })
+                let content = coverLettersResponse.data[0].content
+                const payload = {
+                    user_id: sessionStorage.getItem('user_id'),
+                    content: content
+                }
+                const fileResponse = await axios.post(APIConstants.COVER_LETTER_PDF(uuid), payload, { headers: headers(), responseType: 'blob' }).then(response => response.data)
+                data.cover_letter = fileResponse
+            } catch {
+                return data
+            }
+            return data;
         }
         catch (error) {
             const errorMessage = (error as AxiosError).response?.data?.error || "Failed to fetch application.";
@@ -46,6 +58,25 @@ export async function allApplicationLoader() {
     try {
         const response = await axios.get(APIConstants.ALL_APPLICATIONS(user_id), { headers: headers() });
 
+        if (!response.data) {
+            return json({ error: "Failed to fetch applications." });
+        }
+
+        return json(response.data);
+    }
+    catch (error) {
+        const errorMessage = (error as AxiosError).response.data.error || "Failed to fetch applications.";
+
+        console.error(errorMessage);
+        return json([]);
+    }
+}
+
+export async function archiveLoader() {
+    const user_id = sessionStorage.getItem('user_id') ?? 'no-id'; 
+
+    try {
+        const response = await axios.get(APIConstants.ALL_COVER_LETTERS(user_id), { headers: headers() });
         if (!response.data) {
             return json({ error: "Failed to fetch applications." });
         }
@@ -128,4 +159,4 @@ export async function profileLoader() {
     }
 
 
-}
+};

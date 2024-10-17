@@ -26,7 +26,7 @@ const formatDate = (date: Date) => {
     month: 'long',
     day: 'numeric',
   });
-};
+}; 
 
 function ExperienceForm({ index, initialData }: {index: number, initialData: types.ExperienceData}) {
   const [formData, setFormData] = useState({
@@ -46,7 +46,6 @@ function ExperienceForm({ index, initialData }: {index: number, initialData: typ
   }, [formData.is_current_job]);
 
   const handleInputChange = (event: { target: { name: any; value: any; type: any; }; }) => {
-    debugger
     const { name, value, } = event.target;
     setFormData(prevData => ({
       ...prevData,
@@ -86,7 +85,7 @@ function ExperienceForm({ index, initialData }: {index: number, initialData: typ
               id={`job_title-${index}`}
               name={`job_title-${index}`}
               type="text"
-              defaultValue={formData.job_title}
+              defaultValue={formData.job_title ?? ""}
               onChange={handleInputChange}
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               required
@@ -103,7 +102,7 @@ function ExperienceForm({ index, initialData }: {index: number, initialData: typ
               id={`company_name-${index}`}
               name={`company_name-${index}`}
               type="text"
-              defaultValue={formData.company_name}
+              defaultValue={formData.company_name ?? ""}
               onChange={handleInputChange}
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               required
@@ -132,7 +131,7 @@ function ExperienceForm({ index, initialData }: {index: number, initialData: typ
             <DatePicker
               id={`experience-start_date-${index}`}
               name={`experience-start_date-${index}`}
-              defaultValue={new Date(formData.start_date)}
+              defaultValue={new Date(formData.start_date) ?? ""}
               onChange={(date: Date | null) => handleDateChange(date ?? new Date(), 'start_date')}
               placeholder="Start Date"
               className="block w-full rounded-md py-1.5 text-gray-900"
@@ -148,7 +147,7 @@ function ExperienceForm({ index, initialData }: {index: number, initialData: typ
             <DatePicker
               id={`experience-end_date-${index}`}
               name={`experience-end_date-${index}`}
-              defaultValue={new Date(formData.end_date)}
+              defaultValue={new Date(formData.end_date) ?? ""}
               onChange={(date: Date | null | Date) => handleDateChange(date ?? new Date(), 'end_date')}
               placeholder="End Date"
               className="block w-full rounded-md py-1.5 text-gray-900"
@@ -164,7 +163,7 @@ function ExperienceForm({ index, initialData }: {index: number, initialData: typ
             name={`experience-description-${index}`}
             maxLength={2000}
             rows={4}
-            defaultValue={formData.description}
+            defaultValue={formData.description ?? ""}
             onChange={handleInputChange}
             className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
@@ -214,7 +213,7 @@ export function SkillForm({ index, initialData = {} }: { index: number, initialD
               id={`skill_name-${index}`}
               name={`skill_name-${index}`}
               type="text"
-              defaultValue={formData.skill_name}
+              defaultValue={formData.skill_name ?? ""}
               onChange={handleInputChange}
               autoComplete="skill"
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -235,7 +234,7 @@ export function SkillForm({ index, initialData = {} }: { index: number, initialD
               id={`proficiency_level-${index}`}
               name={`proficiency_level-${index}`}
               type="text"
-              defaultValue={formData.proficiency_level}
+              defaultValue={formData.proficiency_level ?? ""}
               onChange={handleInputChange}
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               required
@@ -260,7 +259,7 @@ function EducationForm({ index, initialData }: { index: number, initialData: typ
       month: 'long',
       day: 'numeric',
     });
-  }; 
+  };
 
   const [formData, setFormData] = useState({
     id: initialData.id || '',
@@ -311,7 +310,7 @@ function EducationForm({ index, initialData }: { index: number, initialData: typ
               id={`institution_name-${index}`}
               name={`institution_name-${index}`}
               type="text"
-              defaultValue={formData.institution_name}
+              defaultValue={formData.institution_name ?? ""}
               onChange={handleInputChange}
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               required
@@ -328,7 +327,7 @@ function EducationForm({ index, initialData }: { index: number, initialData: typ
               id={`degree-${index}`}
               name={`degree-${index}`}
               type="text"
-              defaultValue={formData.degree}
+              defaultValue={formData.degree ?? ""}
               onChange={handleInputChange}
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
@@ -344,7 +343,7 @@ function EducationForm({ index, initialData }: { index: number, initialData: typ
               id={`field_of_study-${index}`}
               name={`field_of_study-${index}`}
               type="text"
-              defaultValue={formData.field_of_study}
+              defaultValue={formData.field_of_study ?? ""}
               onChange={handleInputChange}
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
@@ -358,7 +357,7 @@ function EducationForm({ index, initialData }: { index: number, initialData: typ
             <DatePicker
               id={`education_start_date-${index}`}
               name={`education_start_date-${index}`}
-              defaultValue={new Date(formData.start_date)}
+              defaultValue={new Date(formData.start_date) ?? ""}
               onChange={(date: Date | null) => handleDateChange(date ?? new Date(), 'start_date')}
               placeholder="Start Date"
               className="block w-full rounded-md py-1.5 text-gray-900"
@@ -374,7 +373,7 @@ function EducationForm({ index, initialData }: { index: number, initialData: typ
             <DatePicker
               id={`education_end_date-${index}`}
               name={`education_end_date-${index}`}
-              defaultValue={new Date(formData.end_date)}
+              defaultValue={new Date(formData.end_date) ?? ""}
               onChange={(date: Date | null) => handleDateChange(date ?? new Date(), 'end_date')}
               placeholder="End Date"
               className="block w-full rounded-md py-1.5 text-gray-900"
@@ -394,7 +393,7 @@ function EducationForm({ index, initialData }: { index: number, initialData: typ
             <textarea
               id={`education_description_${index}`}
               name={`education_description_${index}`}
-              defaultValue={formData.description}
+              defaultValue={formData.description ?? ""}
               onChange={handleInputChange}
               maxLength={2000}
               rows={4}
@@ -484,7 +483,7 @@ export default function ProfilePage() {
                   type="text"
                   autoComplete="given-name"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  defaultValue={data.get('user').first_name}
+                  defaultValue={data.get('user').first_name ?? ""}
                 />
               </div>
             </div>
@@ -501,7 +500,7 @@ export default function ProfilePage() {
                   type="text"
                   autoComplete="family-name"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  defaultValue={data.get('user').last_name}
+                  defaultValue={data.get('user').last_name ?? ""}
                 />
               </div>
             </div>
@@ -519,7 +518,7 @@ export default function ProfilePage() {
                   autoComplete="email"
                   readOnly
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  defaultValue={data.get('user').email}
+                  defaultValue={data.get('user').email ?? ""}
                 />
               </div>
             </div>

@@ -1,6 +1,7 @@
 import { Form, Link } from 'react-router-dom';
 
 import { Logo } from '../components/icons';
+import PathConstants from '../pathConstants';
 
 export default function LoginPage() {    
 
@@ -67,7 +68,7 @@ export default function LoginPage() {
 
                     <p className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
                         Not a member?{' '}
-                        <Link to="/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+                        <Link to={PathConstants.SIGNUP} className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
                             Create an account now!
                         </Link>
                     </p>

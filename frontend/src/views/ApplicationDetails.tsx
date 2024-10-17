@@ -1,5 +1,5 @@
 import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Link, Form, useNavigate, useLoaderData, useSubmit, Await, useLocation, useAsyncValue, useActionData } from 'react-router-dom';
+import { Link, Form, useNavigate, useLoaderData, useSubmit, Await, useLocation, useAsyncValue } from 'react-router-dom'
 import { Dialog, DialogBackdrop, DialogPanel, Field, Menu, MenuButton, MenuItem, MenuItems, Textarea } from '@headlessui/react';
 import { PlusIcon, CheckIcon, ChevronDownIcon, ClockIcon, LinkIcon, CalendarDaysIcon, PaperClipIcon } from '@heroicons/react/20/solid';
 import { ArrowDownTrayIcon, ArrowPathIcon, DocumentTextIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -7,6 +7,7 @@ import { BuildingOffice2Icon, NoSymbolIcon, TrashIcon } from '@heroicons/react/2
 import { Breadcrumbs, Drawer, Timeline, TimelineBody, TimelineConnector, TimelineHeader, TimelineIcon, TimelineItem } from '@material-tailwind/react';
 import { Bounce, toast } from 'react-toastify';
 import { Document, Page } from 'react-pdf';
+import axios from 'axios';
 import clsx from 'clsx';
 
 
@@ -22,21 +23,25 @@ import { appendHttpsToLink, formatDate, getCompanyLogoUrl } from '../utils';
 
 import PathConstants, { APIConstants } from '../pathConstants';
 import { ApplicationAction, ApplicationData, ApplicationDocuments, ApplicationStatus, suppressMissingAttributes } from '../types';
-import axios from 'axios';
 import { headers } from '../api';
 
 
 export default function ApplicationDetails() {
     const navigate = useNavigate();
+    const location = useLocation();
     const data = useLoaderData() as { application: ApplicationData };
-
 
 
     const [showDrawer, setShowDrawer] = useState(true);
     const handleCloseDrawer = () => {
         setShowDrawer(false);
         // Timer to allow the drawer to close before navigating
-        setTimeout(() => navigate(PathConstants.APPLICATIONS), 200);
+        setTimeout(() => {
+            // Check if the user is still on the application details page
+            const isAnApplication = location.pathname.includes(`${PathConstants.APPLICATIONS}/`)
+
+            if (isAnApplication) navigate(PathConstants.APPLICATIONS)
+        }, 200);
     }
 
     const isNewApplication = useLocation().pathname === PathConstants.NEW_APPLICATION;
@@ -84,6 +89,7 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
     const isNewApplication = location.pathname === PathConstants.NEW_APPLICATION;
     const [applicationData] = useState<ApplicationData>(application ?? {} as ApplicationData);
     applicationData.img = getCompanyLogoUrl(applicationData.company_name);
+    const currentCoverLetter = (applicationData.cover_letter) ? URL.createObjectURL(applicationData.cover_letter) : null;
 
     const [selectedStatus, setSelectedStatus] = useState<ApplicationStatus>(applicationData.status as ApplicationStatus ?? "Applied");
     const handleStatusSelect = (status: ApplicationStatus) => setSelectedStatus(status)
@@ -206,7 +212,7 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
         <>
             <Form method="post" className="relative h-full ">
                 
-                <div className="absolute z-50 bottom-0 left-0 mb-5 ml-5 flex flex-row gap-x-5 md:hidden">
+                <div className="fixed z-50 bottom-0 left-0 mb-5 ml-5 flex flex-row gap-x-5 md:hidden">
                     <ApplicationButtons applicationData={applicationData} />
                 </div>
 
@@ -397,7 +403,7 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
 
                     <div className="flex flex-col gap-y-10">
                         {/* Cover Letter */}
-                        <CoverLetterSection application={applicationData} />
+                        <CoverLetterSection document={currentCoverLetter} application={application} />
 
                         {/* Actions section */}
                         <section className="row-span-2 sm:order-last md:order-none">
@@ -497,8 +503,7 @@ interface DocumentUploadProps {
 
 const DocumentUploadSection = ({ applicationData, documents }: DocumentUploadProps) => {
     const submit = useSubmit();
-    const actionData = useActionData();
-    console.log('actionData:', actionData);
+    // const actionData = useActionData();      // Used for updating the file upload status
 
     const [allDocuments, setAllDocuments] = useState<ApplicationDocuments[]>(documents)
 
@@ -617,16 +622,18 @@ const DocumentUploadSection = ({ applicationData, documents }: DocumentUploadPro
 
 
 interface CoverLetterProps {
-    document?: string;
+    document?: string | null;
     application: ApplicationData;
 }
 const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
-
     const downloadLinkRef = useRef<HTMLAnchorElement>(null);
     const coverLetterContainerRef = useRef<HTMLDivElement>(null);
-    const [file, setFile] = useState<string | undefined>(document);
+    const [file, setFile] = useState<string | undefined>(document ?? "");
     const [coverLetterPageHeight, setCoverLetterPageHeight] = useState<number>(0);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false); 
+    // const fileTemp = new Blob([application.cover_letter], { type: 'application/pdf' });
+    // const fileURL = URL.createObjectURL(fileTemp);
+    // setFile(fileURL);
 
     // When the page loads and window resizes, set the width of the page
     useEffect(() => {
@@ -644,9 +651,8 @@ const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
     }, [file]);
 
     const handleGenerateCoverLetter = () => {
-        const toastId = toast('Generating cover letter...', { autoClose: false });
+        const toastId = toast.loading('Generating cover letter...', { autoClose: false });
         // Get the cover letter from the server
-        console.log(application.id)
         const payload = {
             user_id: sessionStorage.getItem('user_id'),
             application_id: application.id
@@ -734,11 +740,10 @@ const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
                         <DocumentTextIcon aria-hidden="true" className="mx-auto h-12 w-12 text-gray-300 dark:text-secondaryDarkText" />
                         <div className="mt-4 flex text-sm leading-6">
                             <label
-                                htmlFor="file-upload"
+                                htmlFor="generate-cover-letter"
                                 className="relative cursor-pointer rounded-md font-semibold text-primaryLightAccent focus-within:outline-none focus-within:ring-2 focus-within:ring-primaryLightAccent focus-within:ring-offset-2 hover:text-indigo-500 dark:text-primaryDarkAccent"
                             >
-                                <span onClick={handleGenerateCoverLetter}>Generate</span>
-                                {/* <input id="file-upload" name="file-upload" type="file" className="sr-only" /> */}
+                                <span className="z-50" onClick={handleGenerateCoverLetter}>Generate</span>
                             </label>
                             <p className="pl-1">a cover letter here</p>
                         </div>
@@ -769,7 +774,6 @@ const CoverLetterModal = ({ file, open, onClose, onDownload }: CoverLetterModalP
     const updatePageWidth = useCallback(() => {
         if (coverLetterModalContainerRef.current) {
             const width = coverLetterModalContainerRef.current.offsetWidth;
-            console.log("Width: ", width);
             setCoverLetterPageWidth(width);
         }
     }, []);
@@ -781,9 +785,6 @@ const CoverLetterModal = ({ file, open, onClose, onDownload }: CoverLetterModalP
     }, [open]);
 
     useLayoutEffect(() => {
-        console.log('Calculating width');
-        console.log('Open:', open, 'Mounted:', isModalMounted);
-
         if (open && isModalMounted) {
             // Add a small delay to ensure the DOM has rendered
             const timer = setTimeout(() => {

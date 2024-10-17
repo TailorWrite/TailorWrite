@@ -174,7 +174,7 @@ export async function handleRegister({ request }: { request: Request }) {
 export async function handleAddApplication({ request }: { request: Request }) {
     const toastId = toast.loading('Uploading application...');
     const userId = sessionStorage.getItem("user_id");
-    
+
     const formData = await request.formData();
 
     // Extract form fields from formData
@@ -418,7 +418,6 @@ export async function handleUploadApplicationDocument({ request }: ActionProps):
     // Extract form fields from formData
     const document = formData.get("document");
     const size = formData.get("size");
-    debugger
     const applicationId = formData.get("application_id") as string;
 
     // Perform validation or API request
@@ -448,7 +447,6 @@ export async function handleUploadApplicationDocument({ request }: ActionProps):
                 }
             }
         );
-        debugger;
 
         if (!response.data) {
             toast.update(toastId, {

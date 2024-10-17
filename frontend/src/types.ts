@@ -54,6 +54,7 @@ export interface ApplicationData {
     application_url: string,
     notes?: string,
     documents?: ApplicationDocuments[],
+    cover_letter?: any,
 }
 
 export interface ExperienceData {

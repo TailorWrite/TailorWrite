@@ -11,7 +11,6 @@ import requests
 from bs4 import BeautifulSoup
 import io
 
-# from config import Config
 from models.applications import create_application, get_application, update_application, delete_application, get_applications_by_user, create_file_upload, get_file_uploads_by_application
 from models.authentication import token_required
 
@@ -40,7 +39,6 @@ update_application_model = applications_ns.model('UpdateJobApplication', {
     'notes': fields.String(required=False, description='Additional notes', example='Submitted resume and cover letter.')
 })
 
-from flask_restx import fields
 
 upload_model = applications_ns.model('UploadModel', {
     'file_data': fields.String(required=True, description='Base64 encoded file content'),
@@ -280,7 +278,6 @@ class WebscrapeJobApplication(Resource):
                 'statusCode': response.status_code,
                 'body': f"Failed to retrieve the page. Status code: {response.status_code}"
             }
-
 
 def upload_document_to_supabase(user_id, application_id, document) -> dict: 
     """
