@@ -19,7 +19,7 @@ jobs:
         working-directory: frontend
         run: |
           npm install
-          npm run build
+          npm run build:gh-pages
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.0
