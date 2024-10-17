@@ -4,7 +4,7 @@ from flask_restx import Api
 from routes import register_routes
 from dotenv import load_dotenv
 load_dotenv()
-from config import Config
+from config import Config, TestConfig
 
 
 authorizations = {

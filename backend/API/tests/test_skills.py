@@ -5,7 +5,7 @@ update_skills_data = {
     "skill_name": "Software Development",
     "proficiency_level": "Expert"
 }
-    
+
 @pytest.fixture
 def get_skills(client, login):
     
@@ -18,7 +18,7 @@ def get_skills(client, login):
     skills_id = response.json[0]['id']
     yield skills_id
 
-def test_create_skill(client, login, create_user):
+def test_create_skill(client, create_user, login):
     create_response = create_user
     user_id, basic_auth_token = login
     headers = {'Authorization': f"Basic {basic_auth_token}"}
@@ -83,7 +83,13 @@ def test_delete_skills(client, login, get_skills):
 
     skill_id = get_skills
 
-    # Update the skill
+    # Delete the skill
     response = client.delete(f'/skills/{skill_id}', headers=headers)
     
     assert response.status_code == 200
+        
+    response_client = client.delete(f'/users/{user_id}', headers=headers)
+
+    response_data = response_client.get_json()
+
+    assert response_data["message"] == "User deleted successfully"

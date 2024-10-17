@@ -9,20 +9,20 @@ update_experience_data = {
     "end_date": "2024-08-30",
      "description": "A Junior Software Engineer at OpenAI focusing on Backend Dev"
 }
-    
+
 @pytest.fixture
 def get_experience(client, login):
     
     user_id, basic_auth_token = login
     headers = {'Authorization': f"Basic {basic_auth_token}"}
-    # Fetch experience for the user
+    # Fetch all skills for the user
     response = client.get(f'/experiences/user/{user_id}', headers=headers)
     
     assert response.status_code == 200
-    experience_id = response.json[0]['id']
-    yield experience_id
+    skills_id = response.json[0]['id']
+    yield skills_id
     
-def test_create_experience(client, login, create_user):
+def test_create_experience(client, create_user, login):
     create_response = create_user
     user_id, basic_auth_token = login
     headers = {'Authorization': f"Basic {basic_auth_token}"}
@@ -95,3 +95,9 @@ def test_delete_experience(client, login, get_experience):
     response = client.delete(f'/experiences/{experience_id}', headers=headers)
     
     assert response.status_code == 200
+        
+    response_client = client.delete(f'/users/{user_id}', headers=headers)
+
+    response_data = response_client.get_json()
+
+    assert response_data["message"] == "User deleted successfully"

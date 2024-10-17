@@ -19,7 +19,7 @@ def get_education(client, login):
     education_id = response.json[0]['id']
     yield education_id
     
-def test_create_education(client, login, create_user):
+def test_create_education(client, create_user, login):
     create_response = create_user
     user_id, basic_auth_token = login
     headers = {'Authorization': f"Basic {basic_auth_token}"}
@@ -82,14 +82,20 @@ def test_get_educations_by_user(client, login):
     assert response.status_code == 200
     assert len(response.json) > 0
 
-def test_delete_experience(client, login, get_experience):
+def test_delete_education(client, login, get_education):
     
     user_id, basic_auth_token = login
     headers = {'Authorization': f"Basic {basic_auth_token}"}
 
-    experience_id = get_experience
+    education_id = get_education
 
     # Delete the experience
-    response = client.delete(f'/experiences/{experience_id}', headers=headers)
+    response = client.delete(f'/educations/{education_id}', headers=headers)
     
     assert response.status_code == 200
+        
+    response_client = client.delete(f'/users/{user_id}', headers=headers)
+
+    response_data = response_client.get_json()
+
+    assert response_data["message"] == "User deleted successfully"

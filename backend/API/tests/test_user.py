@@ -74,19 +74,9 @@ def test_update_user(client, login):
     assert response.json['last_name'] == 'Test'
     
 # Test Delete User  
-def test_delete_user(client, login):
-    # Get login credentials
-    user_id, basic_auth_token = login
+def test_delete_user(cleanup):
 
-    # Set authorization header
-    headers = {
-        'Authorization': f"Basic {basic_auth_token}"
-    }
+    response_data = cleanup
 
-    # Send DELETE request to delete the user
-    response = client.delete(f'/users/{user_id}', headers=headers)
-
-    response_data = response.get_json()
-
-    assert response_data['message'] == "User deleted successfully"
+    assert response_data == "User deleted successfully"
     

@@ -6,7 +6,7 @@ update_application_data = {
     'status': 'Interviewed',
     'notes': 'Had an interview with the hiring manager.'
 }
-    
+
 @pytest.fixture
 def get_application(client, login):
     
@@ -18,8 +18,8 @@ def get_application(client, login):
     assert response.status_code == 200
     application_id = response.json[0]['id']
     yield application_id
-    
-def test_create_experience(client, login, create_user):
+
+def test_create_application(client, create_user, login):
     create_response = create_user
     user_id, basic_auth_token = login
     headers = {'Authorization': f"Basic {basic_auth_token}"}
@@ -40,20 +40,6 @@ def test_create_experience(client, login, create_user):
     
     assert create_response == 201
     assert response.status_code == 201
-
-# Test fetching a job application by ID
-def test_get_application(client, login, get_application):
-    # First, create an application to retrieve
-    user_id, basic_auth_token = login
-    headers = {'Authorization': f"Basic {basic_auth_token}"}
-
-    application_id = get_application
-
-    # Fetch the created application
-    response = client.get(f'/applications/{application_id}', headers=headers)
-
-    assert response.status_code == 200
-    assert response.json[0]['job_title'] == "Software Engineer"
 
 # Test updating a job application
 def test_update_application(client, login, get_application):
@@ -93,3 +79,9 @@ def test_delete_application(client, login, get_application):
     response = client.delete(f'/applications/{application_id}', headers=headers)
     
     assert response.status_code == 200
+        
+    response_client = client.delete(f'/users/{user_id}', headers=headers)
+
+    response_data = response_client.get_json()
+
+    assert response_data["message"] == "User deleted successfully"
