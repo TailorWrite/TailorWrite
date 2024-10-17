@@ -89,6 +89,7 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
     const isNewApplication = location.pathname === PathConstants.NEW_APPLICATION;
     const [applicationData] = useState<ApplicationData>(application ?? {} as ApplicationData);
     applicationData.img = getCompanyLogoUrl(applicationData.company_name);
+    const currentCoverLetter = (applicationData.cover_letter) ? URL.createObjectURL(applicationData.cover_letter) : null;
 
     const [selectedStatus, setSelectedStatus] = useState<ApplicationStatus>(applicationData.status as ApplicationStatus ?? "Applied");
     const handleStatusSelect = (status: ApplicationStatus) => setSelectedStatus(status)
@@ -402,7 +403,7 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
 
                     <div className="flex flex-col gap-y-10">
                         {/* Cover Letter */}
-                        <CoverLetterSection application={applicationData} />
+                        <CoverLetterSection document={currentCoverLetter} application={application} />
 
                         {/* Actions section */}
                         <section className="row-span-2 sm:order-last md:order-none">
@@ -625,12 +626,14 @@ interface CoverLetterProps {
     application: ApplicationData;
 }
 const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
-
     const downloadLinkRef = useRef<HTMLAnchorElement>(null);
     const coverLetterContainerRef = useRef<HTMLDivElement>(null);
     const [file, setFile] = useState<string | undefined>(document);
     const [coverLetterPageHeight, setCoverLetterPageHeight] = useState<number>(0);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false); 
+    // const fileTemp = new Blob([application.cover_letter], { type: 'application/pdf' });
+    // const fileURL = URL.createObjectURL(fileTemp);
+    // setFile(fileURL);
 
     // When the page loads and window resizes, set the width of the page
     useEffect(() => {
@@ -650,7 +653,6 @@ const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
     const handleGenerateCoverLetter = () => {
         const toastId = toast.loading('Generating cover letter...', { autoClose: false });
         // Get the cover letter from the server
-        console.log(application.id)
         const payload = {
             user_id: sessionStorage.getItem('user_id'),
             application_id: application.id
