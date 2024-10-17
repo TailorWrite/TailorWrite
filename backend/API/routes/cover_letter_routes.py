@@ -73,7 +73,9 @@ class CoverLetterListByUser(Resource):
         if user_id != token_user_id:
             return "Not allowed"
         try:
-            return jsonify(get_cover_letters_by_user(user_id)["data"])
+            response = get_cover_letters_by_user(user_id)
+            print(len(response.data))
+            return jsonify(response.data)
         except Exception as e:
             return {'error': str(e)}, 400
 
