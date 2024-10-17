@@ -622,13 +622,13 @@ const DocumentUploadSection = ({ applicationData, documents }: DocumentUploadPro
 
 
 interface CoverLetterProps {
-    document?: string;
+    document?: string | null;
     application: ApplicationData;
 }
 const CoverLetterSection = ({ document, application }: CoverLetterProps) => {
     const downloadLinkRef = useRef<HTMLAnchorElement>(null);
     const coverLetterContainerRef = useRef<HTMLDivElement>(null);
-    const [file, setFile] = useState<string | undefined>(document);
+    const [file, setFile] = useState<string | undefined>(document ?? "");
     const [coverLetterPageHeight, setCoverLetterPageHeight] = useState<number>(0);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false); 
     // const fileTemp = new Blob([application.cover_letter], { type: 'application/pdf' });
