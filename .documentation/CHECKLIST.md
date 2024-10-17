@@ -1,0 +1,7 @@
+- [ ] Installation Guide 
+- [ ] User Guide - Using the app 
+- [ ] Technical Documentation 
+- [ ] Current Processes 
+  - Static Analysis 
+  - Continuous Integration 
+- [ ] Deployment Architecture 
