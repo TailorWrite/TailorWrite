@@ -5,7 +5,7 @@ from app import create_app
 from config import TestConfig
 
 @pytest.fixture
-def client(login) -> FlaskClient:
+def client(login) -> FlaskClient: # type: ignore
     app = create_app(TestConfig)
     app.testing = True
     with app.test_client() as client: 
