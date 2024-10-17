@@ -46,7 +46,6 @@ function ExperienceForm({ index, initialData }: {index: number, initialData: typ
   }, [formData.is_current_job]);
 
   const handleInputChange = (event: { target: { name: any; value: any; type: any; }; }) => {
-    debugger
     const { name, value, } = event.target;
     setFormData(prevData => ({
       ...prevData,

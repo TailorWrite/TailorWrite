@@ -503,7 +503,6 @@ interface DocumentUploadProps {
 const DocumentUploadSection = ({ applicationData, documents }: DocumentUploadProps) => {
     const submit = useSubmit();
     // const actionData = useActionData();      // Used for updating the file upload status
-    // console.log('actionData:', actionData);
 
     const [allDocuments, setAllDocuments] = useState<ApplicationDocuments[]>(documents)
 
@@ -773,7 +772,6 @@ const CoverLetterModal = ({ file, open, onClose, onDownload }: CoverLetterModalP
     const updatePageWidth = useCallback(() => {
         if (coverLetterModalContainerRef.current) {
             const width = coverLetterModalContainerRef.current.offsetWidth;
-            console.log("Width: ", width);
             setCoverLetterPageWidth(width);
         }
     }, []);
@@ -785,9 +783,6 @@ const CoverLetterModal = ({ file, open, onClose, onDownload }: CoverLetterModalP
     }, [open]);
 
     useLayoutEffect(() => {
-        console.log('Calculating width');
-        console.log('Open:', open, 'Mounted:', isModalMounted);
-
         if (open && isModalMounted) {
             // Add a small delay to ensure the DOM has rendered
             const timer = setTimeout(() => {
