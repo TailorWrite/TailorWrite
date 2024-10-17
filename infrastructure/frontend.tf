@@ -21,19 +21,19 @@
 # }
 
 # Updating the .env.production file with the backend Elastic IP address
-resource "local_file" "frontend_config" {
-    content  = <<-EOT
-        VITE_API_BASE_PATH=http://${aws_eip.backend_eip.public_ip}
-    EOT
-    filename = "${path.module}/../frontend/.env.production"
+# resource "local_file" "frontend_config" {
+#     content  = <<-EOT
+#         VITE_API_BASE_PATH=http://${aws_eip.backend_eip.public_ip}
+#     EOT
+#     filename = "${path.module}/../frontend/.env.production"
 
-    depends_on = [aws_eip.backend_eip]
-}
+#     depends_on = [aws_eip.backend_eip]
+# }
 
 
 # Provisioning just a basic S3 bucket 
 resource "aws_s3_bucket" "frontend" {
-    bucket = "${var.project_name}-frontend"
+    bucket = "${var.project_name}-website"
 }
 
 # Configuring the bucket to host a static website
@@ -92,11 +92,11 @@ resource "aws_s3_object" "upload_object" {
     content_type = each.value.content_type
 
     # Ensure the upload occurs after the build
-    depends_on = [
-        local_file.frontend_config,
-        # null_resource.build_frontend,
-        # module.template_files
-    ]
+    # depends_on = [
+    #     local_file.frontend_config,
+    #     # null_resource.build_frontend,
+    #     # module.template_files
+    # ]
 }
 
 
