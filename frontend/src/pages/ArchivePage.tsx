@@ -11,7 +11,7 @@ interface ArchiveData {
     application_id: string,
     content: string,
     created_at: string,
-    id: Number,
+    id: number,
     job_applications: ApplicationData,
     updated_at: string
 }
@@ -53,7 +53,7 @@ export default function ArchivePage() {
                     anchor.href = fileURL;
                     
                     // Set the file name for the download
-                    const fileTitle = job_title.replaceAll(" ", "");
+                    const fileTitle = job_title.replace(" ", "");
                     anchor.download = `${fileTitle}_cover-letter.pdf`;
                 
                     // Append the anchor to the body

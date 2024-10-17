@@ -1,9 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires, no-undef
-const withMT = require("@material-tailwind/react/utils/withMT");
-// eslint-disable-next-line @typescript-eslint/no-var-requires, no-undef
-const tailwindColors = require("tailwindcss/colors");
+import withMT from "@material-tailwind/react/utils/withMT";
+import tailwindColors from "tailwindcss/colors";
 
 export default withMT({
   darkMode: 'class',
