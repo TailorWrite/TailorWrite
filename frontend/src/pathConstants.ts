@@ -3,7 +3,7 @@ const PathConstants = {
     BASENAME: '/',
     HOME: '/',
     LOGIN: '/login',
-    SIGNUP: '/signup',
+    SIGNUP: '/register',
     
     DASHBOARD: '/dashboard',
     APPLICATIONS: '/dashboard/applications',
@@ -28,6 +28,7 @@ const APIConstants = {
 
     // User routes
     USER: (uuid: string) => `${API_BASE_URL}/users/${uuid}`,
+    USER_COVER_LETTER: (uuid: string) => `${API_BASE_URL}/users/${uuid}/cover-letter`,
 
     APPLICATIONS: `${API_BASE_URL}/applications`,
     APPLICATION: (application_id: string) => `${API_BASE_URL}/applications/${application_id}`,
@@ -46,6 +47,10 @@ const APIConstants = {
     COVER_LETTER_GENERATE: `${API_BASE_URL}/cover-letter/generate`,
 
     APPLICATIONS_SCRAPE: `${API_BASE_URL}/applications/scrape`,
+
+    ALL_COVER_LETTERS: (user_id: string) => `${API_BASE_URL}/cover-letter/user/${user_id}`,
+    APPLICATION_COVER_LETTERS: (application_id: string) => `${API_BASE_URL}/cover-letter/application/${application_id}`,
+    COVER_LETTER_PDF: (application_id: string) => `${API_BASE_URL}/cover-letter/${application_id}/pdf`,
 }
 
 export default PathConstants;

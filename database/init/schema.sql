@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS accounts (
     first_name VARCHAR(100),
     last_name VARCHAR(100),
     bio TEXT,
+    cover_letter TEXT DEFAULT '',
     profile_picture_url TEXT,
     phone VARCHAR(20),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
@@ -78,5 +79,16 @@ CREATE TABLE IF NOT EXISTS file_uploads (
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS cover_letters (
+    id INT NOT NULL,
+    application_id INT REFERENCES job_applications(id) ON DELETE CASCADE,
+    content TEXT,  -- The cover letter content
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    -- Composite primary key to ensure unique id within an application
+    PRIMARY KEY (application_id, id)
+);
+
 
 DROP FUNCTION IF EXISTS public.handle_new_user;

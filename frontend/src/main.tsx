@@ -17,12 +17,13 @@ import SettingsLayout from './layouts/SettingsLayout';
 import ProfilePage from './views/ProfilePage';
 import DashboardHome from './views/DashboardHome';
 import ApplicationDetails from './views/ApplicationDetails';
+import ArchivePage from './pages/ArchivePage';
 import GeneralSettings from './views/settings/GeneralSettings';
 import DataSettings from './views/settings/DataSettings';
 
 import PathConstants from './pathConstants';
-import { handleAddApplication, handleApplicationSubmit, handleLogin, handleProfile } from './actions';
-import { allApplicationLoader, applicationLoader, profileLoader } from './loaders';
+import { handleAddApplication, handleApplicationSubmit, handleLogin, handleProfile, handleRegister } from './actions';
+import { allApplicationLoader, applicationLoader, profileLoader, archiveLoader } from './loaders';
 
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
@@ -48,6 +49,7 @@ const router = createBrowserRouter([
       {
         path: PathConstants.SIGNUP,
         element: <SignupPage />,
+        action: handleRegister,
       },
     ]
   },
@@ -81,14 +83,14 @@ const router = createBrowserRouter([
           },
         ]
       },
-
       {
         path: PathConstants.GENERATE,
         element: <NotFound />,
       },
       {
         path: PathConstants.ARCHIVE,
-        element: <NotFound />,
+        element: <ArchivePage />,
+        loader: archiveLoader
       },
       {
         path: PathConstants.SETTINGS,

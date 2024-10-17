@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
-import { Card, CardHeader, Input, Typography, Button, CardBody, CardFooter, Tabs, TabsHeader, Tab, Avatar } from "@material-tailwind/react";
+import { Card, CardHeader, Input, Typography, Button, CardBody, CardFooter, Tabs, TabsHeader, Tab } from "@material-tailwind/react";
 import { MagnifyingGlassIcon, ChevronUpDownIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 
 import { ApplicationData, ApplicationStatus, suppressMissingAttributes } from "../types";
 import { formatDate, getCompanyLogoUrl } from "../utils";
 import BasicChip, { Color } from "../components/common/BasicChip";
+import CompanyLogo from "../components/common/CompanyLogo";
 
 const FILTER_TABS = [
     { label: "All", value: "all" },
@@ -133,7 +134,7 @@ export default function ApplicationTracker() {
                                         <tr key={index} onClick={viewApplication} className="hover:cursor-pointer border-b dark:border-darkBorder">
                                             <td className="p-4">
                                                 <div className="flex items-center gap-4">
-                                                    {imgUrl && (<Avatar src={imgUrl} alt={company_name} size="sm" {...suppressMissingAttributes} />)}
+                                                    <CompanyLogo url={imgUrl} alt={company_name} /> 
                                                     <div className="flex flex-col">
                                                         <Typography
                                                             variant="small"
