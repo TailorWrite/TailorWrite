@@ -7,9 +7,9 @@ name: tailorwrite
 
 # Include the docker-compose file for a locally hosted supabase database 
 # Reffer to https://github.com/JamesRobionyRogers/Assignment01-VirtualisingSoftware for more information
-# include: 
-#   - path: 
-#     - ./database/docker-compose.yml
+include: 
+  - path: 
+    - ./database/docker-compose.yml
 
 services:
   frontend:

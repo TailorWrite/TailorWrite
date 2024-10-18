@@ -4,12 +4,12 @@
 #   Stop:           docker compose down
 #   Destroy:        docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down -v --remove-orphans
 
-name: supabase-cloud
+name: supabase-local
 # version: "3.8"
 
 services:
   studio:
-    container_name: supabase-studio
+    container_name: supabase-studio-local
     image: supabase/studio:20240729-ce42139
     restart: unless-stopped
     healthcheck:
@@ -48,7 +48,7 @@ services:
       # NEXT_ANALYTICS_BACKEND_PROVIDER: bigquery
 
   kong:
-    container_name: supabase-kong
+    container_name: supabase-kong-local
     image: kong:2.8.1
     restart: unless-stopped
     # https://unix.stackexchange.com/a/294837
@@ -76,7 +76,7 @@ services:
       - ./volumes/api/kong.yml:/home/kong/temp.yml:ro
 
   auth:
-    container_name: supabase-auth
+    container_name: supabase-auth-local
     image: supabase/gotrue:v2.158.1
     depends_on:
       db:
@@ -148,7 +148,7 @@ services:
 
 
   rest:
-    container_name: supabase-rest
+    container_name: supabase-rest-local
     image: postgrest/postgrest:v12.2.0
     depends_on:
       db:
@@ -272,7 +272,7 @@ services:
   #     - ./volumes/storage:/var/lib/storage:z
 
   meta:
-    container_name: supabase-meta
+    container_name: supabase-meta-local
     image: supabase/postgres-meta:v0.83.2
     depends_on:
       db:
@@ -355,7 +355,7 @@ services:
 
   # Comment out everything below this point if you are using an external Postgres database
   db:
-    container_name: supabase-db
+    container_name: supabase-db-local
     image: supabase/postgres:15.1.1.78
     healthcheck:
       test: pg_isready -U postgres -h localhost
