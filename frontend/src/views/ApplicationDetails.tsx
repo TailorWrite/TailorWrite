@@ -137,9 +137,6 @@ const ApplicationView = ({ setShowDrawer }: ApplicationViewProps) => {
         // Scrape the job description from the application URL
         const toastId = toast.loading('🔍 Scraping job description...', { autoClose: false });
         try {
-            const lambdaFunctionUrl = import.meta.env.VITE_LAMBDA_WEB_SCRAPING_URL;
-            if (!lambdaFunctionUrl) return;
-
             const payload = { url: url };
             const response = await axios.post(APIConstants.APPLICATIONS_SCRAPE, payload);
 
