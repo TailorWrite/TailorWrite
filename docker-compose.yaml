@@ -23,3 +23,7 @@ services:
     build: ./backend/api
     ports:
       - "5001:5001"
+
+  init-db:
+    build: ./database/init
+    env_file: ./database/.env
