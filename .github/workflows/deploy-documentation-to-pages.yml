@@ -1,0 +1,37 @@
+name: Deploy Documentation to GitHub Pages
+
+on:
+  workflow_dispatch:
+    
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install
+        working-directory: ./documentation
+      - name: Build
+        run: pnpm run build
+        working-directory: ./documentation
+      - name: Export
+        run: pnpm run export
+        working-directory: ./documentation
+      - name: Add .nojekyll file
+        run: touch ./documentation/out/.nojekyll
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: documentation/out

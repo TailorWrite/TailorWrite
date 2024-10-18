@@ -21,8 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt
-          pip install pytest
+          pip install -r backend/API/requirements.txt
 
       - name: Display Python version and installed packages
         run: |
@@ -31,8 +30,7 @@ jobs:
 
       - name: Run tests
         run: |
-          cd backend
-          python -m pytest
+          pytest backend/API/tests
 
       - name: Debug if tests fail
         if: failure()

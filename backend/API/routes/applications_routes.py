@@ -154,7 +154,7 @@ class JobApplicationsByUser(Resource):
             else:
                 return [], 200
         except Exception as e:
-            return {'error': str(e)}, 400
+            return {'error': str(e)}, 401
 
 
 @applications_ns.route('/<int:application_id>/documents')
