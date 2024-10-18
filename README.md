@@ -39,7 +39,7 @@ Running the project locally requires Docker to be installed on your machine.
 
 1. Clone the Repository using the following command:
 ```sh
-git clone https://github.com/TailorWrite/TailorWrite.git
+git clone -b deploy-local https://github.com/TailorWrite/TailorWrite.git
 ```
 
 2. Change into the project directory:
