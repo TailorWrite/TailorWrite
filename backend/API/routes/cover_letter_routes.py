@@ -338,17 +338,14 @@ def GeneratePDF(generated_text, user_data, application_data, style):
         output.write(content)
 
     # Compile the LaTeX file to PDF
-    output_pdf_path = f"{OUTPUT_BASE_PATH}/cover_letter.pdf"[4:]
+    output_pdf_path = f"{OUTPUT_BASE_PATH}/cover_letter.pdf"
     try:
         subprocess.run(['pdflatex', '-interaction=nonstopmode', '-output-directory', OUTPUT_BASE_PATH, output_tex_path], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        
         # Clean up auxiliary files
         for ext in ['.aux', '.log', '.out']:
             aux_file = f"{OUTPUT_BASE_PATH}/cover_letter{ext}"
             if os.path.exists(aux_file):
                 os.remove(aux_file)
-        
-        output_pdf_path = f"{os.getcwd()}{output_pdf_path}"
         return send_file(output_pdf_path, as_attachment=True, download_name="cover_letter.pdf", mimetype='application/pdf')
     except subprocess.CalledProcessError as e:
         return {"error": f"LaTeX compilation failed: {str(e)}"}, 500
