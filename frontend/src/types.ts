@@ -7,7 +7,7 @@ export const suppressMissingAttributes = {
 };
 
 // Exporting Types
-export type ApplicationStatus = "Applied" | "Interview" | "Offer" | "Rejected";
+export type ApplicationStatus = "Applied" | "Interview" | "Offer" | "Rejected" | "Interested";
 
 export interface RegisterFormData {
     email: string;

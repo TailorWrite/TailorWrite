@@ -3,10 +3,10 @@ import clsx from 'clsx'
 export interface BasicChipProps {
     className?: string;
     color: Color;
-    value: string
+    value: string | React.ReactNode
 }
 
-export type Color = 'blue' | 'yellow' | 'green' | 'red'; 
+export type Color = 'blue' | 'yellow' | 'green' | 'red' | 'gray'; 
 
 const BasicChip = ({ className, color, value }: BasicChipProps) => {
 
@@ -15,7 +15,7 @@ const BasicChip = ({ className, color, value }: BasicChipProps) => {
         yellow: 'bg-yellow-400/20  text-yellow-900  dark:bg-yellow-600/30  dark:text-yellow-400  dark:border-yellow-200/20',
         green:  'bg-green-500/20   text-green-900   dark:bg-green-600/30   dark:text-green-400   dark:border-green-200/20',
         red:    'bg-red-600/20     text-red-900     dark:bg-red-600/30     dark:text-red-400     dark:border-red-200/20',
-
+        gray:   'bg-gray-400/20    text-gray-900    dark:bg-gray-600/30    dark:text-gray-400    dark:border-gray-200/20'
     }
 
     return (

@@ -6,4 +6,5 @@ export const StatusMap: Record<ApplicationStatus, Color> = {
 	Interview: 'yellow',
 	Offer: 'green',
 	Rejected: 'red',
+	Interested: 'gray'
 }

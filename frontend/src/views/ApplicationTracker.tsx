@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
-import { Card, CardHeader, Input, Typography, Button, CardBody, CardFooter, Tabs, TabsHeader, Tab } from "@material-tailwind/react";
+import { Card, CardHeader, Input, Typography, Button, CardBody, /* CardFooter, */ Tabs, TabsHeader, Tab } from "@material-tailwind/react";
 import { MagnifyingGlassIcon, ChevronUpDownIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 
 import { ApplicationData, ApplicationStatus, suppressMissingAttributes } from "../types";
@@ -14,6 +14,7 @@ const FILTER_TABS = [
     { label: "Interview", value: "interview" },
     { label: "Rejected", value: "rejected" },
     { label: "Offer", value: "offer" },
+    { label: "Interested", value: "interested" },
 ];
 
 const TABLE_HEAD = ["Company", "Role", "Status", "Date", "Actions"];
@@ -23,6 +24,7 @@ const STATUS_MAP: Record<ApplicationStatus, Color> = {
     Interview: "yellow",
     Rejected: "red",
     Offer: "green",
+    Interested: "gray",
 };
 
 export default function ApplicationTracker() {
@@ -32,11 +34,11 @@ export default function ApplicationTracker() {
 
     const [filter, setFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => { setSearchTerm(e.target.value.toLowerCase()); setPage(1); }
-    const handleFilter = (value: string) => { setFilter(value); setPage(1); }
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => { setSearchTerm(e.target.value.toLowerCase()); /* setPage(1); */ }
+    const handleFilter = (value: string) => { setFilter(value); /* setPage(1); */ }
 
-    const recordsPerPage = 5;
-    const [page, setPage] = useState(1);
+    // const recordsPerPage = 5;
+    // const [page, setPage] = useState(1);
 
     const filteredApplications = allApplications.filter(({ job_title, company_name, status }) => {
         const isFilterMatch = filter === "all" || status.toLowerCase() === filter;
@@ -44,14 +46,15 @@ export default function ApplicationTracker() {
         return isFilterMatch && isSearchMatch;
     });
 
-    const pageCount = Math.ceil(filteredApplications.length / recordsPerPage);
-    const currentApplications = filteredApplications.slice((page - 1) * recordsPerPage, page * recordsPerPage);
+    // const pageCount = Math.ceil(filteredApplications.length / recordsPerPage);
+    const currentApplications = filteredApplications
+    // const currentApplications = filteredApplications.slice((page - 1) * recordsPerPage, page * recordsPerPage);
 
     const handleAddApplication = () => navigate('/dashboard/applications/new');
 
     return (
         <Card className="flex flex-col h-full shadow-none bg-transparent" {...suppressMissingAttributes}>
-            <CardHeader floated={false} shadow={false} className="rounded-none bg-transparent" {...suppressMissingAttributes}>
+            <CardHeader floated={false} shadow={false} className="pb-8 rounded-none bg-transparent" {...suppressMissingAttributes}>
                 <div className="mb-8 flex items-center justify-between gap-8 ">
                     <div>
                         <h3 className="mb-2 text-2xl font-bold dark:text-primaryDarkText">
@@ -98,9 +101,10 @@ export default function ApplicationTracker() {
                 </div>
             </CardHeader>
 
-            <CardBody className="px-0 flex-1 overflow-auto" {...suppressMissingAttributes} >
-                <table className="mt-4 w-full min-w-max table-auto text-left">
-                    <thead>
+            <CardBody className="px-0 pt-0 flex-1 overflow-auto" {...suppressMissingAttributes} >
+                <table className="w-full min-w-max table-auto text-left  dark:border-t-darkBorder">
+                    {/* bg-blue-gray-50 dark:bg-primaryDark dark:border-darkBorder */}
+                    <thead className="sticky top-0 z-10 "> 
                         <tr>
                             {TABLE_HEAD.map((head, index) => (
                                 <th
@@ -122,7 +126,7 @@ export default function ApplicationTracker() {
                             ))}
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="overflow-x-scroll">
                         {
                             currentApplications.map(
                                 ({ id, img, job_title, company_name, status, application_date }: ApplicationData, index) => {
@@ -193,7 +197,7 @@ export default function ApplicationTracker() {
                 </table>
             </CardBody>
 
-            <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 dark:border-darkBorder p-4" {...suppressMissingAttributes} >
+            {/* <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 dark:border-darkBorder p-4" {...suppressMissingAttributes} >
                 <Typography variant="small" color="blue-gray" className="font-normal dark:text-white" {...suppressMissingAttributes}>
                     Page {page} of {pageCount}
                 </Typography>
@@ -224,7 +228,7 @@ export default function ApplicationTracker() {
                         </div>
                     )
                 }
-            </CardFooter>
+            </CardFooter> */}
         </Card>
     );
 }

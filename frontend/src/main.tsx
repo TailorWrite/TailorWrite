@@ -60,6 +60,7 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <DashboardHome />,
+        loader: allApplicationLoader,
       },
       {
         path: PathConstants.APPLICATIONS,

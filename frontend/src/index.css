@@ -70,3 +70,7 @@ html.dark .shiki span {
 ::-webkit-scrollbar-resize {
     background: rgba(0, 0, 0, 0.5);
 }
+
+textarea {
+    field-sizing: normal;
+}

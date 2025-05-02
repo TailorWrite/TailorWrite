@@ -3,7 +3,7 @@
 # Running: docker-compose up -d
 # Stopping: docker-compose down
 
-name: tailorwrite
+name: tailorwrite-development
 
 # Include the docker-compose file for a locally hosted supabase database 
 # Reffer to https://github.com/JamesRobionyRogers/Assignment01-VirtualisingSoftware for more information
